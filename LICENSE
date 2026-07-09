@@ -1,0 +1,16 @@
+RSpice Proprietary Source License
+
+Copyright (c) 2026 RSpice. All rights reserved.
+
+This repository and its contents, except for third-party materials identified
+by their own license notices, are proprietary and confidential intellectual
+property of RSpice. No license is granted to copy, modify, distribute,
+sublicense, sell, or create derivative works from these materials without
+prior written permission from the copyright holder.
+
+Access to this repository or to the deployed website does not grant any patent,
+trademark, copyright, trade-secret, or other intellectual-property rights.
+
+Third-party materials remain governed exclusively by their respective license
+terms. In particular, bundled IBM Plex font files are covered by the SIL Open
+Font License included in assets/fonts/OFL-IBMPlex.txt.
