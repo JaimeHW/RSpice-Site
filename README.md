@@ -8,8 +8,8 @@ proprietary RSpice simulator and cloud-service source.
 
 This repository owns:
 
-- the marketing and documentation HTML pages at the repository root;
-- shared CSS, JavaScript, fonts, and images under `assets/`; and
+- the deployable marketing and documentation tree under `public/`;
+- shared CSS, JavaScript, fonts, and images under `public/assets/`; and
 - validation of local links, static assets, browser-safety invariants, and
   bounded product claims.
 
@@ -26,7 +26,7 @@ not built and tested from the same client revision.
 
 ## Making a change
 
-1. Edit the static pages or assets.
+1. Edit the static pages or assets under `public/`.
 2. Run `python tools/check_site.py` (Windows: `py tools\check_site.py`).
 3. Commit the change and open a pull request.
 4. After merge, dispatch the client repository's `Deploy site` workflow with

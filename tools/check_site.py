@@ -10,7 +10,8 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 
-ROOT = Path(__file__).resolve().parents[1]
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+ROOT = REPOSITORY_ROOT / "public"
 RUNTIME_ROUTES = {
     "/ide",
     "/ide/",
