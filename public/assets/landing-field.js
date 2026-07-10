@@ -8,113 +8,125 @@
   if (!context) return;
 
   var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  var contours = [];
-  var strokeGradient = null;
-  var width = 0;
-  var height = 0;
+  var width = 1;
+  var height = 1;
   var pixelRatio = 1;
   var animationFrame = 0;
   var previousFrame = 0;
+  var noisePattern = null;
   var pointer = {
-    x: 0,
-    y: 0,
-    targetX: 0,
-    targetY: 0,
+    x: 0.5,
+    y: 0.42,
+    targetX: 0.5,
+    targetY: 0.42,
     strength: 0,
     targetStrength: 0
   };
 
-  function seededRandom(seed) {
-    var state = seed >>> 0;
-    return function () {
+  function buildNoisePattern() {
+    var noise = document.createElement("canvas");
+    var size = 96;
+    var state = 912367;
+    noise.width = size;
+    noise.height = size;
+
+    var noiseContext = noise.getContext("2d");
+    if (!noiseContext) return null;
+
+    var image = noiseContext.createImageData(size, size);
+    for (var index = 0; index < image.data.length; index += 4) {
       state = (state * 1664525 + 1013904223) >>> 0;
-      return state / 4294967296;
-    };
+      var value = 205 + ((state >>> 24) % 51);
+      image.data[index] = value;
+      image.data[index + 1] = value;
+      image.data[index + 2] = value;
+      image.data[index + 3] = 18 + ((state >>> 17) % 28);
+    }
+    noiseContext.putImageData(image, 0, 0);
+    return context.createPattern(noise, "repeat");
   }
 
-  function rebuildContours() {
-    var random = seededRandom(Math.round(width) * 23 + Math.round(height) * 11 + 730201);
-    var count = width < 700 ? 9 : 14;
-    var usableHeight = height * 0.88;
-    contours = [];
+  function drawBloom(x, y, radiusX, radiusY, color, opacity) {
+    context.save();
+    context.translate(x, y);
+    context.scale(radiusX, radiusY);
 
-    for (var index = 0; index < count; index += 1) {
-      contours.push({
-        y: height * 0.06 + usableHeight * ((index + 0.5) / count),
-        amplitudeA: 3.5 + random() * 7,
-        amplitudeB: 1.5 + random() * 4,
-        frequencyA: Math.PI * 2 * (0.75 + random() * 0.8) / width,
-        frequencyB: Math.PI * 2 * (1.8 + random() * 1.4) / width,
-        phaseA: random() * Math.PI * 2,
-        phaseB: random() * Math.PI * 2,
-        speed: (random() - 0.5) * 0.000025,
-        opacity: index % 4 === 0 ? 0.13 : 0.075,
-        major: index % 4 === 0
-      });
+    var gradient = context.createRadialGradient(0, 0, 0, 0, 0, 1);
+    gradient.addColorStop(0, "rgba(" + color + ", " + opacity + ")");
+    gradient.addColorStop(0.34, "rgba(" + color + ", " + (opacity * 0.62) + ")");
+    gradient.addColorStop(0.72, "rgba(" + color + ", " + (opacity * 0.16) + ")");
+    gradient.addColorStop(1, "rgba(" + color + ", 0)");
+    context.fillStyle = gradient;
+    context.fillRect(-1, -1, 2, 2);
+    context.restore();
+  }
+
+  function draw(timestamp) {
+    var phase = timestamp * 0.000025;
+    pointer.x += (pointer.targetX - pointer.x) * 0.035;
+    pointer.y += (pointer.targetY - pointer.y) * 0.035;
+    pointer.strength += (pointer.targetStrength - pointer.strength) * 0.045;
+
+    context.clearRect(0, 0, width, height);
+
+    drawBloom(
+      width * (0.12 + Math.sin(phase) * 0.025 + (pointer.x - 0.5) * 0.018),
+      height * (0.12 + Math.cos(phase * 0.82) * 0.025),
+      Math.max(width * 0.64, 540),
+      Math.max(height * 0.68, 430),
+      "34, 135, 128",
+      0.075
+    );
+
+    drawBloom(
+      width * (0.92 + Math.cos(phase * 0.73) * 0.022 + (pointer.x - 0.5) * 0.012),
+      height * (0.46 + Math.sin(phase * 0.64) * 0.03),
+      Math.max(width * 0.55, 500),
+      Math.max(height * 0.74, 520),
+      "77, 85, 161",
+      0.052
+    );
+
+    drawBloom(
+      width * (0.48 + Math.sin(phase * 0.41) * 0.02),
+      height * 1.04,
+      Math.max(width * 0.72, 620),
+      Math.max(height * 0.55, 390),
+      "176, 118, 52",
+      0.025
+    );
+
+    if (pointer.strength > 0.002) {
+      drawBloom(
+        pointer.x * width,
+        pointer.y * height,
+        Math.max(width * 0.3, 310),
+        Math.max(height * 0.46, 310),
+        "68, 155, 145",
+        0.018 * pointer.strength
+      );
     }
 
-    strokeGradient = context.createLinearGradient(0, 0, width, 0);
-    strokeGradient.addColorStop(0, "rgba(152, 165, 171, 0)");
-    strokeGradient.addColorStop(0.1, "rgba(152, 165, 171, 0.42)");
-    strokeGradient.addColorStop(0.5, "rgba(166, 177, 182, 0.62)");
-    strokeGradient.addColorStop(0.9, "rgba(152, 165, 171, 0.42)");
-    strokeGradient.addColorStop(1, "rgba(152, 165, 171, 0)");
+    if (noisePattern) {
+      context.save();
+      context.globalAlpha = 0.027;
+      context.fillStyle = noisePattern;
+      context.fillRect(0, 0, width, height);
+      context.restore();
+    }
   }
 
   function resize() {
     width = Math.max(1, window.innerWidth);
     height = Math.max(1, window.innerHeight);
-    pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+    pixelRatio = Math.min(window.devicePixelRatio || 1, 1.35);
     canvas.width = Math.round(width * pixelRatio);
     canvas.height = Math.round(height * pixelRatio);
     canvas.style.width = width + "px";
     canvas.style.height = height + "px";
     context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    pointer.x = pointer.targetX = width * 0.5;
-    pointer.y = pointer.targetY = height * 0.44;
-    rebuildContours();
-    draw(performance.now());
-  }
-
-  function contourY(contour, x, timestamp) {
-    var phase = timestamp * contour.speed;
-    var y = contour.y
-      + Math.sin(x * contour.frequencyA + contour.phaseA + phase) * contour.amplitudeA
-      + Math.sin(x * contour.frequencyB + contour.phaseB - phase * 0.58) * contour.amplitudeB;
-
-    if (pointer.strength > 0.001) {
-      var radiusX = Math.max(190, width * 0.17);
-      var radiusY = 155;
-      var distanceX = (x - pointer.x) / radiusX;
-      var distanceY = (y - pointer.y) / radiusY;
-      var influence = Math.exp(-(distanceX * distanceX * 2.2 + distanceY * distanceY * 1.35));
-      var direction = y >= pointer.y ? 1 : -1;
-      y += direction * influence * 8 * pointer.strength;
-    }
-
-    return y;
-  }
-
-  function draw(timestamp) {
-    context.clearRect(0, 0, width, height);
-    pointer.x += (pointer.targetX - pointer.x) * 0.06;
-    pointer.y += (pointer.targetY - pointer.y) * 0.06;
-    pointer.strength += (pointer.targetStrength - pointer.strength) * 0.055;
-    context.strokeStyle = strokeGradient;
-
-    contours.forEach(function (contour) {
-      context.beginPath();
-      for (var x = -8; x <= width + 8; x += 8) {
-        var y = contourY(contour, x, timestamp);
-        if (x === -8) context.moveTo(x, y);
-        else context.lineTo(x, y);
-      }
-      context.globalAlpha = contour.opacity;
-      context.lineWidth = contour.major ? 0.9 : 0.65;
-      context.stroke();
-    });
-
-    context.globalAlpha = 1;
+    noisePattern = buildNoisePattern();
+    draw(reducedMotion.matches ? 0 : performance.now());
   }
 
   function animate(timestamp) {
@@ -137,8 +149,8 @@
   }
 
   window.addEventListener("pointermove", function (event) {
-    pointer.targetX = event.clientX;
-    pointer.targetY = event.clientY;
+    pointer.targetX = event.clientX / Math.max(1, width);
+    pointer.targetY = event.clientY / Math.max(1, height);
     pointer.targetStrength = event.pointerType === "touch" ? 0 : 1;
   }, { passive: true });
   window.addEventListener("pointerleave", function () {
