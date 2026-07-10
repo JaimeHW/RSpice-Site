@@ -502,7 +502,9 @@ body {
 }
 
 body::before {
-  background: #090b0d;
+  background:
+    radial-gradient(ellipse 96% 68% at 50% -18%, rgba(74, 82, 86, 0.18), transparent 62%),
+    linear-gradient(180deg, #0c0f11 0%, #090b0d 76%);
 }
 
 .landing-field {
@@ -511,6 +513,7 @@ body::before {
   inset: 0;
   width: 100%;
   height: 100%;
+  opacity: 0.82;
   pointer-events: none;
 }
 
@@ -804,6 +807,6 @@ main,
 
 @media (prefers-reduced-motion: reduce) {
   .landing-field {
-    opacity: 0.72;
+    opacity: 0.58;
   }
 }
