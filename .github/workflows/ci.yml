@@ -13,14 +13,35 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  validate:
-    name: Validate static source
+  build:
+    name: Validate and build static site
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Checkout Workbench mockup
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: JaimeHW/RSpice
+          path: rspice-source
+          token: ${{ secrets.RSPICE_SOURCE_TOKEN || github.token }}
+          sparse-checkout: |
+            mockups/rspice-workbench-host/public/rspice
+            mockups/rspice-workbench-host/public/crates/rspice-ui/assets/fonts
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.14"
-      - name: Validate pages, assets, and public claims
-        run: python tools/check_site.py
+      - name: Validate source
+        run: python tools/check_site.py --root public
+      - name: Build deployable tree
+        run: python tools/build_site.py --out dist --workbench-source rspice-source/mockups/rspice-workbench-host/public/rspice
+      - name: Validate deployable tree
+        run: python tools/check_site.py --root dist
+      - name: Upload deployable site
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rspice-static-site
+          path: dist/
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 14

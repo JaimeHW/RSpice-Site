@@ -1,7 +1,7 @@
 # RSpice Site
 
-This repository contains the public, static marketing and documentation source
-for [rspice.app](https://rspice.app). It is deliberately separate from the
+This repository contains the public static website for
+[rspice.app](https://rspice.app). It is deliberately separate from the
 proprietary RSpice simulator and cloud-service source.
 
 ## Repository boundary
@@ -9,29 +9,90 @@ proprietary RSpice simulator and cloud-service source.
 This repository owns:
 
 - the deployable marketing and documentation tree under `public/`;
-- shared CSS, JavaScript, fonts, and images under `public/assets/`; and
-- validation of local links, static assets, browser-safety invariants, and
-  bounded product claims.
+- shared CSS, JavaScript, fonts, images, crawler metadata, and Cloudflare Pages
+  headers under `public/`; and
+- deterministic validation and static assembly under `tools/`.
+
+The `/workbench/` route is deliberately not copied into `public/`. The builder
+overlays the existing RSpice Workbench mockup from
+`mockups/rspice-workbench-host/public/rspice` at build time. The marketing page
+embeds that real HTML surface in a non-interactive frame; it never substitutes a
+screenshot or a hand-maintained imitation. The Workbench source itself is not
+redesigned or edited here; the assembled artifact only remaps its relative brand
+and font URLs so the existing UI can run from `/workbench/`.
 
 It does **not** own the browser simulator runtime. The `/ide/` and `/play/`
-routes, including their WebAssembly bundles and workers, are built from the
-private RSpice client repository. Its release workflow checks out an explicit
-commit from this repository, overlays the verified browser runtime, records
-both source revisions in `build.json`, runs browser smoke tests, and only then
-publishes the assembled site.
+routes, including their WebAssembly bundles and workers, are reserved for the
+private RSpice client repository. Its release workflow overlays a verified
+browser runtime on the website artifact, records both source revisions in
+`build.json`, runs browser smoke tests, and only then publishes the assembled
+site.
 
-Keeping that assembly in the client release pipeline ensures the website can
-never publish a browser UI whose JavaScript worker and WebAssembly exports were
-not built and tested from the same client revision.
+Keeping that assembly in the client release pipeline prevents the website from
+publishing a browser UI whose JavaScript worker and WebAssembly exports were
+built from a different client revision.
 
-## Making a change
+## Validate and build
 
-1. Edit the static pages or assets under `public/`.
-2. Run `python tools/check_site.py` (Windows: `py tools\check_site.py`).
-3. Commit the change and open a pull request.
-4. After merge, dispatch the client repository's `Deploy site` workflow with
-   the desired site commit or tag.
-5. Verify `https://rspice.app/build.json` reports both the expected
+The tooling uses only the Python standard library. Python 3.10 or newer is
+recommended.
+
+Validate the editable source tree:
+
+```shell
+python tools/check_site.py --root public
+```
+
+On Windows, `py` can be used in place of `python`. Validation covers every HTML
+file recursively, local links and fragments, responsive/SEO metadata,
+accessibility basics, URL safety, deployment metadata, and the `/ide/`,
+`/play/`, and `/workbench/` overlay boundaries.
+
+Build a clean deployable copy in `dist/`. By default the builder expects the
+sibling `../RSpice` checkout used by this workspace:
+
+```shell
+python tools/build_site.py
+```
+
+When the RSpice checkout lives elsewhere, pass the existing mockup-host source:
+
+```shell
+python tools/build_site.py --workbench-source ../RSpice/mockups/rspice-workbench-host/public/rspice
+```
+
+Choose another repository-local output directory when needed:
+
+```shell
+python tools/build_site.py --out build/site
+```
+
+The build validates `public/`, replaces the selected output with an exact copy,
+overlays the existing Workbench UI and its bundled fonts at `/workbench/`,
+rewrites only deployment-relative brand/font paths in that output copy, and
+validates the resulting artifact again. It refuses destinations outside the
+repository, inside `public/`, or overlapping repository metadata and tooling.
+
+## Continuous integration and deployment
+
+Every pull request and push to `main` uses a sparse RSpice checkout for the
+Workbench mockup, validates the source, builds `dist/`, validates the resulting
+tree, and uploads it as the `rspice-static-site` workflow artifact. The artifact
+includes dotfiles, the Workbench overlay, and the Cloudflare Pages `_headers`
+file.
+
+When `JaimeHW/RSpice` is private, configure this repository's
+`RSPICE_SOURCE_TOKEN` Actions secret with read-only access to that repository.
+The workflow falls back to its normal token for a public source repository.
+
+After a change merges:
+
+1. Download or consume the successful `rspice-static-site` artifact.
+2. Dispatch the private client repository's `Deploy site` workflow with the
+   desired site commit or tag.
+3. Let that workflow overlay the matching `/ide/` and `/play/` runtime files and
+   deploy the assembled tree.
+4. Verify `https://rspice.app/build.json` reports the expected
    `client_source_sha` and `site_source_sha`.
 
 The site repository never contains deployment credentials, generated
@@ -49,4 +110,4 @@ subtree. Its extraction was verified against RSpice client commit
 
 The RSpice website source and content are proprietary and all rights are
 reserved. Bundled fonts retain the license included beside them under
-`assets/fonts/`.
+`public/assets/fonts/`.
