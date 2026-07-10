@@ -43,6 +43,7 @@
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
+  <canvas class="landing-field" data-landing-field aria-hidden="true"></canvas>
 
   <header class="topbar" data-topbar>
     <div class="topbar__inner">
@@ -90,13 +91,13 @@
           </div>
         </div>
         <div class="workbench__shell" id="product">
-          <div class="workbench__toolbar"><span>STATIC WORKBENCH SPECIMEN / NON-INTERACTIVE</span><span>RESPONSIVE-PREVIEW STYLE / GUI REVAMP IN PROGRESS</span></div>
+          <div class="workbench__toolbar"><span>STATIC WORKBENCH SPECIMEN / NON-INTERACTIVE</span><span>1440 × 900 SOURCE SURFACE / AUTO-FIT</span></div>
           <figure class="workbench__screen">
             <div class="workbench__screen-frame">
-              <iframe src="workbench/responsive-preview.html" title="Non-interactive RSpice Workbench responsive preview" sandbox="allow-scripts allow-same-origin" tabindex="-1"></iframe>
+              <iframe src="workbench-frame.html" title="Non-interactive RSpice Workbench GUI" sandbox="allow-scripts allow-same-origin" tabindex="-1"></iframe>
               <span class="workbench__screen-blocker" aria-hidden="true"></span>
             </div>
-            <figcaption><span>Design: hierarchy, schematic capture, checks, local run context, and inspection in one deliberate shell. This is a rendered interaction concept—not a released product screen.</span><span>FIG. 01 / STATIC CONCEPT</span></figcaption>
+            <figcaption><span>Design: hierarchy, schematic capture, checks, local run context, and inspection in one deliberate shell. This is the current GUI mockup rendered at its native source dimensions—not a screenshot or a released product screen.</span><span>FIG. 01 / LIVE MOCKUP SURFACE</span></figcaption>
           </figure>
         </div>
       </div>
@@ -152,18 +153,29 @@
         </figure>
         </div>
         <div class="analyses__layout">
-        <div class="analysis-board">
-          <div class="analysis-board__head"><span>FAMILY</span><span>ENGINE PATH</span><span>NOTES</span></div>
-          <article><div><code>01</code><h3>Bias / sweep</h3></div><p><code>.OP</code> <code>.DC</code> <code>.STEP</code> <code>.TF</code> <code>.SENS</code></p><small>Operating points, parameter families, transfer and sensitivity.</small></article>
-          <article><div><code>02</code><h3>Time / frequency</h3></div><p><code>.TRAN</code> <code>.AC</code> <code>.NOISE</code> <code>.PZ</code> <code>.FOUR</code></p><small>Adaptive transient and small-signal paths with result-specific viewers.</small></article>
-          <article><div><code>03</code><h3>Statistical</h3></div><p><code>MC</code> <code>PVT</code> <code>.MEAS</code> <code>COMPARE</code></p><small>Seeded variation, corners, threshold gating, and regression evidence.</small></article>
-          <article><div><code>04</code><h3>RF / periodic</h3></div><p><code>HB</code> <code>PSS</code> <code>STB</code> <code>S</code></p><small>Selected engine and CLI paths; use the capability status in the product surface.</small></article>
+          <div class="analysis-board" role="table" aria-label="RSpice analysis support matrix">
+            <div class="analysis-board__head" role="row"><span role="columnheader">FAMILY</span><span role="columnheader">COMMAND / ROUTE</span><span role="columnheader">ENGINE BEHAVIOR</span><span role="columnheader">STATUS</span></div>
+            <article role="row"><div role="cell"><code>01</code><h3>Operating point &amp; sweeps</h3></div><p class="analysis-path" role="cell"><code>.OP</code> <code>.DC</code> <code>.STEP</code> <code>.TEMP</code> <code>.TF</code> <code>.SENS</code></p><small role="cell">Solves the nonlinear bias state, including nested two-source DC sweeps, temperature and parameter families, transfer functions, and small-signal sensitivity.</small><span class="analysis-status analysis-status--core" role="cell">CORE</span></article>
+            <article role="row"><div role="cell"><code>02</code><h3>Transient &amp; spectral</h3></div><p class="analysis-path" role="cell"><code>.TRAN</code> <code>.FOUR</code> <code>THD</code> <code>IMD</code></p><small role="cell">LTE-controlled adaptive timestepping with checkpoint/resume segmentation, followed by Fourier, distortion, eye-diagram, and jitter post-processing paths.</small><span class="analysis-status analysis-status--core" role="cell">CORE</span></article>
+            <article role="row"><div role="cell"><code>03</code><h3>Linear frequency domain</h3></div><p class="analysis-path" role="cell"><code>.AC</code> <code>.NOISE</code> <code>.PZ</code></p><small role="cell">Complex small-signal sweeps, input/output-referred noise, and pole-zero extraction over the elaborated device and model graph.</small><span class="analysis-status analysis-status--core" role="cell">CORE</span></article>
+            <article role="row"><div role="cell"><code>04</code><h3>Measurement &amp; verification</h3></div><p class="analysis-path" role="cell"><code>.MEAS</code> <code>GOAL</code> <code>TOL</code> <code>COMPARE</code></p><small role="cell">Measures TRAN, DC, AC, and NOISE results; gates runs against tolerances; compares golden data; and emits machine-readable pass/fail evidence.</small><span class="analysis-status analysis-status--core" role="cell">CORE</span></article>
+            <article role="row"><div role="cell"><code>05</code><h3>Statistical &amp; corners</h3></div><p class="analysis-path" role="cell"><code>.MC</code> <code>--monte-carlo</code> <code>--corners</code></p><small role="cell">Runs seeded operating-point parameter variation and process-corner campaigns. Exposure currently spans selected deck, CLI, and IDE paths rather than one uniform surface.</small><span class="analysis-status analysis-status--selected" role="cell">SELECTED</span></article>
+            <article role="row"><div role="cell"><code>06</code><h3>Periodic &amp; RF</h3></div><p class="analysis-path" role="cell"><code>PSS</code> <code>HB</code> <code>.STB</code> <code>S-PARAM</code></p><small role="cell">Includes shooting PSS, harmonic balance, stability, and two-port S-parameter paths with Touchstone export. Availability is analysis- and interface-specific.</small><span class="analysis-status analysis-status--selected" role="cell">SELECTED</span></article>
+            <article role="row"><div role="cell"><code>07</code><h3>Advanced analysis boundary</h3></div><p class="analysis-path" role="cell"><code>PAC</code> <code>PNOISE</code> <code>PXF</code> <code>PSTB</code> <code>ENV</code> <code>.DISTO</code></p><small role="cell">Conversion-matrix, monodromy, envelope, and multirate mathematics exist below the product layer. They do not yet have complete circuit extraction; <code>.DISTO</code> currently maps to AC rather than a Volterra engine.</small><span class="analysis-status analysis-status--partial" role="cell">KERNEL / PARTIAL</span></article>
+          </div>
         </div>
-        <aside class="analysis-note">
-          <span class="analysis-note__label">MODEL SURFACE / DEVICE ATLAS</span>
-          <p>BSIM4 / BSIM3 / EKV / VDMOS<br>Gummel-Poon / VBIC / HICUM<br>JFET / HEMT / GaN<br>Transmission lines / magnetics<br>XSPICE-style mixed signal<br>Compiled Verilog-A</p>
-          <a href="docs.html">Read the current technical scope <span aria-hidden="true">↗</span></a>
-        </aside>
+
+        <div class="capability-ledger" aria-labelledby="capability-ledger-title">
+          <div class="capability-ledger__head"><h3 id="capability-ledger-title">FEATURE SURFACE / IMPLEMENTED ENGINE CONTRACT</h3><span>DEVICE → DECK → SOLVE → EVIDENCE → EXPORT</span></div>
+          <div class="capability-ledger__grid">
+            <article><span>01 / SEMICONDUCTOR MODELS</span><h3>MOS and bipolar families</h3><p>Native and generated model paths cover common discrete, IC, and advanced compact-model workflows, with unsupported physics rejected explicitly.</p><ul><li>BSIM4 v4.8, BSIM3v3.3, VDMOS, EKV3, MOS1/2/3/6, BSIM1/2</li><li>Generated BSIM-SOI and EKV 2.6 built-ins where sources are bundled</li><li>Gummel-Poon plus generated VBIC, HICUM, and MEXTRAM where sources are bundled</li></ul></article>
+            <article><span>02 / DEVICES &amp; INTERCONNECT</span><h3>Junctions, magnetics, and lines</h3><p>The device graph extends beyond transistor primitives to the components needed for power, interconnect, and board-level decks.</p><ul><li>Diode, JFET/JFET2, MES/MESA/HFET families, and GaN HEMT</li><li>Temperature-aware R/C/L, coupled and multi-winding transformers</li><li>Jiles–Atherton saturable inductors; ideal, LTRA, TXL, and CPL lines</li></ul></article>
+            <article><span>03 / SOURCES &amp; MIXED SIGNAL</span><h3>Stimulus and behavioral glue</h3><p>Source and bridge models support realistic stimulus construction and mixed-domain test benches without hiding unsupported behavior.</p><ul><li>PULSE, SIN, EXP, PWL, SFFM, AM, TRNOISE, and PWL file sources</li><li>E/F/G/H controlled and B behavioral sources; controlled switches</li><li>XSPICE-style analog/digital elements, tri-state drivers, and A/D–D/A bridges</li></ul></article>
+            <article><span>04 / DECK &amp; MODEL PIPELINE</span><h3>Elaboration with provenance</h3><p>RSpice resolves the circuit before solving it, preserving the cards, parameters, libraries, and model origin that produced a result.</p><ul><li><code>.SUBCKT</code>, <code>.PARAM</code>, expressions, <code>.INCLUDE</code>, and <code>.LIB</code></li><li><code>.OPTIONS</code>, <code>.TEMP</code>, engineering suffixes, and flattened elaboration</li><li>Verilog-A parser, semantic IR, bytecode VM, native JIT, and generated-Rust backends</li></ul></article>
+            <article><span>05 / AUTOMATION &amp; VALIDATION</span><h3>Runs that can fail a pipeline</h3><p>The CLI treats validity and comparison as contracts, not console decoration, so automated characterization can stop on a bad answer.</p><ul><li><code>run</code>, <code>info</code>, <code>check</code>, <code>compare</code>, <code>convert</code>, and <code>compile-va</code></li><li>Typed exit codes, timeouts, JUnit, TAP, JSON summaries, and measurement files</li><li>ngspice and Xyce corpus harnesses with explicit oracles and failure tracking</li></ul></article>
+            <article><span>06 / INTERFACES &amp; DATA</span><h3>One engine, several controlled surfaces</h3><p>Native and programmatic interfaces share the same simulation core while exposing only the analyses appropriate to each target.</p><ul><li>egui/wgpu desktop Workbench, CLI, Python/NumPy, and WebAssembly bindings</li><li>SPICE RAW, ASCII RAW, CSV, TSV, JSON, HDF5, and Touchstone output</li><li>Native desktop is the primary target; browser support is experimental and mobile UI remains a design target</li></ul></article>
+          </div>
+          <a class="capability-ledger__link" href="docs.html">Read the revision-specific technical scope and limitations <span aria-hidden="true">↗</span></a>
         </div>
       </div>
     </section>
@@ -288,6 +300,7 @@
     <div class="page-frame footer__base"><span>© <span data-year>2026</span> RSpice</span><span>LOCAL FIRST / CONNECTED WHEN READY</span><span>IBM Plex under SIL OFL</span></div>
   </footer>
 
+  <script src="assets/landing-field.js" defer></script>
   <script src="assets/field.js" defer></script>
 </body>
 </html>

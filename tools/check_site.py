@@ -305,6 +305,7 @@ class SiteValidator:
             self.parse_page(path)
         for page in self.pages.values():
             self.validate_page(page)
+        self.validate_workbench_embed()
         for page in self.pages.values():
             for reference in page.parser.references:
                 self.validate_reference(reference)
@@ -867,6 +868,78 @@ class SiteValidator:
                         f"shared/landing JavaScript must not use {label}; use safe DOM APIs",
                         line,
                     )
+
+    def validate_workbench_embed(self) -> None:
+        """Keep the landing specimen coupled to the GUI, not the preview lab."""
+        homepage = self.pages.get((self.root / "index.html").resolve())
+        wrapper = self.pages.get((self.root / "workbench-frame.html").resolve())
+        if not homepage:
+            return
+        if not wrapper:
+            self.error(
+                homepage.path,
+                "homepage Workbench embed requires workbench-frame.html",
+            )
+            return
+
+        homepage_frames = [
+            node for node in homepage.parser.elements if node.tag == "iframe"
+        ]
+        wrapper_frames = [
+            node for node in wrapper.parser.elements if node.tag == "iframe"
+        ]
+
+        for page, frames in (
+            (homepage, homepage_frames),
+            (wrapper, wrapper_frames),
+        ):
+            for node in frames:
+                source = (node.attrs.get("src") or "").lower()
+                if "responsive-preview.html" in source:
+                    self.error(
+                        page.path,
+                        "landing Workbench must render the GUI directly, not responsive-preview.html",
+                        node.line,
+                    )
+
+        landing_surface = [
+            node
+            for node in homepage_frames
+            if posixpath.normpath(urlsplit(node.attrs.get("src") or "").path)
+            == "workbench-frame.html"
+        ]
+        if len(landing_surface) != 1:
+            self.error(
+                homepage.path,
+                "homepage must contain exactly one Workbench iframe using workbench-frame.html",
+            )
+        else:
+            surface = landing_surface[0]
+            sandbox = set((surface.attrs.get("sandbox") or "").lower().split())
+            if sandbox != {"allow-scripts", "allow-same-origin"}:
+                self.error(
+                    homepage.path,
+                    "Workbench iframe sandbox must contain only allow-scripts and allow-same-origin",
+                    surface.line,
+                )
+            if (surface.attrs.get("tabindex") or "").strip() != "-1":
+                self.error(
+                    homepage.path,
+                    "Workbench iframe must be removed from keyboard navigation",
+                    surface.line,
+                )
+
+        gui_frames = [
+            node
+            for node in wrapper_frames
+            if posixpath.normpath(urlsplit(node.attrs.get("src") or "").path)
+            == "workbench/index.html"
+        ]
+        if len(gui_frames) != 1:
+            self.error(
+                wrapper.path,
+                "workbench-frame.html must contain exactly one iframe using workbench/index.html",
+            )
 
     def validate_reserved_routes(self) -> None:
         if self.root != DEFAULT_ROOT.resolve():

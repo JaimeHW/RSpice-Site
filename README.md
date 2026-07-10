@@ -17,7 +17,10 @@ The `/workbench/` route under `public/` is a generated vendor snapshot of the
 existing RSpice Workbench mockup from
 `mockups/rspice-workbench-host/public/rspice`. The marketing page embeds that
 real HTML surface in a non-interactive frame; it never substitutes a screenshot
-or a hand-maintained imitation. Refresh the snapshot with
+or a hand-maintained imitation. The site-owned `workbench-frame.html` wrapper
+auto-fits the fixed desktop GUI from `/workbench/index.html`; the standalone
+`responsive-preview.html` lab and its viewport controls are not embedded in the
+landing page. Refresh the snapshot with
 `python tools/sync_workbench.py`. CI verifies that the checked-in snapshot still
 matches the simulator source, and the deploy build overlays the current source
 again before publishing.
