@@ -6,15 +6,16 @@
   <meta name="theme-color" content="#071015">
   <meta name="color-scheme" content="dark">
   <title>Development record &mdash; RSpice</title>
-  <meta name="description" content="The source-backed RSpice development record and the boundary between active work, planned services, and future release notes.">
+  <meta name="description" content="Current RSpice source status, active implementation areas, Workbench redesign status, and release requirements.">
   <link rel="canonical" href="https://rspice.app/changelog">
   <link rel="icon" href="assets/brand/rspice.ico" sizes="any">
   <link rel="apple-touch-icon" href="assets/brand/icon-256.png">
   <link rel="stylesheet" href="assets/field.css">
   <link rel="stylesheet" href="assets/technical.css">
+  <link rel="stylesheet" href="assets/interior-refined.css">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Development record &mdash; RSpice">
-  <meta property="og:description" content="A source-backed development record for RSpice, without invented public releases.">
+  <meta property="og:description" content="Current source status and active implementation areas for RSpice.">
   <meta property="og:image" content="https://rspice.app/assets/og.png">
 </head>
 <body class="technical-page">
@@ -25,9 +26,9 @@
       <a class="identity" href="index.html" aria-label="RSpice home"><img src="assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a>
       <button class="nav-trigger" type="button" aria-controls="site-nav" aria-expanded="false" data-nav-trigger><span class="visually-hidden">Open navigation</span><span aria-hidden="true"></span><span aria-hidden="true"></span></button>
       <nav class="site-nav" id="site-nav" aria-label="Primary navigation" data-site-nav>
-        <a href="index.html#engine">Engine</a><a href="index.html#analyses">Analyses</a><a href="index.html#truth">Product truth</a><a href="index.html#roadmap">Roadmap</a><a href="index.html#pricing">Planned pricing</a><a href="docs.html">Docs</a>
+        <a href="index.html#engine">Engine</a><a href="index.html#analyses">Analyses</a><a href="index.html#truth">Status</a><a href="index.html#roadmap">Hosted roadmap</a><a href="index.html#pricing">Licensing</a><a href="docs.html">Docs</a>
       </nav>
-      <div class="topbar__actions"><a class="source-link" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a><a class="launch-link" href="ide/">Open web lab <span class="launch-link__tag">preview</span></a></div>
+      <div class="topbar__actions"><a class="source-link" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a><a class="launch-link" href="ide/">Open WASM lab <span class="launch-link__tag">experimental</span></a></div>
     </div>
   </header>
 
@@ -36,8 +37,8 @@
       <div class="page-frame technical-hero__grid">
         <div>
           <p class="eyebrow">RSPICE / DEVELOPMENT RECORD</p>
-          <h1>Development activity is not a release announcement.</h1>
-          <p class="technical-hero__lede">RSpice has active source work, but no signed public production release or reliable public release cadence to advertise yet. This page names the current engineering tracks and points to the versioned source history instead of fabricating version numbers.</p>
+          <h1>Current source status and active implementation areas.</h1>
+          <p class="technical-hero__lede">The workspace reports version 0.1.0 and does not publish signed installer releases. Repository commits and tags are the current change record.</p>
         </div>
         <dl class="technical-hero__ledger" aria-label="Development record status">
           <div><dt>PUBLIC RELEASE</dt><dd>Not published</dd></div>
@@ -51,54 +52,54 @@
     <div class="page-frame technical-layout">
       <aside class="technical-index" aria-label="Development record sections">
         <p>ON THIS PAGE</p>
-        <a href="#record">Current record</a><a href="#tracks">Engineering tracks</a><a href="#ui">Workbench revamp</a><a href="#release">Release discipline</a><a href="#history">Source history</a>
+        <a href="#record">Current source status</a><a href="#tracks">Implementation areas</a><a href="#ui">Workbench implementation</a><a href="#release">Release requirements</a><a href="#history">Commit history</a>
       </aside>
 
       <article class="technical-document">
         <section class="technical-section" id="record">
-          <p class="technical-number">01 / CURRENT RECORD</p>
-          <h2>Use the revision you are evaluating as the record.</h2>
-          <p>The workspace manifest currently identifies the source as version <code>0.1.0</code>. That metadata is not being presented as a finished commercial release. A specific commit, its test output, its target platform, and its documented limitations are the meaningful unit of evaluation.</p>
-          <div class="technical-callout"><strong>NO FICTION</strong><span>There are no public v1.0.0 or v0.9.0 product releases on this site. No static release count, benchmark total, or validation percentage should be treated as current unless it is attached to a reproducible source revision and CI artifact.</span></div>
+          <p class="technical-number">01 / CURRENT SOURCE STATUS</p>
+          <h2>Source metadata is 0.1.0; no signed installer release exists.</h2>
+          <p>Use the exact source commit, test output, target platform, model bundle, and documented limitations when comparing revisions.</p>
+          <div class="technical-callout"><strong>RECENT SOURCE FOCUS / 2026-07-10</strong><span>Recent commits concentrate on tiered generated Verilog-A kernels, sparse local-kernel size limits, and parallel Rust code generation. The linked commit history remains authoritative as work continues.</span></div>
         </section>
 
         <section class="technical-section" id="tracks">
-          <p class="technical-number">02 / ENGINEERING TRACKS</p>
-          <h2>Active work is organized around the simulation contract.</h2>
+          <p class="technical-number">02 / IMPLEMENTATION AREAS</p>
+          <h2>Current implementation areas.</h2>
           <div class="technical-grid technical-grid--three">
-            <article><span><span class="technical-pill">SOURCE PATH</span></span><h3>Core simulation</h3><p>SPICE-compatible elaboration, modified nodal analysis, device evaluation, sparse solve paths, and analysis dispatch remain the core engineering surface.</p></article>
-            <article><span><span class="technical-pill">SOURCE PATH</span></span><h3>Automation &amp; evidence</h3><p>CLI controls, Python bindings, comparison tools, machine-readable reports, and corpus harnesses support repeatable evaluation.</p></article>
-            <article><span><span class="technical-pill technical-pill--warning">UNDER REVAMP</span></span><h3>Graphical workflow</h3><p>The native GUI is being reshaped around a clearer workbench model for design, simulation, results, and review.</p></article>
+            <article><span><span class="technical-pill">SOURCE PATH</span></span><h3>Core simulation</h3><p>Netlist elaboration, modified nodal analysis, device evaluation, sparse solvers, and analysis dispatch.</p></article>
+            <article><span><span class="technical-pill">SOURCE PATH</span></span><h3>Automation &amp; validation</h3><p>CLI commands, Python bindings, result conversion, golden comparison, machine-readable reports, and corpus harnesses.</p></article>
+            <article><span><span class="technical-pill technical-pill--warning">UNDER REVAMP</span></span><h3>Workbench GUI</h3><p>The current HTML mockup defines layouts for design, simulation, results, verification, models, and project management.</p></article>
           </div>
-          <p>Advanced model support, periodic/RF paths, behavioral modeling, and host surfaces can move at different speeds. The source documentation is intentionally more specific than this page where a feature has a concrete contract.</p>
+          <p>Compact-model generation, periodic/RF analyses, behavioral models, and host interfaces are versioned independently. See the source README for implementation-specific limitations.</p>
         </section>
 
         <section class="technical-section" id="ui">
-          <p class="technical-number">03 / WORKBENCH REVAMP</p>
-          <h2>The new GUI is a design instrument, not a screenshot campaign.</h2>
-          <p>The existing Workbench mockup is the active interaction model for the GUI redesign. On the home page, RSpice renders that mockup directly as a non-interactive surface, including its responsive preview shell, so the site does not pretend a static image or hand-made duplicate is the product UI.</p>
+          <p class="technical-number">03 / WORKBENCH IMPLEMENTATION</p>
+          <h2>The Workbench mockup defines the current GUI layout.</h2>
+          <p>The home page renders the fixed 1440 × 900 Workbench HTML directly through an auto-fit frame. It does not embed the responsive-preview controls and does not use a screenshot.</p>
           <div class="technical-grid">
-            <article><span>NOW</span><h3>Interaction concept</h3><p>Hierarchy, schematic capture, checks, run context, inspection, results, and responsive shells are shown as a high-fidelity mockup.</p></article>
-            <article><span>NEXT</span><h3>Implementation evidence</h3><p>The native and browser hosts need measured behavior, input/output contracts, accessibility, and production validation before the concept can be called a released workbench.</p></article>
+            <article><span>MOCKUP</span><h3>Defined layouts</h3><p>Hierarchy, schematic capture, checks, run configuration, property inspection, results, and desktop, tablet, or phone compositions.</p></article>
+            <article><span>IMPLEMENTATION</span><h3>Remaining qualification</h3><p>The native and browser hosts still require feature wiring, accessibility testing, performance measurements, persistence, and release packaging.</p></article>
           </div>
           <div class="technical-actions"><a class="button button--hot" href="index.html#product">Inspect Workbench concept</a><a class="button button--quiet" href="docs.html#interfaces">Read interface boundary</a></div>
         </section>
 
         <section class="technical-section" id="release">
-          <p class="technical-number">04 / RELEASE DISCIPLINE</p>
-          <h2>A release page belongs after release evidence exists.</h2>
+          <p class="technical-number">04 / RELEASE REQUIREMENTS</p>
+          <h2>Required contents of a public release.</h2>
           <ul class="technical-list">
             <li><span><strong>Pin a revision:</strong> identify the exact source commit, dependencies, toolchain, model bundle, and platform target.</span></li>
-            <li><span><strong>Run the gate:</strong> retain the relevant unit, integration, corpus, and host smoke-test artifacts rather than summarizing them with an untraceable badge.</span></li>
+            <li><span><strong>Run the gate:</strong> retain unit, integration, corpus, and host smoke-test artifacts for the release revision.</span></li>
             <li><span><strong>Ship a signed artifact:</strong> publish installer provenance, checksums, support window, known limitations, and rollback path.</span></li>
-            <li><span><strong>Then write notes:</strong> versioned release notes can explain user-visible changes without turning ongoing source work into marketing theater.</span></li>
+            <li><span><strong>Publish release notes:</strong> list user-visible changes, fixed defects, known limitations, migrations, and compatibility changes.</span></li>
           </ul>
         </section>
 
         <section class="technical-section" id="history">
-          <p class="technical-number">05 / SOURCE HISTORY</p>
-          <h2>Inspect changes where they are versioned.</h2>
-          <p>The repository history is the canonical public change record while RSpice remains in active development. Use it alongside the exact build and test evidence for the revision you intend to evaluate.</p>
+          <p class="technical-number">05 / COMMIT HISTORY</p>
+          <h2>Repository commits and tags are the current change log.</h2>
+          <p>Each commit identifies the changed files and parent revision. Pair it with CI output and the build environment when evaluating numerical or interface changes.</p>
           <div class="technical-actions"><a class="button button--hot" href="https://github.com/JaimeHW/RSpice/commits/main" target="_blank" rel="noopener">Open commit history <span aria-hidden="true">&nearr;</span></a><a class="button button--quiet" href="parity.html">Read validation approach</a></div>
         </section>
       </article>
@@ -107,12 +108,12 @@
 
   <footer class="footer">
     <div class="page-frame footer__grid">
-      <div class="footer__identity"><a class="identity" href="index.html"><img src="assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a><p>Analog, mixed-signal, and RF simulation in active development.</p></div>
-      <div><h2>Explore</h2><a href="index.html#engine">Engine</a><a href="index.html#analyses">Analysis map</a><a href="index.html#truth">Product truth</a><a href="index.html#roadmap">Connected roadmap</a></div>
-      <div><h2>Resources</h2><a href="docs.html">Technical scope</a><a href="parity.html">Validation approach</a><a href="changelog.html">Development log</a><a href="download.html">Build locally</a></div>
+      <div class="footer__identity"><a class="identity" href="index.html"><img src="assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a><p>Rust circuit simulator with desktop, CLI, Python, and WebAssembly interfaces.</p></div>
+      <div><h2>Explore</h2><a href="index.html#engine">Engine</a><a href="index.html#analyses">Analyses</a><a href="index.html#truth">Status</a><a href="index.html#roadmap">Hosted services</a></div>
+      <div><h2>Resources</h2><a href="docs.html">Technical scope</a><a href="parity.html">Validation approach</a><a href="changelog.html">Development log</a><a href="download.html">Build from source</a></div>
       <div><h2>Contact</h2><a href="mailto:hello@rspice.app">General</a><a href="mailto:sales@rspice.app">Commercial</a><a href="privacy.html">Privacy</a><a href="https://github.com/JaimeHW/RSpice-Site/security" target="_blank" rel="noopener">Security</a></div>
     </div>
-    <div class="page-frame footer__base"><span>&copy; <span data-year>2026</span> RSpice</span><span>LOCAL FIRST / CONNECTED WHEN READY</span><span>IBM Plex under SIL OFL</span></div>
+    <div class="page-frame footer__base"><span>&copy; <span data-year>2026</span> RSpice</span><span>SOURCE BUILD / HOSTED SERVICES NOT ACTIVE</span><span>IBM Plex under SIL OFL</span></div>
   </footer>
   <script src="assets/field.js" defer></script>
 </body>

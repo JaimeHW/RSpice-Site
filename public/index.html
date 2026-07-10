@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#071015">
   <meta name="color-scheme" content="dark">
-  <title>RSpice — Analog simulation, without the black box</title>
-  <meta name="description" content="RSpice is a Rust-based analog, mixed-signal, and RF circuit simulator in active development. Explore the native engine, experimental browser preview, Workbench concept, and connected-product roadmap.">
+  <title>RSpice — Rust analog, mixed-signal, and RF simulator</title>
+  <meta name="description" content="RSpice is a Rust circuit simulator with native desktop, CLI, Python, and WebAssembly interfaces. Review implemented analyses, device models, current availability, and hosted-service plans.">
   <link rel="canonical" href="https://rspice.app/">
   <link rel="icon" href="assets/brand/rspice.ico" sizes="any">
   <link rel="apple-touch-icon" href="assets/brand/icon-256.png">
@@ -18,15 +18,15 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="RSpice">
   <meta property="og:url" content="https://rspice.app/">
-  <meta property="og:title" content="RSpice — Analog simulation, without the black box">
-  <meta property="og:description" content="A Rust-based circuit simulator in active development, with a native engine, experimental browser preview, and an explicit roadmap.">
+  <meta property="og:title" content="RSpice — Rust analog, mixed-signal, and RF simulator">
+  <meta property="og:description" content="Native desktop, CLI, Python, and WebAssembly interfaces over a Rust circuit-simulation engine.">
   <meta property="og:image" content="https://rspice.app/assets/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="RSpice analog and mixed-signal circuit simulation">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="RSpice — Analog simulation, without the black box">
-  <meta name="twitter:description" content="A Rust-based circuit simulator in active development.">
+  <meta name="twitter:title" content="RSpice — Rust analog, mixed-signal, and RF simulator">
+  <meta name="twitter:description" content="A Rust circuit simulator with desktop, CLI, Python, and WebAssembly interfaces.">
   <meta name="twitter:image" content="https://rspice.app/assets/og.png">
 
   <script type="application/ld+json">
@@ -58,14 +58,14 @@
       <nav class="site-nav" id="site-nav" aria-label="Primary navigation" data-site-nav>
         <a href="#engine">Engine</a>
         <a href="#analyses">Analyses</a>
-        <a href="#truth">Product truth</a>
-        <a href="#roadmap">Roadmap</a>
-        <a href="#pricing">Planned pricing</a>
+        <a href="#truth">Status</a>
+        <a href="#roadmap">Hosted roadmap</a>
+        <a href="#pricing">Licensing</a>
         <a href="docs.html">Docs</a>
       </nav>
       <div class="topbar__actions">
         <a class="source-link" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Source <span aria-hidden="true">↗</span></a>
-        <a class="launch-link" href="ide/">Open web lab <span class="launch-link__tag">preview</span></a>
+        <a class="launch-link" href="ide/">Open WASM lab <span class="launch-link__tag">experimental</span></a>
       </div>
     </div>
   </header>
@@ -76,7 +76,7 @@
       <div class="page-frame hero__frame">
         <div class="status-line">
           <span><i class="status-line__dot"></i>ENGINEERING BUILD / ACTIVE DEVELOPMENT</span>
-          <span>LOCAL FIRST · EXPLICIT STATUS · NO FAKE CLOUD</span>
+          <span>SOURCE BUILD · HOSTED SERVICES NOT ACTIVE</span>
         </div>
 
         <div class="hero__brief">
@@ -84,20 +84,20 @@
             <p class="eyebrow">RSPICE WORKBENCH / ANALOG · MIXED-SIGNAL · RF</p>
             <h1 id="hero-title">RSpice simulation workbench</h1>
           </div>
-          <p class="hero__lede">A Rust-based engine and GUI in active development. The surface below renders the existing Workbench mockup itself as a non-interactive specimen—not a screenshot and not a second, hand-built interface.</p>
+          <p class="hero__lede">A Rust circuit simulator with desktop, CLI, Python, and WebAssembly interfaces. The panel below renders the current Workbench HTML mockup at 1440 × 900 and scales it to fit.</p>
           <div class="hero__info">
             <dl class="hero__facts" aria-label="RSpice product status"><div><dt>CORE</dt><dd>Rust / sparse / parallel</dd></div><div><dt>TOOLS</dt><dd>GUI / CLI / Python / WASM</dd></div><div><dt>CONNECTED</dt><dd>Roadmap / not live</dd></div></dl>
-            <div class="hero__actions"><a class="button button--hot" href="ide/">Open web preview <span aria-hidden="true">↗</span></a><a class="button button--quiet" href="download.html">Build locally</a></div>
+            <div class="hero__actions"><a class="button button--hot" href="ide/">Open WASM lab <span aria-hidden="true">↗</span></a><a class="button button--quiet" href="download.html">Build from source</a></div>
           </div>
         </div>
         <div class="workbench__shell" id="product">
-          <div class="workbench__toolbar"><span>STATIC WORKBENCH SPECIMEN / NON-INTERACTIVE</span><span>1440 × 900 SOURCE SURFACE / AUTO-FIT</span></div>
+          <div class="workbench__toolbar"><span>CURRENT GUI MOCKUP / NON-INTERACTIVE</span><span>1440 × 900 HTML / AUTO-FIT</span></div>
           <figure class="workbench__screen">
             <div class="workbench__screen-frame">
               <iframe src="workbench-frame.html" title="Non-interactive RSpice Workbench GUI" sandbox="allow-scripts allow-same-origin" tabindex="-1"></iframe>
               <span class="workbench__screen-blocker" aria-hidden="true"></span>
             </div>
-            <figcaption><span>Design: hierarchy, schematic capture, checks, local run context, and inspection in one deliberate shell. This is the current GUI mockup rendered at its native source dimensions—not a screenshot or a released product screen.</span><span>FIG. 01 / LIVE MOCKUP SURFACE</span></figcaption>
+            <figcaption><span>Hierarchy, schematic capture, checks, run controls, and property inspection in the current Workbench design. This frame renders HTML at its source dimensions; it is not the released egui application.</span><span>FIG. 01 / GUI MOCKUP</span></figcaption>
           </figure>
         </div>
       </div>
@@ -107,28 +107,28 @@
       <span class="anchor-alias" id="capabilities" aria-hidden="true"></span>
       <div class="page-frame">
         <header class="section-title">
-          <p class="eyebrow">02 / ENGINE CONTRACT</p>
-          <h2 id="engine-title">A simulation run should carry its own evidence.</h2>
+          <p class="eyebrow">02 / RUN RECORD</p>
+          <h2 id="engine-title">Inputs, solver status, and verification output stay linked.</h2>
         </header>
-        <div class="engine__board" aria-label="RSpice simulation record contract">
-          <div class="engine__board-head"><span>RUN RECORD / STRUCTURAL CONTRACT</span><span>DECK &rarr; ELABORATE &rarr; SOLVE &rarr; EVIDENCE</span><span>REVIEWABLE OUTPUT</span></div>
+        <div class="engine__board" aria-label="RSpice simulation run contents">
+          <div class="engine__board-head"><span>RUN CONTENTS</span><span>NETLIST &rarr; ELABORATION &rarr; ANALYSIS &rarr; OUTPUT</span><span>SERIALIZABLE RECORD</span></div>
         <div class="engine__matrix">
           <article>
-            <span class="matrix-index">A1 / INPUT GRAPH</span>
-            <h3>One elaborated circuit.</h3>
-            <p>Netlist parsing, expressions, subcircuits, device evaluation, matrix assembly, and analysis dispatch belong to the same simulation record.</p>
+            <span class="matrix-index">A1 / ELABORATED INPUT</span>
+            <h3>Resolved deck and model graph</h3>
+            <p>The run records parsed cards, evaluated parameters, flattened subcircuits, include paths, model selection, and the generated netlist used for assembly.</p>
             <ul><li>SPICE-compatible decks</li><li>Model and include provenance</li><li>Inspectable generated netlist</li></ul>
           </article>
           <article>
-            <span class="matrix-index">A2 / SOLVER STATE</span>
-            <h3>Failure is output.</h3>
-            <p>Unsupported model physics, non-finite results, invalid cards, and timeouts should be typed, visible conditions—not quietly rounded into an answer.</p>
+            <span class="matrix-index">A2 / EXECUTION STATUS</span>
+            <h3>Typed solver outcomes</h3>
+            <p>Unsupported model physics, invalid cards, non-convergence, non-finite values, comparison failures, and timeouts return distinct statuses.</p>
             <ul><li>Explicit rejection paths</li><li>Watchdog-aware execution</li><li>Machine-readable reports</li></ul>
           </article>
           <article>
-            <span class="matrix-index">A3 / EVIDENCE PACKET</span>
-            <h3>Evidence travels with a run.</h3>
-            <p>Measurements, reference comparisons, seeds, options, model identity, and build information make a result reviewable after the plot window has closed.</p>
+            <span class="matrix-index">A3 / VERIFICATION OUTPUT</span>
+            <h3>Measurements and comparison artifacts</h3>
+            <p>Measurements, golden-reference differences, random seeds, solver options, model identity, and build information remain attached to exported results.</p>
             <ul><li>JUnit and TAP reporting</li><li>Golden comparison</li><li>Input-linked result summary</li></ul>
           </article>
         </div>
@@ -144,11 +144,11 @@
         <div class="analyses__intro">
         <header class="section-title">
           <p class="eyebrow">03 / ANALYSIS MAP</p>
-          <h2 id="analyses-title">Analysis support, plotted as an engineering surface.</h2>
-          <p class="section-title__body">RSpice has a broad engine surface, but reachability differs between the native UI, CLI, and browser targets. The map is a capability index, not a blanket release claim.</p>
+          <h2 id="analyses-title">Implemented analyses and current exposure.</h2>
+          <p class="section-title__body">Core analyses run through the native engine. Selected statistical, periodic, and RF paths use deck, CLI, or IDE-specific entry points; the status column distinguishes complete paths from partial kernels.</p>
         </header>
         <figure class="analysis-scope" aria-label="Stylized analysis-space plot">
-          <figcaption><span>ANALYSIS SPACE / SELECTED PATHS</span><span>INPUT &rarr; RESPONSE &rarr; EVIDENCE</span></figcaption>
+          <figcaption><span>REPRESENTATIVE RESPONSE FAMILIES</span><span>DC · TRAN · AC</span></figcaption>
           <svg viewBox="0 0 560 200" role="img" aria-label="A technical plot with DC, transient, AC, and statistical analysis traces"><path class="analysis-scope__grid" d="M0 40H560M0 100H560M0 160H560M70 0V200M180 0V200M290 0V200M400 0V200M510 0V200"/><path class="analysis-scope__trace analysis-scope__trace--dc" d="M0 146C72 145 104 141 147 111S221 55 280 54S388 105 447 104S514 68 560 28"/><path class="analysis-scope__trace analysis-scope__trace--tran" d="M0 157C31 157 37 37 72 37S100 161 129 161S160 73 192 73S224 132 254 132S283 94 314 94S345 116 381 116S423 73 455 73S500 99 560 99"/><path class="analysis-scope__trace analysis-scope__trace--ac" d="M0 176C69 172 95 166 139 148S207 112 258 119S327 154 380 128S459 46 560 30"/><g class="analysis-scope__marks"><circle cx="72" cy="37" r="4"/><circle cx="280" cy="54" r="4"/><circle cx="455" cy="73" r="4"/></g><text x="13" y="28">DC / BIAS</text><text x="207" y="188">TRANSIENT / TIME</text><text x="450" y="28">AC / FREQ</text></svg>
         </figure>
         </div>
@@ -158,22 +158,22 @@
             <article role="row"><div role="cell"><code>01</code><h3>Operating point &amp; sweeps</h3></div><p class="analysis-path" role="cell"><code>.OP</code> <code>.DC</code> <code>.STEP</code> <code>.TEMP</code> <code>.TF</code> <code>.SENS</code></p><small role="cell">Solves the nonlinear bias state, including nested two-source DC sweeps, temperature and parameter families, transfer functions, and small-signal sensitivity.</small><span class="analysis-status analysis-status--core" role="cell">CORE</span></article>
             <article role="row"><div role="cell"><code>02</code><h3>Transient &amp; spectral</h3></div><p class="analysis-path" role="cell"><code>.TRAN</code> <code>.FOUR</code> <code>THD</code> <code>IMD</code></p><small role="cell">LTE-controlled adaptive timestepping with checkpoint/resume segmentation, followed by Fourier, distortion, eye-diagram, and jitter post-processing paths.</small><span class="analysis-status analysis-status--core" role="cell">CORE</span></article>
             <article role="row"><div role="cell"><code>03</code><h3>Linear frequency domain</h3></div><p class="analysis-path" role="cell"><code>.AC</code> <code>.NOISE</code> <code>.PZ</code></p><small role="cell">Complex small-signal sweeps, input/output-referred noise, and pole-zero extraction over the elaborated device and model graph.</small><span class="analysis-status analysis-status--core" role="cell">CORE</span></article>
-            <article role="row"><div role="cell"><code>04</code><h3>Measurement &amp; verification</h3></div><p class="analysis-path" role="cell"><code>.MEAS</code> <code>GOAL</code> <code>TOL</code> <code>COMPARE</code></p><small role="cell">Measures TRAN, DC, AC, and NOISE results; gates runs against tolerances; compares golden data; and emits machine-readable pass/fail evidence.</small><span class="analysis-status analysis-status--core" role="cell">CORE</span></article>
-            <article role="row"><div role="cell"><code>05</code><h3>Statistical &amp; corners</h3></div><p class="analysis-path" role="cell"><code>.MC</code> <code>--monte-carlo</code> <code>--corners</code></p><small role="cell">Runs seeded operating-point parameter variation and process-corner campaigns. Exposure currently spans selected deck, CLI, and IDE paths rather than one uniform surface.</small><span class="analysis-status analysis-status--selected" role="cell">SELECTED</span></article>
+            <article role="row"><div role="cell"><code>04</code><h3>Measurement &amp; verification</h3></div><p class="analysis-path" role="cell"><code>.MEAS</code> <code>GOAL</code> <code>TOL</code> <code>COMPARE</code></p><small role="cell">Measures TRAN, DC, AC, and NOISE results; gates runs against tolerances; compares golden data; and emits machine-readable pass/fail reports.</small><span class="analysis-status analysis-status--core" role="cell">CORE</span></article>
+            <article role="row"><div role="cell"><code>05</code><h3>Statistical &amp; corners</h3></div><p class="analysis-path" role="cell"><code>.MC</code> <code>--monte-carlo</code> <code>--corners</code></p><small role="cell">Runs seeded operating-point parameter variation and process-corner campaigns. Exposure currently spans selected deck, CLI, and IDE entry points.</small><span class="analysis-status analysis-status--selected" role="cell">SELECTED</span></article>
             <article role="row"><div role="cell"><code>06</code><h3>Periodic &amp; RF</h3></div><p class="analysis-path" role="cell"><code>PSS</code> <code>HB</code> <code>.STB</code> <code>S-PARAM</code></p><small role="cell">Includes shooting PSS, harmonic balance, stability, and two-port S-parameter paths with Touchstone export. Availability is analysis- and interface-specific.</small><span class="analysis-status analysis-status--selected" role="cell">SELECTED</span></article>
             <article role="row"><div role="cell"><code>07</code><h3>Advanced analysis boundary</h3></div><p class="analysis-path" role="cell"><code>PAC</code> <code>PNOISE</code> <code>PXF</code> <code>PSTB</code> <code>ENV</code> <code>.DISTO</code></p><small role="cell">Conversion-matrix, monodromy, envelope, and multirate mathematics exist below the product layer. They do not yet have complete circuit extraction; <code>.DISTO</code> currently maps to AC rather than a Volterra engine.</small><span class="analysis-status analysis-status--partial" role="cell">KERNEL / PARTIAL</span></article>
           </div>
         </div>
 
         <div class="capability-ledger" aria-labelledby="capability-ledger-title">
-          <div class="capability-ledger__head"><h3 id="capability-ledger-title">FEATURE SURFACE / IMPLEMENTED ENGINE CONTRACT</h3><span>DEVICE → DECK → SOLVE → EVIDENCE → EXPORT</span></div>
+          <div class="capability-ledger__head"><h3 id="capability-ledger-title">IMPLEMENTED DEVICE, DECK, AND HOST FEATURES</h3><span>DEVICE → DECK → SOLVE → EXPORT</span></div>
           <div class="capability-ledger__grid">
-            <article><span>01 / SEMICONDUCTOR MODELS</span><h3>MOS and bipolar families</h3><p>Native and generated model paths cover common discrete, IC, and advanced compact-model workflows, with unsupported physics rejected explicitly.</p><ul><li>BSIM4 v4.8, BSIM3v3.3, VDMOS, EKV3, MOS1/2/3/6, BSIM1/2</li><li>Generated BSIM-SOI and EKV 2.6 built-ins where sources are bundled</li><li>Gummel-Poon plus generated VBIC, HICUM, and MEXTRAM where sources are bundled</li></ul></article>
-            <article><span>02 / DEVICES &amp; INTERCONNECT</span><h3>Junctions, magnetics, and lines</h3><p>The device graph extends beyond transistor primitives to the components needed for power, interconnect, and board-level decks.</p><ul><li>Diode, JFET/JFET2, MES/MESA/HFET families, and GaN HEMT</li><li>Temperature-aware R/C/L, coupled and multi-winding transformers</li><li>Jiles–Atherton saturable inductors; ideal, LTRA, TXL, and CPL lines</li></ul></article>
-            <article><span>03 / SOURCES &amp; MIXED SIGNAL</span><h3>Stimulus and behavioral glue</h3><p>Source and bridge models support realistic stimulus construction and mixed-domain test benches without hiding unsupported behavior.</p><ul><li>PULSE, SIN, EXP, PWL, SFFM, AM, TRNOISE, and PWL file sources</li><li>E/F/G/H controlled and B behavioral sources; controlled switches</li><li>XSPICE-style analog/digital elements, tri-state drivers, and A/D–D/A bridges</li></ul></article>
-            <article><span>04 / DECK &amp; MODEL PIPELINE</span><h3>Elaboration with provenance</h3><p>RSpice resolves the circuit before solving it, preserving the cards, parameters, libraries, and model origin that produced a result.</p><ul><li><code>.SUBCKT</code>, <code>.PARAM</code>, expressions, <code>.INCLUDE</code>, and <code>.LIB</code></li><li><code>.OPTIONS</code>, <code>.TEMP</code>, engineering suffixes, and flattened elaboration</li><li>Verilog-A parser, semantic IR, bytecode VM, native JIT, and generated-Rust backends</li></ul></article>
-            <article><span>05 / AUTOMATION &amp; VALIDATION</span><h3>Runs that can fail a pipeline</h3><p>The CLI treats validity and comparison as contracts, not console decoration, so automated characterization can stop on a bad answer.</p><ul><li><code>run</code>, <code>info</code>, <code>check</code>, <code>compare</code>, <code>convert</code>, and <code>compile-va</code></li><li>Typed exit codes, timeouts, JUnit, TAP, JSON summaries, and measurement files</li><li>ngspice and Xyce corpus harnesses with explicit oracles and failure tracking</li></ul></article>
-            <article><span>06 / INTERFACES &amp; DATA</span><h3>One engine, several controlled surfaces</h3><p>Native and programmatic interfaces share the same simulation core while exposing only the analyses appropriate to each target.</p><ul><li>egui/wgpu desktop Workbench, CLI, Python/NumPy, and WebAssembly bindings</li><li>SPICE RAW, ASCII RAW, CSV, TSV, JSON, HDF5, and Touchstone output</li><li>Native desktop is the primary target; browser support is experimental and mobile UI remains a design target</li></ul></article>
+            <article><span>01 / SEMICONDUCTOR MODELS</span><h3>MOS and bipolar models</h3><p>Native models cover the principal silicon paths; bundled Verilog-A sources provide generated implementations for additional compact-model families.</p><ul><li>BSIM4 v4.8, BSIM3v3.3, VDMOS, EKV3, MOS1/2/3/6, BSIM1/2</li><li>Generated BSIM-SOI and EKV 2.6 built-ins where sources are bundled</li><li>Gummel-Poon plus generated VBIC, HICUM, and MEXTRAM where sources are bundled</li></ul></article>
+            <article><span>02 / DEVICES &amp; INTERCONNECT</span><h3>Junction, magnetic, and line devices</h3><p>Device registration includes junction models, magnetic components, and ideal or lossy transmission-line elements.</p><ul><li>Diode, JFET/JFET2, MES/MESA/HFET families, and GaN HEMT</li><li>Temperature-aware R/C/L, coupled and multi-winding transformers</li><li>Jiles–Atherton saturable inductors; ideal, LTRA, TXL, and CPL lines</li></ul></article>
+            <article><span>03 / SOURCES &amp; MIXED SIGNAL</span><h3>Sources, controlled elements, and bridges</h3><p>Independent and controlled sources provide time-domain stimulus, behavioral expressions, switching, and analog/digital conversion.</p><ul><li>PULSE, SIN, EXP, PWL, SFFM, AM, TRNOISE, and PWL file sources</li><li>E/F/G/H controlled and B behavioral sources; controlled switches</li><li>XSPICE-style analog/digital elements, tri-state drivers, and A/D–D/A bridges</li></ul></article>
+            <article><span>04 / DECK &amp; MODEL PIPELINE</span><h3>Netlist elaboration and Verilog-A</h3><p>The parser resolves parameters, includes, libraries, and subcircuits before matrix assembly; Verilog-A uses interpreted, JIT, and generated-Rust paths.</p><ul><li><code>.SUBCKT</code>, <code>.PARAM</code>, expressions, <code>.INCLUDE</code>, and <code>.LIB</code></li><li><code>.OPTIONS</code>, <code>.TEMP</code>, engineering suffixes, and flattened elaboration</li><li>Verilog-A parser, semantic IR, bytecode VM, native JIT, and generated-Rust backends</li></ul></article>
+            <article><span>05 / AUTOMATION &amp; VALIDATION</span><h3>CLI reports and regression tests</h3><p>CLI exit codes and report formats allow measurement failures, timeouts, invalid results, and golden-reference mismatches to stop CI jobs.</p><ul><li><code>run</code>, <code>info</code>, <code>check</code>, <code>compare</code>, <code>convert</code>, and <code>compile-va</code></li><li>Typed exit codes, timeouts, JUnit, TAP, JSON summaries, and measurement files</li><li>ngspice and Xyce corpus harnesses with explicit oracles and failure tracking</li></ul></article>
+            <article><span>06 / INTERFACES &amp; DATA</span><h3>Desktop, Python, WASM, and formats</h3><p>The egui application, CLI, Python bindings, and WebAssembly bindings use the same core, with target-specific analysis exposure.</p><ul><li>egui/wgpu desktop Workbench, CLI, Python/NumPy, and WebAssembly bindings</li><li>SPICE RAW, ASCII RAW, CSV, TSV, JSON, HDF5, and Touchstone output</li><li>Native desktop is the primary target; browser support is experimental and mobile UI remains a design target</li></ul></article>
           </div>
           <a class="capability-ledger__link" href="docs.html">Read the revision-specific technical scope and limitations <span aria-hidden="true">↗</span></a>
         </div>
@@ -186,19 +186,19 @@
       <div class="page-frame">
         <header class="section-title section-title--split">
           <div>
-            <p class="eyebrow">04 / PRODUCT TRUTH</p>
-            <h2 id="truth-title">Status belongs beside the surface.</h2>
+            <p class="eyebrow">04 / AVAILABILITY</p>
+            <h2 id="truth-title">Current availability by host and service.</h2>
           </div>
-          <p>Engineering software earns trust by separating what works now, what can be evaluated, what has only been designed, and what does not exist yet.</p>
+          <p>Source code, the experimental browser path, the Workbench mockup, and planned hosted services are separate deliverables with different availability.</p>
         </header>
         <div class="truth__instrument">
-          <div class="truth__instrument-head"><span>CAPABILITY INSTRUMENT / DECLARED STATUS</span><span>NO IMPLIED ENTITLEMENT</span><span>REVISION-SPECIFIC EVIDENCE REQUIRED</span></div>
+          <div class="truth__instrument-head"><span>AVAILABILITY MATRIX</span><span>CURRENT PUBLIC STATUS</span><span>CHECK THE SOURCE REVISION</span></div>
         <div class="truth-table" role="table" aria-label="RSpice product status">
-          <div class="truth-table__head" role="row"><span role="columnheader">STATUS</span><span role="columnheader">SURFACE</span><span role="columnheader">WHAT IT MEANS</span><span role="columnheader">NEXT DECISION</span></div>
-          <article role="row"><span class="truth-pill truth-pill--ready" role="cell">SOURCE READY</span><h3 role="cell">Native engine &amp; tools</h3><p role="cell">The Rust engine, CLI, Python bindings, validation harnesses, and desktop EGUI application are active code paths.</p><a role="cell" href="download.html">Build locally <span aria-hidden="true">↗</span></a></article>
-          <article role="row"><span class="truth-pill truth-pill--test" role="cell">EXPERIMENTAL</span><h3 role="cell">WebAssembly &amp; browser IDE</h3><p role="cell">The browser surface is an evaluation target with WebGPU and single-threaded constraints—not a production web suite.</p><a role="cell" href="ide/">Open preview <span aria-hidden="true">↗</span></a></article>
-          <article role="row"><span class="truth-pill truth-pill--concept" role="cell">CONCEPT</span><h3 role="cell">New Workbench UI</h3><p role="cell">The desktop, tablet, and phone interaction model is a high-fidelity mockup guiding the GUI revamp.</p><a role="cell" href="#product">Inspect concept <span aria-hidden="true">↗</span></a></article>
-          <article role="row"><span class="truth-pill truth-pill--future" role="cell">ROADMAP</span><h3 role="cell">Accounts, sync, cloud &amp; sharing</h3><p role="cell">Live collaboration, cloud saves, managed simulation, and published circuit URLs are planned services; they are not live.</p><a role="cell" href="#roadmap">View architecture <span aria-hidden="true">↗</span></a></article>
+          <div class="truth-table__head" role="row"><span role="columnheader">STATUS</span><span role="columnheader">COMPONENT</span><span role="columnheader">CURRENT SCOPE</span><span role="columnheader">DETAIL</span></div>
+          <article role="row"><span class="truth-pill truth-pill--ready" role="cell">SOURCE BUILD</span><h3 role="cell">Native engine &amp; tools</h3><p role="cell">The Rust engine, CLI, Python bindings, validation harnesses, and desktop egui application are present in the public source tree.</p><a role="cell" href="download.html">Build from source <span aria-hidden="true">↗</span></a></article>
+          <article role="row"><span class="truth-pill truth-pill--test" role="cell">EXPERIMENTAL</span><h3 role="cell">WebAssembly &amp; browser IDE</h3><p role="cell">The WASM interface exposes netlist summaries plus DC, AC, and transient runs; WebGPU and single-thread limits apply.</p><a role="cell" href="ide/">Open WASM lab <span aria-hidden="true">↗</span></a></article>
+          <article role="row"><span class="truth-pill truth-pill--concept" role="cell">MOCKUP</span><h3 role="cell">New Workbench UI</h3><p role="cell">The embedded desktop, tablet, and phone layouts are HTML design mockups, not the current egui application.</p><a role="cell" href="#product">Inspect mockup <span aria-hidden="true">↗</span></a></article>
+          <article role="row"><span class="truth-pill truth-pill--future" role="cell">ROADMAP</span><h3 role="cell">Accounts, sync, cloud &amp; sharing</h3><p role="cell">Live collaboration, cloud saves, managed simulation, and published circuit URLs are planned services; they are not live.</p><a role="cell" href="#roadmap">View hosted plan <span aria-hidden="true">↗</span></a></article>
         </div>
         </div>
       </div>
@@ -209,26 +209,26 @@
       <div class="page-frame">
         <div class="roadmap__top">
           <header class="section-title">
-            <p class="eyebrow">05 / CONNECTED RSPICE</p>
-            <h2 id="roadmap-title">Connected work, without surrendering the local project.</h2>
+            <p class="eyebrow">05 / HOSTED SERVICES</p>
+            <h2 id="roadmap-title">Local projects remain usable without hosted services.</h2>
           </header>
-          <p class="roadmap__lede">The goal is not to make a browser tab mandatory. It is to let an engineering team choose connected work when the control plane is ready: versioned projects, reversible sharing, accountable compute, and readable evidence.</p>
+          <p class="roadmap__lede">Planned services add identity, project synchronization, collaboration, managed simulation, and public or private result links. Local files and local simulation remain independent of those services.</p>
         </div>
 
         <div class="roadmap__route" aria-label="Planned RSpice connected service architecture">
           <article class="route-node route-node--now"><span>01 / NOW</span><h3>Local project</h3><p>Files, models, engine, and results stay on the engineer’s device.</p></article>
           <i aria-hidden="true"></i>
-          <article class="route-node"><span>02 / PLANNED</span><h3>Identity boundary</h3><p>Authentication belongs to the future application service, not the static marketing site.</p></article>
+          <article class="route-node"><span>02 / PLANNED</span><h3>Identity boundary</h3><p>Authentication belongs to the future application service, not the public website.</p></article>
           <i aria-hidden="true"></i>
-          <article class="route-node"><span>03 / PLANNED</span><h3>Project graph</h3><p>Versioned files, permissions, presence, comments, and deliberate sharing.</p></article>
+          <article class="route-node"><span>03 / PLANNED</span><h3>Versioned projects</h3><p>File revisions, permissions, presence, comments, and public, unlisted, or private sharing.</p></article>
           <i aria-hidden="true"></i>
-          <article class="route-node"><span>04 / PLANNED</span><h3>Compute &amp; evidence</h3><p>Queued runs, runner policy, result records, and durable review links.</p></article>
+          <article class="route-node"><span>04 / PLANNED</span><h3>Managed simulation</h3><p>Queued runs, runner selection, cost estimates, retained outputs, and shareable result URLs.</p></article>
         </div>
 
         <div class="roadmap__notes">
-          <article><span>ACCOUNT DECISION</span><h3>Keep the public site stateless.</h3><p>Do not build sign-up and login into this static marketing site. When cloud services exist, the app should own identity at a dedicated app/account surface and return users here only for public content, billing information, and documentation.</p></article>
-          <article><span>SHARING DECISION</span><h3>URLs should carry a policy, not just a token.</h3><p>Future result pages should distinguish public, unlisted, and private visibility; show the exact input and run provenance; and make expiration, revocation, and export intentional controls.</p></article>
-          <article><span>COMPUTE DECISION</span><h3>Meter work, not seats.</h3><p>Keep local simulation independent of a cloud plan. Charge separately for managed runner time and storage so teams can see the cost of a large corner, Monte Carlo, or optimization campaign before it starts.</p></article>
+          <article><span>ACCOUNT LOCATION</span><h3>Accounts belong to the application service.</h3><p>The public site remains account-free. Registration, organization management, billing, and authenticated project access will use the hosted application.</p></article>
+          <article><span>SHARING POLICY</span><h3>Every shared URL includes visibility controls.</h3><p>Planned result pages distinguish public, unlisted, and private access and retain the input revision, run configuration, expiration, revocation, and export settings.</p></article>
+          <article><span>COMPUTE BILLING</span><h3>Runner time and storage are separate usage.</h3><p>Local simulation does not require a hosted plan. Managed corner, Monte Carlo, and optimization jobs show estimated runner and storage cost before submission.</p></article>
         </div>
       </div>
     </section>
@@ -237,15 +237,15 @@
       <div class="page-frame">
         <header class="section-title section-title--split">
           <div>
-            <p class="eyebrow">06 / PLANNED PRICING</p>
-            <h2 id="pricing-title">License the workflow. Meter the expensive work.</h2>
+            <p class="eyebrow">06 / LICENSING PLAN</p>
+            <h2 id="pricing-title">Proposed seat licenses and hosted-compute billing.</h2>
           </div>
-          <p>These are proposed launch prices, not active checkout offers. The model is designed for commercial durability: paid engineering seats, free reviewers, and separate usage for expensive managed computation.</p>
+          <p>These prices are planning assumptions, not active offers. Commercial editing uses named seats; view-only review is free; managed runner time and storage are billed separately.</p>
         </header>
 
         <div class="price-grid">
           <article>
-            <div><span>EVALUATION / ACADEMIC</span><h3>Explore</h3></div>
+            <div><span>EVALUATION / ACADEMIC</span><h3>Evaluation</h3></div>
             <p class="price"><strong>$0</strong><small>source and non-commercial preview</small></p>
             <ul><li>Source-built local tools</li><li>Experimental browser preview</li><li>Personal, educational, and evaluation use</li></ul>
             <a href="download.html">Build from source <span aria-hidden="true">↗</span></a>
@@ -254,19 +254,19 @@
             <div><span>COMMERCIAL</span><h3>Professional</h3></div>
             <p class="price"><strong>$149</strong><small>named user / month, billed annually</small></p>
             <ul><li>Commercial native license at launch</li><li>Desktop, CLI, Python, and CI workflows</li><li>Updates and technical support</li></ul>
-            <a href="mailto:sales@rspice.app?subject=RSpice%20Professional%20launch%20access">Request launch access <span aria-hidden="true">↗</span></a>
+            <a href="mailto:sales@rspice.app?subject=RSpice%20Professional%20license">Email sales <span aria-hidden="true">↗</span></a>
           </article>
           <article>
             <div><span>COLLABORATIVE</span><h3>Team</h3></div>
             <p class="price"><strong>$249</strong><small>editor / month, billed annually</small></p>
-            <ul><li>Professional plus connected projects when ready</li><li>Roles, review, and audit history</li><li>View-only reviewers stay free</li></ul>
-            <a href="mailto:sales@rspice.app?subject=RSpice%20Team%20launch%20access">Plan with us <span aria-hidden="true">↗</span></a>
+            <ul><li>Professional license plus hosted project editing after launch</li><li>Roles, comments, review, and audit history</li><li>View-only reviewers stay free</li></ul>
+            <a href="mailto:sales@rspice.app?subject=RSpice%20Team%20license">Email sales <span aria-hidden="true">↗</span></a>
           </article>
           <article>
             <div><span>CONTROLLED ENVIRONMENTS</span><h3>Enterprise</h3></div>
             <p class="price"><strong>Custom</strong><small>annual commitment</small></p>
-            <ul><li>Offline, floating, and private-runner plans</li><li>Governance features when services launch</li><li>Qualification and support terms</li></ul>
-            <a href="mailto:sales@rspice.app?subject=RSpice%20Enterprise">Talk to sales <span aria-hidden="true">↗</span></a>
+            <ul><li>Offline, floating, and private-runner plans</li><li>SSO, role policy, and audit export after hosted launch</li><li>Qualification and support terms</li></ul>
+            <a href="mailto:sales@rspice.app?subject=RSpice%20Enterprise">Email sales <span aria-hidden="true">↗</span></a>
           </article>
         </div>
         <p class="pricing__note">No account, payment flow, cloud storage, managed compute, or subscription checkout is active on this site today. Any hosted compute will be billed separately from seats.</p>
@@ -276,12 +276,12 @@
     <section class="final-call" aria-labelledby="final-title">
       <div class="page-frame final-call__inner">
         <div>
-          <p class="eyebrow">RSPICE / DEVELOPMENT SIGNAL</p>
-          <h2 id="final-title">Start from the run record.</h2>
+          <p class="eyebrow">SOURCE / BROWSER EVALUATION</p>
+          <h2 id="final-title">Build the CLI or run the experimental WASM path.</h2>
         </div>
         <div class="final-call__actions">
-          <a class="button button--hot" href="ide/">Open web lab <span aria-hidden="true">↗</span></a>
-          <a class="button button--quiet" href="mailto:hello@rspice.app?subject=RSpice%20roadmap">Start a conversation</a>
+          <a class="button button--hot" href="ide/">Open WASM lab <span aria-hidden="true">↗</span></a>
+          <a class="button button--quiet" href="mailto:hello@rspice.app?subject=RSpice%20evaluation">Email RSpice</a>
         </div>
       </div>
     </section>
@@ -291,13 +291,13 @@
     <div class="page-frame footer__grid">
       <div class="footer__identity">
         <a class="identity" href="#top"><img src="assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a>
-        <p>Analog, mixed-signal, and RF simulation in active development.</p>
+        <p>Rust circuit simulator with desktop, CLI, Python, and WebAssembly interfaces.</p>
       </div>
-      <div><h2>Explore</h2><a href="#engine">Engine</a><a href="#analyses">Analysis map</a><a href="#truth">Product truth</a><a href="#roadmap">Connected roadmap</a></div>
-      <div><h2>Resources</h2><a href="docs.html">Documentation</a><a href="parity.html">Validation approach</a><a href="changelog.html">Development log</a><a href="download.html">Build locally</a></div>
+      <div><h2>Explore</h2><a href="#engine">Engine</a><a href="#analyses">Analyses</a><a href="#truth">Status</a><a href="#roadmap">Hosted services</a></div>
+      <div><h2>Resources</h2><a href="docs.html">Documentation</a><a href="parity.html">Validation approach</a><a href="changelog.html">Development log</a><a href="download.html">Build from source</a></div>
       <div><h2>Contact</h2><a href="mailto:hello@rspice.app">General</a><a href="mailto:sales@rspice.app">Commercial</a><a href="privacy.html">Privacy</a><a href="https://github.com/JaimeHW/RSpice-Site/security" target="_blank" rel="noopener">Security</a></div>
     </div>
-    <div class="page-frame footer__base"><span>© <span data-year>2026</span> RSpice</span><span>LOCAL FIRST / CONNECTED WHEN READY</span><span>IBM Plex under SIL OFL</span></div>
+    <div class="page-frame footer__base"><span>© <span data-year>2026</span> RSpice</span><span>SOURCE BUILD / HOSTED SERVICES NOT ACTIVE</span><span>IBM Plex under SIL OFL</span></div>
   </footer>
 
   <script src="assets/landing-field.js" defer></script>
