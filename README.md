@@ -13,13 +13,14 @@ This repository owns:
   headers under `public/`; and
 - deterministic validation and static assembly under `tools/`.
 
-The `/workbench/` route is deliberately not copied into `public/`. The builder
-overlays the existing RSpice Workbench mockup from
-`mockups/rspice-workbench-host/public/rspice` at build time. The marketing page
-embeds that real HTML surface in a non-interactive frame; it never substitutes a
-screenshot or a hand-maintained imitation. The Workbench source itself is not
-redesigned or edited here; the assembled artifact only remaps its relative brand
-and font URLs so the existing UI can run from `/workbench/`.
+The `/workbench/` route under `public/` is a generated vendor snapshot of the
+existing RSpice Workbench mockup from
+`mockups/rspice-workbench-host/public/rspice`. The marketing page embeds that
+real HTML surface in a non-interactive frame; it never substitutes a screenshot
+or a hand-maintained imitation. Refresh the snapshot with
+`python tools/sync_workbench.py`. CI verifies that the checked-in snapshot still
+matches the simulator source, and the deploy build overlays the current source
+again before publishing.
 
 It does **not** own the browser simulator runtime. The `/ide/` and `/play/`
 routes, including their WebAssembly bundles and workers, are reserved for the
@@ -69,9 +70,8 @@ Choose another repository-local output directory when needed:
 python tools/build_site.py --out build/site
 ```
 
-For local preview, do not serve `public/` directly: that editable tree
-intentionally excludes the Workbench overlay. Use the preview tool, which builds
-the same artifact that deployment consumes and disables browser caching:
+For local preview, use the preview tool to build the same artifact that
+deployment consumes and disable browser caching:
 
 ```shell
 python tools/serve_site.py

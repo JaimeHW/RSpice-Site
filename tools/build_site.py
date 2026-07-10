@@ -19,7 +19,7 @@ WORKBENCH_SOURCE_SUFFIX = Path(
 WORKBENCH_FILES = ("index.html", "styles.css", "app.js")
 WORKBENCH_ASSET_REWRITES = {
     "../../assets/brand/logo.svg": "../assets/brand/logo.svg",
-    "../../crates/rspice-ui/assets/fonts/": "fonts/",
+    "../../crates/rspice-ui/assets/fonts/": "../assets/fonts/",
 }
 PROTECTED_PATHS = {
     REPOSITORY_ROOT.resolve(),
@@ -99,10 +99,21 @@ def safe_workbench_source(raw_source: Path) -> Path:
 def overlay_workbench(output: Path, source: Path) -> None:
     destination = output / "workbench"
     font_source = source.parent / "crates" / "rspice-ui" / "assets" / "fonts"
-    font_destination = destination / "fonts"
+    font_destination = output / "assets" / "fonts"
 
+    if destination.resolve().parent != output.resolve() or destination.name != "workbench":
+        raise ValueError("refusing unsafe Workbench output destination")
+    if destination.is_symlink() or getattr(destination, "is_junction", lambda: False)():
+        raise ValueError("refusing Workbench output through a link or junction")
+    if destination.exists():
+        shutil.rmtree(destination)
     shutil.copytree(source, destination, copy_function=shutil.copy2)
-    shutil.copytree(font_source, font_destination, copy_function=shutil.copy2)
+    shutil.copytree(
+        font_source,
+        font_destination,
+        copy_function=shutil.copy2,
+        dirs_exist_ok=True,
+    )
 
     rewrite_counts = {source_url: 0 for source_url in WORKBENCH_ASSET_REWRITES}
     text_files = tuple(destination.rglob("*.html")) + tuple(destination.rglob("*.css"))
@@ -169,7 +180,7 @@ def main() -> int:
         output.parent.mkdir(parents=True, exist_ok=True)
         shutil.copytree(SOURCE, output, copy_function=shutil.copy2)
         overlay_workbench(output, workbench_source)
-    except (OSError, shutil.Error) as exc:
+    except (OSError, shutil.Error, ValueError) as exc:
         print(f"build failed while assembling {output}: {exc}", file=sys.stderr)
         return 1
 

@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-density="compact">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#11171b">
+  <meta name="description" content="RSpice Workbench for circuit design, simulation, analysis, and verification">
+  <title>RSpice Workbench</title>
+  <link rel="stylesheet" href="styles.css?v=20260710ad">
+</head>
+<body>
+  <a class="skip-link" href="#workspace-main">Skip to workspace</a>
+
+  <div class="app-shell" id="app-shell">
+    <header class="titlebar" aria-label="Application title bar">
+      <button class="brand-lockup" type="button" data-view-target="project" aria-label="RSpice project overview">
+        <img src="../assets/brand/logo.svg" alt="">
+        <span class="brand-name">RSpice</span>
+      </button>
+
+      <nav class="menu-bar" aria-label="Application menu">
+        <button type="button" data-menu="file">File</button>
+        <button type="button" data-menu="edit">Edit</button>
+        <button type="button" data-menu="view">View</button>
+        <button type="button" data-menu="place">Place</button>
+        <button type="button" data-menu="simulate">Simulate</button>
+        <button type="button" data-menu="analyze">Analyze</button>
+        <button type="button" data-menu="verify">Verify</button>
+        <button type="button" data-menu="tools">Tools</button>
+        <button type="button" data-menu="help">Help</button>
+        <button type="button" class="titlebar-overflow menu-overflow-trigger" id="menu-overflow-trigger" data-menu="overflow" aria-label="More application menus" title="More application menus"><span class="icon" data-icon="more"></span></button>
+      </nav>
+
+      <div class="title-context" aria-label="Active project">
+        <span class="project-state" role="status" aria-label="All changes saved" title="All changes saved"></span>
+        <span class="title-project">Precision Sensor AFE</span>
+        <span class="crumb-separator">/</span>
+        <span class="title-cell" id="title-cell">top · schematic</span>
+      </div>
+
+      <div class="title-actions">
+        <button class="command-trigger" type="button" id="command-trigger" aria-haspopup="dialog">
+          <span class="icon" data-icon="search"></span>
+          <span>Search or run a command</span>
+          <kbd>Ctrl K</kbd>
+        </button>
+        <button class="icon-button" type="button" id="preferences-button" data-action="preferences" title="Preferences" aria-label="Open preferences" aria-haspopup="dialog" aria-controls="settings-dialog">
+          <span class="icon" data-icon="settings"></span>
+        </button>
+        <button class="avatar-button" id="account-button" type="button" title="Account and license" aria-label="Account and license" aria-haspopup="dialog" aria-controls="settings-dialog">JM</button>
+      </div>
+    </header>
+
+    <section class="primary-toolbar" aria-label="Context toolbar">
+      <button class="mobile-panel-toggle" id="open-left-panel" type="button" aria-label="Open navigator">
+        <span class="icon" data-icon="panel-left"></span>
+      </button>
+      <div class="context-tools" id="context-toolbar"></div>
+      <div class="toolbar-spacer"></div>
+      <div class="simulation-context" id="simulation-context">
+        <label class="compact-select" title="Reference PVT point">
+          <span class="corner-indicator"></span>
+          <select id="corner-select" aria-label="Reference PVT point">
+            <option>FF · −40 °C</option><option>FF · 27 °C</option><option>FF · 125 °C</option>
+            <option>FS · −40 °C</option><option>FS · 27 °C</option><option>FS · 125 °C</option>
+            <option>TT · −40 °C</option><option selected>TT · 27 °C</option><option>TT · 125 °C</option>
+            <option>SF · −40 °C</option><option>SF · 27 °C</option><option>SF · 125 °C</option>
+            <option>SS · −40 °C</option><option>SS · 27 °C</option><option>SS · 125 °C</option>
+          </select>
+        </label>
+        <button class="run-config-button" id="run-config-button" type="button" title="Open simulation plan" aria-label="Open Lab characterization simulation plan">
+          <span class="icon" data-icon="sliders"></span>
+          <span class="run-config-copy"><strong id="run-config-title">Lab characterization</strong><small id="run-config-detail">15 PVT · 8 analyses</small></span>
+          <span class="chevron">⌄</span>
+        </button>
+        <div class="run-split">
+          <button class="run-button" type="button" id="run-button">
+            <span class="icon" data-icon="play"></span><span id="run-label">Run</span>
+          </button>
+          <button class="run-more" id="run-more" type="button" aria-label="Open jobs and run options">⌄</button>
+        </div>
+      </div>
+      <button class="mobile-panel-toggle" id="open-right-panel" type="button" aria-label="Open inspector">
+        <span class="icon" data-icon="panel-right"></span>
+      </button>
+    </section>
+
+    <div class="workbench">
+      <nav class="activity-rail" aria-label="Primary workspaces">
+        <div class="activity-main">
+          <button type="button" class="activity-button" data-view="project" aria-label="Project" title="Project overview">
+            <span class="icon" data-icon="home"></span><span class="activity-label">Project</span>
+          </button>
+          <button type="button" class="activity-button active" data-view="design" aria-label="Design" title="Hierarchical schematic capture">
+            <span class="icon" data-icon="schematic"></span><span class="activity-label">Design</span>
+          </button>
+          <button type="button" class="activity-button" data-view="simulate" aria-label="Simulate" title="Simulation setup">
+            <span class="icon" data-icon="simulate"></span><span class="activity-label">Simulate</span>
+          </button>
+          <button type="button" class="activity-button" data-view="results" aria-label="Results" title="Results & waveforms">
+            <span class="activity-badge hidden" id="results-badge">1</span>
+            <span class="icon" data-icon="waveform"></span><span class="activity-label">Results</span>
+          </button>
+          <button type="button" class="activity-button" data-view="verify" aria-label="Verify" title="Corners, yield & optimization">
+            <span class="icon" data-icon="verify"></span><span class="activity-label">Verify</span>
+          </button>
+          <button type="button" class="activity-button" data-view="models" aria-label="Models" title="Models & PDK libraries">
+            <span class="icon" data-icon="library"></span><span class="activity-label">Models</span>
+          </button>
+          <button type="button" class="activity-button" data-view="netlist" aria-label="Netlist" title="Netlist & script editor">
+            <span class="icon" data-icon="code"></span><span class="activity-label">Netlist</span>
+          </button>
+          <button type="button" class="activity-button mobile-more" id="mobile-more" aria-label="More workspaces" title="More workspaces and commands">
+            <span class="icon" data-icon="more"></span><span class="activity-label">More</span>
+          </button>
+        </div>
+      </nav>
+
+      <aside class="side-panel left-panel" id="left-panel" aria-label="Workspace navigator">
+        <div class="panel-content" id="left-panel-content"></div>
+        <button class="drawer-close" type="button" data-close-drawer aria-label="Close navigator">×</button>
+      </aside>
+      <div class="pane-splitter pane-splitter-left" id="left-pane-splitter" role="separator" aria-label="Resize navigator; use arrow keys and Home to reset" aria-orientation="vertical" aria-valuemin="220" aria-valuemax="440" aria-valuenow="256" title="Drag to resize · Arrow keys adjust · Home resets" tabindex="0"></div>
+
+      <main class="center-stack" id="workspace-main" tabindex="-1">
+        <div class="document-tabs" id="document-tabs" role="tablist" aria-label="Open documents"></div>
+        <section class="workspace-stage" id="workspace-stage" role="tabpanel" aria-label="Active workspace"></section>
+
+        <div class="dock-splitter dock-splitter-bottom" id="console-splitter" role="separator" aria-label="Resize console; use up and down arrows or Home to reset" aria-orientation="horizontal" aria-valuemin="90" aria-valuemax="520" aria-valuenow="145" title="Drag to resize · Arrow keys adjust · Home resets" tabindex="0"></div>
+        <section class="bottom-console" id="bottom-console" aria-label="Console and diagnostics">
+          <div class="console-tabs">
+            <div class="console-tab-group" role="tablist" aria-label="Console pages">
+              <button class="console-tab active" type="button" data-console-tab="console">Console</button>
+              <button class="console-tab" type="button" data-console-tab="problems">Problems <span class="tab-count warn">2</span></button>
+              <button class="console-tab" type="button" data-console-tab="measurements">Measurements</button>
+              <button class="console-tab" type="button" data-console-tab="jobs">Task log <span class="tab-count ok">1</span></button>
+            </div>
+            <span class="console-context" id="console-context">Run 41 · Transient · completed in 1.84 s</span>
+        <button class="console-action" id="console-clear" type="button" title="Clear output" aria-label="Clear console output"><span class="icon" data-icon="trash"></span></button>
+        <button class="console-action" id="console-maximize" type="button" title="Maximize console" aria-label="Maximize console" aria-pressed="false"><span class="icon" data-icon="fit"></span></button>
+        <button class="console-action" id="console-collapse" type="button" title="Collapse console" aria-label="Collapse console"><span class="icon" data-icon="chevron-down"></span></button>
+          </div>
+          <div class="console-body" id="console-body"></div>
+        </section>
+      </main>
+
+      <aside class="side-panel right-panel" id="right-panel" aria-label="Inspector">
+        <div class="panel-content" id="right-panel-content"></div>
+        <button class="drawer-close" type="button" data-close-drawer aria-label="Close inspector">×</button>
+      </aside>
+      <div class="pane-splitter pane-splitter-right" id="right-pane-splitter" role="separator" aria-label="Resize inspector; use arrow keys and Home to reset" aria-orientation="vertical" aria-valuemin="278" aria-valuemax="440" aria-valuenow="312" title="Drag to resize · Arrow keys adjust · Home resets" tabindex="0"></div>
+      <div class="drawer-scrim" id="drawer-scrim" data-close-drawer></div>
+    </div>
+
+    <footer class="statusbar" aria-label="Application status">
+      <div class="status-left">
+        <button type="button" class="status-item" id="problem-summary" title="Open Problems"><span class="status-icon ok">✓</span><span>Schematic checks · 0 errors · 2 advisories</span></button>
+        <span class="status-item status-coordinates" id="cursor-coordinates">x 24.00 · y 18.00 mm</span>
+        <span class="status-item status-selection" id="selection-status">U1 · OPA189</span>
+      </div>
+      <div class="status-right">
+        <span class="status-item status-platform"><span class="icon" data-icon="cpu"></span><span>Local · 12 threads</span></span>
+        <span class="status-item engine-state"><span class="engine-dot"></span><span id="engine-status">Engine ready</span></span>
+        <button type="button" class="status-item" id="zoom-control" aria-label="Canvas zoom 100 percent"><span id="zoom-value">100%</span></button>
+      </div>
+    </footer>
+  </div>
+
+  <div class="menu-popover" id="menu-popover" role="menu" hidden></div>
+
+  <dialog class="command-dialog" id="command-dialog" aria-labelledby="command-title">
+    <h2 class="sr-only" id="command-title">Search and run a command</h2>
+    <div class="command-search-row">
+      <span class="icon" data-icon="search"></span>
+      <input id="command-input" type="search" autocomplete="off" spellcheck="false" placeholder="Search commands, cells, signals, models…" aria-label="Command search">
+      <kbd>Esc</kbd>
+    </div>
+    <div class="command-scope-row" aria-label="Search scopes">
+      <button class="scope-chip active" type="button">All</button>
+      <button class="scope-chip" type="button">Commands</button>
+      <button class="scope-chip" type="button">Design</button>
+      <button class="scope-chip" type="button">Signals</button>
+      <button class="scope-chip" type="button">Help</button>
+    </div>
+    <div class="command-results" id="command-results"></div>
+    <div class="command-footer">
+      <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span><span><kbd>Enter</kbd> open</span><span><kbd>Tab</kbd> actions</span>
+      <span class="command-provider">Local index · 286 items</span>
+    </div>
+  </dialog>
+
+  <dialog class="settings-dialog" id="settings-dialog" aria-labelledby="settings-title">
+    <div class="dialog-header">
+      <div><span class="eyebrow">WORKSPACE</span><h2 id="settings-title">Preferences</h2></div>
+      <button class="icon-button dialog-close" type="button" aria-label="Close preferences">×</button>
+    </div>
+    <div class="settings-grid">
+      <nav class="settings-nav" aria-label="Preference categories">
+        <button class="active" type="button" data-settings-page="appearance">Appearance</button><button type="button" data-settings-page="workspace">Workspace</button><button type="button" data-settings-page="units">Units & notation</button><button type="button" data-settings-page="schematic">Schematic</button><button type="button" data-settings-page="simulation">Simulation</button><button type="button" data-settings-page="results">Results</button><button type="button" data-settings-page="files">Files & storage</button><button type="button" data-settings-page="compute">Remote compute</button><button type="button" data-settings-page="security">Security & privacy</button><button type="button" data-settings-page="accessibility">Accessibility</button><button type="button" data-settings-page="shortcuts">Shortcuts</button><button type="button" data-settings-page="integrations">Integrations</button><button type="button" data-settings-page="governance">Governance</button><button type="button" data-settings-page="licensing">Licensing & updates</button>
+      </nav>
+      <div class="settings-content" id="settings-content">
+        <h3>Appearance</h3>
+        <p class="muted">Shared across desktop and web. Touch target sizing follows the active platform.</p>
+        <div class="setting-row"><div><strong>Color mode</strong><small>Choose the workspace surface mode.</small></div><div class="segmented"><button class="active" type="button">Dark</button><button type="button">Light</button><button type="button">System</button></div></div>
+        <div class="setting-row"><div><strong>Density</strong><small>Compact is optimized for engineering workstations.</small></div><div class="segmented"><button class="active" type="button">Compact</button><button type="button">Comfortable</button></div></div>
+        <div class="setting-row"><div><strong>Color-safe traces</strong><small>Use the Okabe–Ito waveform palette.</small></div><label class="switch"><input type="checkbox" aria-label="Use color-safe waveform traces"><span></span></label></div>
+        <div class="setting-row"><div><strong>Canvas contrast</strong><small>Increase symbol and grid separation.</small></div><input type="range" min="0" max="100" value="62" aria-label="Canvas contrast"></div>
+      </div>
+    </div>
+    <div class="dialog-footer"><span class="muted grow">Device preferences apply immediately; governed project settings remain versioned.</span><button class="button primary dialog-close" type="button">Close</button></div>
+  </dialog>
+
+  <dialog class="command-dialog analysis-picker-dialog" id="analysis-dialog" aria-labelledby="analysis-dialog-title">
+    <div class="dialog-header">
+      <div><span class="eyebrow">SIMULATION STUDIO</span><h2 id="analysis-dialog-title">Add analysis or workflow</h2></div>
+      <button class="icon-button dialog-close" type="button" aria-label="Close analysis picker">×</button>
+    </div>
+    <div class="command-search-row"><span class="icon" data-icon="search"></span><input id="analysis-search" type="search" autocomplete="off" placeholder="Search solvers, sweeps, measurements, checks…" aria-label="Search analysis and workflow catalog"><kbd>Esc</kbd></div>
+    <div class="analysis-picker-body" id="analysis-picker-body"></div>
+    <div class="dialog-footer"><span class="muted grow">Solvers, run-set controllers, measurements, checks, and optimization workflows are classified explicitly.</span><button class="button ghost dialog-close" type="button">Close</button></div>
+  </dialog>
+
+  <dialog class="settings-dialog mobile-nav-dialog" id="mobile-nav-dialog" aria-labelledby="mobile-nav-title">
+    <div class="dialog-header"><div><span class="eyebrow">RSPICE</span><h2 id="mobile-nav-title">Workspaces & tools</h2></div><button class="icon-button dialog-close" type="button" aria-label="Close navigation">×</button></div>
+    <div class="mobile-nav-grid">
+      <button type="button" data-view-target="project"><span class="icon" data-icon="home"></span><strong>Project</strong><small>Libraries, recovery and configuration</small></button>
+      <button type="button" data-view-target="design"><span class="icon" data-icon="schematic"></span><strong>Design</strong><small>Schematic and hierarchy</small></button>
+      <button type="button" data-view-target="simulate"><span class="icon" data-icon="simulate"></span><strong>Analysis</strong><small>Setup, runs and resources</small></button>
+      <button type="button" data-view-target="results"><span class="icon" data-icon="waveform"></span><strong>Results</strong><small>Plots, calculator and measurements</small></button>
+      <button type="button" data-view-target="verify"><span class="icon" data-icon="verify"></span><strong>Verify</strong><small>PVT, yield, reliability and regression</small></button>
+      <button type="button" data-view-target="models"><span class="icon" data-icon="library"></span><strong>Models & PDKs</strong><small>Sources, sections and qualification</small></button>
+      <button type="button" data-view-target="netlist"><span class="icon" data-icon="code"></span><strong>Code & automation</strong><small>Netlists, Verilog-A and scripts</small></button>
+      <button type="button" id="mobile-console-button"><span class="icon" data-icon="terminal"></span><strong>Console</strong><small>Diagnostics, measurements and task log</small></button>
+      <button type="button" data-action="preferences"><span class="icon" data-icon="settings"></span><strong>Preferences</strong><small>Appearance, files, shortcuts and license</small></button>
+    </div>
+  </dialog>
+
+  <dialog class="settings-dialog jobs-dialog" id="jobs-dialog" aria-labelledby="jobs-dialog-title">
+    <div class="dialog-header"><div><span class="eyebrow">EXECUTION</span><h2 id="jobs-dialog-title">Jobs, targets & run history</h2></div><button class="icon-button dialog-close" type="button" aria-label="Close jobs manager">×</button></div>
+    <div class="jobs-manager-body" id="jobs-manager-body"></div>
+    <div class="dialog-footer"><button class="button ghost dialog-close" type="button">Close</button><button class="button" id="jobs-export" type="button">Export run manifest</button><button class="button primary" id="jobs-run" type="button">Run active plan</button></div>
+  </dialog>
+
+  <dialog class="settings-dialog workflow-dialog" id="workflow-dialog" aria-labelledby="workflow-dialog-title">
+    <div class="dialog-header"><div><span class="eyebrow" id="workflow-dialog-eyebrow">WORKFLOW</span><h2 id="workflow-dialog-title">RSpice workflow</h2></div><button class="icon-button dialog-close" type="button" aria-label="Close workflow">×</button></div>
+    <div class="workflow-dialog-body" id="workflow-dialog-body"></div>
+    <div class="dialog-footer"><button class="button ghost dialog-close" type="button">Cancel</button><button class="button primary" id="workflow-dialog-primary" type="button">Apply</button></div>
+  </dialog>
+
+  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="app.js?v=20260710x"></script>
+</body>
+</html>

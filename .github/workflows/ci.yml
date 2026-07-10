@@ -31,6 +31,12 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.14"
+      - name: Verify public Workbench snapshot
+        shell: bash
+        run: |
+          python tools/sync_workbench.py --workbench-source rspice-source/mockups/rspice-workbench-host/public/rspice
+          git diff --exit-code -- public/workbench public/assets/fonts
+          test -z "$(git status --porcelain --untracked-files=all -- public/workbench public/assets/fonts)"
       - name: Validate source
         run: python tools/check_site.py --root public
       - name: Build deployable tree

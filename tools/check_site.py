@@ -18,7 +18,9 @@ from urllib.parse import quote, unquote, urlsplit
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ROOT = REPOSITORY_ROOT / "public"
 SITE_ORIGIN = "https://rspice.app"
-RESERVED_ROUTES = {"ide", "play", "workbench"}
+CLIENT_RUNTIME_ROUTES = {"ide", "play"}
+EMBEDDED_APP_ROUTES = {"workbench"}
+RESERVED_ROUTES = CLIENT_RUNTIME_ROUTES | EMBEDDED_APP_ROUTES
 VOID_ELEMENTS = {
     "area",
     "base",
@@ -871,12 +873,12 @@ class SiteValidator:
             return
         for child in self.root.iterdir():
             route_name = child.name.casefold()
-            if route_name in RESERVED_ROUTES or route_name in {
-                f"{route}.html" for route in RESERVED_ROUTES
+            if route_name in CLIENT_RUNTIME_ROUTES or route_name in {
+                f"{route}.html" for route in CLIENT_RUNTIME_ROUTES
             }:
                 self.error(
                     child,
-                    "/ide, /play, and /workbench are reserved for release overlays, not site source",
+                    "/ide and /play are reserved for client release overlays, not site source",
                 )
 
     def validate_deployment_files(self) -> None:
