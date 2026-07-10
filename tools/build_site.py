@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 from check_site import print_result, validate_site
+from reference_catalog import generate_reference_bundle
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -17,6 +18,15 @@ WORKBENCH_SOURCE_SUFFIX = Path(
     "mockups/rspice-workbench-host/public/rspice"
 )
 WORKBENCH_FILES = ("index.html", "styles.css", "app.js")
+RSPICE_CATALOG_FILES = (
+    "README.md",
+    "Cargo.toml",
+    "crates/rspice-cli/README.md",
+    "tests/ngspice/validation-manifest.tsv",
+    "tests/xyce/RSPICE-HARNESS-MANIFEST.tsv",
+    ".github/workflows/nightly.yml",
+    "benchmarks/scoreboards/scoreboard.json",
+)
 WORKBENCH_ASSET_REWRITES = {
     "../../assets/brand/logo.svg": "../assets/brand/logo.svg",
     "../../crates/rspice-ui/assets/fonts/": "../assets/fonts/",
@@ -31,10 +41,20 @@ PROTECTED_PATHS = {
 
 
 def default_workbench_source() -> Path:
-    """Resolve both the local sibling checkout and the deploy-workflow layout."""
+    """Resolve local source layouts, then the reviewed site vendor snapshot."""
     candidates = (
         REPOSITORY_ROOT.parent / "RSpice" / WORKBENCH_SOURCE_SUFFIX,
         REPOSITORY_ROOT.parent / WORKBENCH_SOURCE_SUFFIX,
+        SOURCE / "workbench",
+    )
+    return next((candidate for candidate in candidates if candidate.is_dir()), candidates[0])
+
+
+def default_rspice_source() -> Path:
+    """Resolve the local sibling checkout and the nested CI checkout."""
+    candidates = (
+        REPOSITORY_ROOT.parent / "RSpice",
+        REPOSITORY_ROOT / "rspice-source",
     )
     return next((candidate for candidate in candidates if candidate.is_dir()), candidates[0])
 
@@ -90,15 +110,59 @@ def safe_workbench_source(raw_source: Path) -> Path:
     for name in WORKBENCH_FILES:
         if not (source / name).is_file():
             raise ValueError(f"workbench source is missing required file: {name}")
-    font_source = source.parent / "crates" / "rspice-ui" / "assets" / "fonts"
-    if not font_source.is_dir():
-        raise ValueError(f"workbench source is missing bundled fonts: {font_source}")
+    workbench_font_source(source)
     return source
+
+
+def workbench_font_source(source: Path) -> Path:
+    candidates = (
+        source.parent / "crates" / "rspice-ui" / "assets" / "fonts",
+        SOURCE / "assets" / "fonts",
+    )
+    font_source = next((candidate for candidate in candidates if candidate.is_dir()), None)
+    if font_source is None:
+        raise ValueError(
+            "workbench source is missing bundled fonts in both its host tree and public/assets/fonts"
+        )
+    return font_source
+
+
+def safe_rspice_source(raw_source: Path) -> Path:
+    is_junction = getattr(raw_source, "is_junction", lambda: False)
+    if raw_source.is_symlink() or is_junction():
+        raise ValueError("RSpice source must not be a symbolic link or directory junction")
+    try:
+        source = raw_source.resolve()
+    except (OSError, RuntimeError) as exc:
+        raise ValueError(f"RSpice source cannot be resolved: {exc}") from exc
+    if not source.is_dir():
+        raise ValueError(f"RSpice source is not a directory: {source}")
+    if not (source / ".git").exists():
+        raise ValueError(f"RSpice source is not a Git checkout: {source}")
+    for relative in RSPICE_CATALOG_FILES:
+        if not (source / relative).is_file():
+            raise ValueError(f"RSpice source is missing catalog input: {relative}")
+    return source
+
+
+def safe_validation_artifacts(raw_directory: Path | None) -> Path | None:
+    if raw_directory is None:
+        return None
+    is_junction = getattr(raw_directory, "is_junction", lambda: False)
+    if raw_directory.is_symlink() or is_junction():
+        raise ValueError("validation artifacts must not use a symbolic link or directory junction")
+    try:
+        directory = raw_directory.resolve()
+    except (OSError, RuntimeError) as exc:
+        raise ValueError(f"validation artifacts cannot be resolved: {exc}") from exc
+    if not directory.is_dir():
+        raise ValueError(f"validation artifacts are not a directory: {directory}")
+    return directory
 
 
 def overlay_workbench(output: Path, source: Path) -> None:
     destination = output / "workbench"
-    font_source = source.parent / "crates" / "rspice-ui" / "assets" / "fonts"
+    font_source = workbench_font_source(source)
     font_destination = output / "assets" / "fonts"
 
     if destination.resolve().parent != output.resolve() or destination.name != "workbench":
@@ -115,22 +179,21 @@ def overlay_workbench(output: Path, source: Path) -> None:
         dirs_exist_ok=True,
     )
 
-    rewrite_counts = {source_url: 0 for source_url in WORKBENCH_ASSET_REWRITES}
+    deployed_asset_counts = {source_url: 0 for source_url in WORKBENCH_ASSET_REWRITES}
     text_files = tuple(destination.rglob("*.html")) + tuple(destination.rglob("*.css"))
     for text_file in text_files:
         content = text_file.read_text(encoding="utf-8")
         rewritten = content
         for source_url, deploy_url in WORKBENCH_ASSET_REWRITES.items():
-            occurrences = rewritten.count(source_url)
-            if occurrences:
-                rewrite_counts[source_url] += occurrences
+            if source_url in rewritten:
                 rewritten = rewritten.replace(source_url, deploy_url)
+            deployed_asset_counts[source_url] += rewritten.count(deploy_url)
         if rewritten != content:
             text_file.write_text(rewritten, encoding="utf-8", newline="\n")
 
-    if not rewrite_counts["../../assets/brand/logo.svg"]:
+    if not deployed_asset_counts["../../assets/brand/logo.svg"]:
         raise ValueError("workbench source does not contain the expected brand asset URL")
-    if not rewrite_counts["../../crates/rspice-ui/assets/fonts/"]:
+    if not deployed_asset_counts["../../crates/rspice-ui/assets/fonts/"]:
         raise ValueError("workbench source does not contain the expected font asset URLs")
 
 
@@ -148,7 +211,22 @@ def parse_args() -> argparse.Namespace:
         "--workbench-source",
         type=Path,
         default=default_workbench_source(),
-        help="existing RSpice Workbench static-host source to overlay (default: local sibling or deploy-workflow checkout)",
+        help="existing RSpice Workbench static-host source to overlay (default: local simulator source or reviewed public snapshot)",
+    )
+    parser.add_argument(
+        "--rspice-source",
+        type=Path,
+        default=default_rspice_source(),
+        help="RSpice Git checkout used to generate the technical catalog (default: local sibling or CI checkout)",
+    )
+    parser.add_argument(
+        "--validation-artifacts",
+        type=Path,
+        help="optional downloaded validation artifact directory for the selected source revision",
+    )
+    parser.add_argument(
+        "--validation-run-url",
+        help="optional workflow URL recorded beside imported validation artifacts",
     )
     return parser.parse_args()
 
@@ -158,6 +236,15 @@ def main() -> int:
     try:
         output = safe_destination(args.output)
         workbench_source = safe_workbench_source(args.workbench_source)
+        rspice_source = safe_rspice_source(args.rspice_source)
+        validation_artifacts = safe_validation_artifacts(args.validation_artifacts)
+        if is_within(workbench_source, output) or is_within(output, workbench_source):
+            raise ValueError("workbench source must not overlap the build output")
+        if validation_artifacts and (
+            is_within(validation_artifacts, output)
+            or is_within(output, validation_artifacts)
+        ):
+            raise ValueError("validation artifacts must not overlap the build output")
     except ValueError as exc:
         print(f"build refused: {exc}", file=sys.stderr)
         return 2
@@ -180,6 +267,12 @@ def main() -> int:
         output.parent.mkdir(parents=True, exist_ok=True)
         shutil.copytree(SOURCE, output, copy_function=shutil.copy2)
         overlay_workbench(output, workbench_source)
+        generate_reference_bundle(
+            output,
+            rspice_source,
+            validation_artifacts,
+            args.validation_run_url,
+        )
     except (OSError, shutil.Error, ValueError) as exc:
         print(f"build failed while assembling {output}: {exc}", file=sys.stderr)
         return 1

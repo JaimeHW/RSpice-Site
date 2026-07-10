@@ -19,28 +19,76 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - name: Checkout Workbench mockup
+      - name: Checkout RSpice catalog inputs
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           repository: JaimeHW/RSpice
           path: rspice-source
           token: ${{ secrets.RSPICE_SOURCE_TOKEN || github.token }}
+          sparse-checkout-cone-mode: false
           sparse-checkout: |
-            mockups/rspice-workbench-host/public/rspice
-            mockups/rspice-workbench-host/public/crates/rspice-ui/assets/fonts
+            /README.md
+            /Cargo.toml
+            /crates/rspice-cli/README.md
+            /tests/ngspice/validation-manifest.tsv
+            /tests/xyce/RSPICE-HARNESS-MANIFEST.tsv
+            /.github/workflows/nightly.yml
+            /benchmarks/scoreboards/scoreboard.json
+            /mockups/rspice-workbench-host/public/rspice/**
+            /mockups/rspice-workbench-host/public/crates/rspice-ui/assets/fonts/**
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.14"
+      - name: Test site tooling
+        run: python -m unittest discover -s tools -p "test_*.py"
       - name: Verify public Workbench snapshot
         shell: bash
         run: |
-          python tools/sync_workbench.py --workbench-source rspice-source/mockups/rspice-workbench-host/public/rspice
-          git diff --exit-code -- public/workbench public/assets/fonts
-          test -z "$(git status --porcelain --untracked-files=all -- public/workbench public/assets/fonts)"
+          if [ -d rspice-source/mockups/rspice-workbench-host/public/rspice ]; then
+            python tools/sync_workbench.py --workbench-source rspice-source/mockups/rspice-workbench-host/public/rspice
+            git diff --exit-code -- public/workbench public/assets/fonts
+            test -z "$(git status --porcelain --untracked-files=all -- public/workbench public/assets/fonts)"
+          else
+            echo "Workbench source is not tracked at this RSpice revision; using the reviewed site vendor snapshot."
+            test -f public/workbench/index.html
+            test -f public/workbench/styles.css
+            test -f public/workbench/app.js
+          fi
+      - name: Verify generated technical reference
+        shell: bash
+        run: |
+          python tools/sync_reference.py --rspice-source rspice-source
+          git diff --exit-code -- public/reference.html public/validation.html public/reference
+          test -z "$(git status --porcelain --untracked-files=all -- public/reference.html public/validation.html public/reference)"
+      - name: Find revision-matched nightly artifact
+        continue-on-error: true
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.RSPICE_SOURCE_TOKEN || github.token }}
+        run: |
+          source_sha=$(git -C rspice-source rev-parse HEAD)
+          matching=$(gh run list --repo JaimeHW/RSpice --workflow nightly.yml --branch main --status completed --limit 50 --json databaseId,headSha,url,conclusion | jq -c --arg sha "$source_sha" 'map(select(.headSha == $sha)) | first // empty')
+          if [ -z "$matching" ]; then
+            echo "No completed Nightly run exactly matches $source_sha; publishing configured gates without a pass result."
+            exit 0
+          fi
+          run_id=$(jq -r '.databaseId' <<< "$matching")
+          run_url=$(jq -r '.url' <<< "$matching")
+          run_conclusion=$(jq -r '.conclusion' <<< "$matching")
+          rm -rf rspice-validation.tmp rspice-validation
+          gh run download "$run_id" --repo JaimeHW/RSpice --name conformance-log --dir rspice-validation.tmp
+          jq -n --arg source_revision "$source_sha" --arg run_url "$run_url" --arg run_conclusion "$run_conclusion" '{source_revision:$source_revision,run_url:$run_url,run_conclusion:$run_conclusion}' > rspice-validation.tmp/validation-metadata.json
+          mv rspice-validation.tmp rspice-validation
       - name: Validate source
         run: python tools/check_site.py --root public
       - name: Build deployable tree
-        run: python tools/build_site.py --out dist --workbench-source rspice-source/mockups/rspice-workbench-host/public/rspice
+        shell: bash
+        run: |
+          args=(--out dist --rspice-source rspice-source --workbench-source public/workbench)
+          if [ -d rspice-validation ]; then
+            args+=(--validation-artifacts rspice-validation)
+          fi
+          python tools/build_site.py "${args[@]}"
       - name: Validate deployable tree
         run: python tools/check_site.py --root dist
       - name: Upload deployable site

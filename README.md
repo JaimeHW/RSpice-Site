@@ -20,10 +20,13 @@ real HTML surface in a non-interactive frame; it never substitutes a screenshot
 or a hand-maintained imitation. The site-owned `workbench-frame.html` wrapper
 auto-fits the fixed desktop GUI from `/workbench/index.html`; the standalone
 `responsive-preview.html` lab and its viewport controls are not embedded in the
-landing page. Refresh the snapshot with
-`python tools/sync_workbench.py`. CI verifies that the checked-in snapshot still
-matches the simulator source, and the deploy build overlays the current source
-again before publishing.
+landing page. Refresh the snapshot with `python tools/sync_workbench.py`.
+
+The current mockup directory is not tracked by the RSpice Git revision, so the
+reviewed `public/workbench/` copy is the production build input. CI compares it
+with the simulator source automatically whenever that directory is present in a
+clean checkout; until then, CI validates and deploys the vendor snapshot instead
+of depending on a local-only path.
 
 It does **not** own the browser simulator runtime. The `/ide/` and `/play/`
 routes, including their WebAssembly bundles and workers, are reserved for the
@@ -35,6 +38,23 @@ site.
 Keeping that assembly in the client release pipeline prevents the website from
 publishing a browser UI whose JavaScript worker and WebAssembly exports were
 built from a different client revision.
+
+The `/reference` and `/validation` pages are generated from an exact RSpice Git
+checkout. `tools/reference_catalog.py` reads the source README tables, CLI
+reference, workspace metadata, ngspice and Xyce manifests, nightly gate, and
+benchmark scoreboard; it writes the searchable page, a machine-readable catalog,
+and copies the source-controlled raw inputs under `public/reference/`. Refresh
+the checked-in snapshot with:
+
+```shell
+python tools/sync_reference.py --rspice-source ../RSpice
+```
+
+CI repeats that command and fails when the snapshot differs. A build may also
+import a downloaded nightly artifact, but a CI conclusion is presented as a
+result only when `validation-metadata.json` identifies the exact source commit.
+Unpinned or mismatched files remain downloadable without being counted as a
+result.
 
 ## Validate and build
 
@@ -52,10 +72,10 @@ file recursively, local links and fragments, responsive/SEO metadata,
 accessibility basics, URL safety, deployment metadata, and the `/ide/`,
 `/play/`, and `/workbench/` overlay boundaries.
 
-Build a clean deployable copy in `dist/`. By default the builder expects the
-sibling `../RSpice` checkout used by this workspace. In the private client
-deployment workflow it automatically resolves the primary RSpice checkout that
-sits beside the standalone site checkout:
+Build a clean deployable copy in `dist/`. The builder uses the sibling
+`../RSpice` Workbench source when it is present and otherwise uses the reviewed
+`public/workbench/` snapshot. Reference generation still requires the sibling
+RSpice Git checkout by default:
 
 ```shell
 python tools/build_site.py
@@ -64,7 +84,14 @@ python tools/build_site.py
 When the RSpice checkout lives elsewhere, pass the existing mockup-host source:
 
 ```shell
-python tools/build_site.py --workbench-source ../RSpice/mockups/rspice-workbench-host/public/rspice
+python tools/build_site.py --rspice-source ../RSpice --workbench-source ../RSpice/mockups/rspice-workbench-host/public/rspice
+```
+
+To reproduce a validation page with CI data, pass an artifact directory that
+contains `conformance.log` and revision metadata:
+
+```shell
+python tools/build_site.py --validation-artifacts build/nightly-artifact
 ```
 
 Choose another repository-local output directory when needed:
@@ -83,7 +110,8 @@ python tools/serve_site.py
 Then open `http://127.0.0.1:48917/`. Stop it with `Ctrl+C`.
 
 The build validates `public/`, replaces the selected output with an exact copy,
-overlays the existing Workbench UI and its bundled fonts at `/workbench/`,
+overlays the selected Workbench UI and its bundled fonts at `/workbench/`,
+regenerates reference and validation data from the selected RSpice revision,
 rewrites only deployment-relative brand/font paths in that output copy, and
 validates the resulting artifact again. It refuses destinations outside the
 repository, inside `public/`, or overlapping repository metadata and tooling.
@@ -91,10 +119,19 @@ repository, inside `public/`, or overlapping repository metadata and tooling.
 ## Continuous integration and deployment
 
 Every pull request and push to `main` uses a sparse RSpice checkout for the
-Workbench mockup, validates the source, builds `dist/`, validates the resulting
-tree, and uploads it as the `rspice-static-site` workflow artifact. The artifact
-includes dotfiles, the Workbench overlay, and the Cloudflare Pages `_headers`
-file.
+technical-catalog inputs and optional tracked Workbench source, validates the
+vendor snapshot, verifies the generated reference snapshot, runs the tooling
+tests, attempts to download an exact-revision nightly conformance log, validates
+the source, builds `dist/`, validates the resulting tree, and uploads it as the
+`rspice-static-site` workflow artifact.
+The artifact includes dotfiles, the Workbench overlay, generated reference data,
+and the Cloudflare Pages `_headers` file.
+
+The `/early-access` form has no collection endpoint today. It prepares a
+structured email to `sales@rspice.app` and stores nothing on the site. A future
+same-origin endpoint can be set in `data-intake-endpoint` only after its data
+handling, abuse protection, retention, privacy notice, and customer-record
+ownership are ready.
 
 When `JaimeHW/RSpice` is private, configure this repository's
 `RSPICE_SOURCE_TOKEN` Actions secret with read-only access to that repository.

@@ -48,6 +48,10 @@ def sync(source: Path) -> None:
         raise ValueError("refusing unsafe public Workbench destination")
     if DESTINATION.is_symlink() or getattr(DESTINATION, "is_junction", lambda: False)():
         raise ValueError("refusing public Workbench through a link or junction")
+    if source.resolve() == destination:
+        raise ValueError(
+            "Workbench sync source is already the public vendor snapshot; pass the simulator mockup source"
+        )
     if DESTINATION.exists():
         shutil.rmtree(DESTINATION)
     shutil.copytree(source, DESTINATION, copy_function=shutil.copy2)

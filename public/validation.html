@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090b0d">
+  <meta name="color-scheme" content="dark">
+  <title>Validation status &mdash; RSpice</title>
+  <meta name="description" content="Revision-pinned RSpice validation configuration, manifest inventory, imported CI results, raw artifacts, and benchmark context.">
+  <link rel="canonical" href="https://rspice.app/validation">
+  <link rel="icon" href="assets/brand/rspice.ico" sizes="any">
+  <link rel="apple-touch-icon" href="assets/brand/icon-256.png">
+  <link rel="stylesheet" href="assets/field.css">
+  <link rel="stylesheet" href="assets/technical.css">
+  <link rel="stylesheet" href="assets/interior-refined.css">
+  <link rel="stylesheet" href="assets/reference.css">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Validation status — RSpice">
+  <meta property="og:description" content="Revision-pinned RSpice validation configuration, manifest inventory, imported CI results, raw artifacts, and benchmark context.">
+  <meta property="og:image" content="https://rspice.app/assets/og.png">
+</head>
+<body class="technical-page validation-page">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="topbar" data-topbar>
+    <div class="topbar__inner">
+      <a class="identity" href="index.html" aria-label="RSpice home"><img src="assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a>
+      <button class="nav-trigger" type="button" aria-controls="site-nav" aria-expanded="false" data-nav-trigger><span class="visually-hidden">Open navigation</span><span aria-hidden="true"></span><span aria-hidden="true"></span></button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary navigation" data-site-nav><a href="index.html#engine">Engine</a><a href="index.html#analyses">Analyses</a><a href="index.html#truth">Status</a><a href="reference.html">Reference</a><a href="validation.html" aria-current="page">Validation</a><a href="docs.html">Docs</a></nav>
+      <div class="topbar__actions"><a class="source-link" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a><a class="launch-link" href="ide/">Open WASM lab <span class="launch-link__tag">experimental</span></a></div>
+    </div>
+  </header>
+  <main id="main">
+    <header class="technical-hero"><div class="page-frame technical-hero__grid"><div><p class="eyebrow">RSPICE / REVISION-PINNED VALIDATION</p><h1>Configured gates, imported CI results, and raw validation files.</h1><p class="technical-hero__lede">Every count on this page is tied to source commit <a href="https://github.com/JaimeHW/RSpice/commit/c216a0922ae3ecf93ae2746aadc677ae3ef6fa95" target="_blank" rel="noopener"><code>c216a0922ae3</code></a>. Missing CI data stays missing instead of being replaced with an unversioned percentage.</p></div><dl class="technical-hero__ledger"><div><dt>SOURCE REVISION</dt><dd>c216a0922ae3</dd></div><div><dt>NGSPICE GATE</dt><dd>113 decks / ≤ 2 failing</dd></div><div><dt>XYCE CONTRACTS</dt><dd>2123 manifest entries</dd></div><div><dt>CI ARTIFACT</dt><dd>NOT IMPORTED</dd></div></dl></div></header>
+    <div class="page-frame validation-layout">
+      <section class="validation-status"><div><p class="technical-number">IMPORTED RUN STATUS</p><h2>NOT IMPORTED</h2><p>No matching nightly artifact was supplied to this build. The page below reports source-controlled manifests and gate configuration, not a current pass result.</p></div><div class="technical-actions"><a class="button button--quiet" href="reference/catalog.json">Catalog JSON</a></div></section>
+      <section class="reference-section"><header><div><p class="technical-number">01 / SOURCE-CONTROLLED GATES</p><h2>Nightly and corpus configuration</h2></div></header><div class="technical-grid technical-grid--three"><article><span>NGSPICE</span><h3>113 aggregate decks</h3><p>The nightly ratchet allows no more than 2 failing decks and fails if the aggregate row or pinned deck count disappears.</p></article><article><span>NGSPICE MANIFEST</span><h3>49 classified entries</h3><p>Modes distinguish numeric comparison, smoke execution, locked grids, engineering measures, and expected unsupported or unsolvable cases.</p></article><article><span>XYCE MANIFEST</span><h3>2123 retained contracts</h3><p>Wrapper-dependent Xyce decks stay listed until their upstream runner behavior is implemented.</p></article></div></section>
+      <section class="reference-section"><header><div><p class="technical-number">02 / NGSPICE MANIFEST</p><h2>Classification counts</h2></div></header><div class="technical-table-wrap"><table class="technical-table"><thead><tr><th>MODE</th><th>ENTRIES</th></tr></thead><tbody><tr><td>locked_grid</td><td>2</td></tr><tr><td>measures</td><td>3</td></tr><tr><td>reference_unsolvable</td><td>1</td></tr><tr><td>scripted_control</td><td>23</td></tr><tr><td>smoke</td><td>20</td></tr></tbody></table></div></section>
+      <section class="reference-section"><header><div><p class="technical-number">03 / IMPORTED ARTIFACTS</p><h2>Machine-readable and raw files</h2></div></header><ul class="artifact-list"><li><span>No CI artifact files imported for this build.</span></li></ul><div class="reference-downloads"><a href="reference/raw/ngspice-validation-manifest.tsv">ngspice manifest</a><a href="reference/raw/xyce-harness-manifest.tsv">Xyce manifest</a><a href="reference/raw/nightly.yml">nightly workflow</a><a href="reference/catalog.json">full catalog JSON</a></div></section>
+      <section class="reference-section"><header><div><p class="technical-number">04 / SOURCE-CONTROLLED BENCHMARK</p><h2>Published scoreboard context</h2></div><p class="reference-section__lede">These timings come from the source-controlled scoreboard, not the imported CI run. Host, executable paths, repeat count, and methodology remain in the raw JSON.</p></header><div class="technical-table-wrap"><table class="technical-table"><thead><tr><th>DECK</th><th>RSPICE MEDIAN MS</th><th>NGSPICE MEDIAN MS</th><th>NGSPICE / RSPICE</th></tr></thead><tbody><tr><td>diode_rectifier.cir</td><td>18.729</td><td>25.567</td><td>1.365</td></tr><tr><td>divider_ac.cir</td><td>19.199</td><td>37.713</td><td>1.964</td></tr><tr><td>mos_array_4096.cir</td><td>3007.729</td><td>1820.483</td><td>0.605</td></tr><tr><td>rc_ladder_100.cir</td><td>94.659</td><td>135.441</td><td>1.431</td></tr><tr><td>rc_ladder_1000.cir</td><td>832.453</td><td>1113.031</td><td>1.337</td></tr><tr><td>rc_ladder_10000.cir</td><td>972.763</td><td>1452.116</td><td>1.493</td></tr><tr><td>ring51.cir</td><td>505.896</td><td>231.315</td><td>0.457</td></tr></tbody></table></div><div class="reference-downloads"><a href="reference/raw/benchmark-scoreboard.json">Download scoreboard JSON</a><a href="parity.html">Read validation methodology</a></div></section>
+    </div>
+  </main>
+  <footer class="footer">
+    <div class="page-frame footer__grid">
+      <div class="footer__identity"><a class="identity" href="index.html"><img src="assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a><p>Rust circuit simulator with desktop, CLI, Python, and WebAssembly interfaces.</p></div>
+      <div><h2>Technical</h2><a href="reference.html">Generated reference</a><a href="validation.html">Validation status</a><a href="parity.html">Methodology</a><a href="docs.html">Scope and builds</a></div>
+      <div><h2>Project</h2><a href="changelog.html">Development record</a><a href="download.html">Build from source</a><a href="early-access.html">Early access</a><a href="privacy.html">Privacy</a></div>
+      <div><h2>Contact</h2><a href="mailto:hello@rspice.app">General</a><a href="mailto:sales@rspice.app">Commercial</a><a href="https://github.com/JaimeHW/RSpice-Site/security" target="_blank" rel="noopener">Security</a></div>
+    </div>
+    <div class="page-frame footer__base"><span>&copy; <span data-year>2026</span> RSpice</span><span>SOURCE BUILD / HOSTED SERVICES NOT ACTIVE</span><span>IBM Plex under SIL OFL</span></div>
+  </footer>
+  <script src="assets/field.js" defer></script>
+</body>
+</html>

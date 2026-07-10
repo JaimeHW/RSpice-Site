@@ -1,0 +1,117 @@
+# Nightly depth: the full release-mode test suite, the ngspice conformance
+# run gated at its recorded watermark (the pass-rate log is the artifact),
+# and a release build of the shipped binaries on Windows to catch
+# LTO/release-only breakage.
+name: Nightly
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  RUST_BACKTRACE: "1"
+  RUST_TOOLCHAIN: "1.94.0"
+
+jobs:
+  conformance:
+    name: Conformance & full suite (Linux, release)
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Install Rust toolchain
+        run: rustup toolchain install ${{ env.RUST_TOOLCHAIN }} --profile minimal
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+        with:
+          key: nightly
+      - name: Full test suite (release)
+        run: >-
+          cargo test --locked --workspace --exclude rspice-python --exclude rspice-wasm
+          --release -- --skip test_ngspice_ --skip test_full_ngspice
+      - name: Core library unit tests (release)
+        run: cargo test --locked -p rspice-core --lib --release
+      - name: ngspice conformance report
+        # Serial test threads: each deck spawns a case-runner subprocess with
+        # a hard per-case timeout; parallel threads oversubscribe the runner
+        # and trip the caps. The command's own exit status is advisory; the
+        # ratchet step below is the gate.
+        continue-on-error: true
+        run: >-
+          cargo test --locked -p rspice-core --release --test ngspice_regression
+          -- --nocapture --test-threads 1 | tee conformance.log
+      - name: Conformance ratchet
+        # Accuracy can only move forward: fail the nightly when the full
+        # suite reports more failing decks than the recorded watermark.
+        # Never lower the floor. Watermark 2 as measured 2026-06-12: the
+        # two fourbitadder decks (general + transient), a regression
+        # bisected to 5f4f9e41 with a fix in flight; ratchet to 0 when it
+        # lands. The grep anchors on the aggregate row of
+        # test_full_ngspice_suite_summary and pins the deck count, so a
+        # shrinking test universe fails the gate instead of faking
+        # progress; bump the count deliberately when decks are added.
+        env:
+          MAX_FAILING: "2"
+        run: |
+          failed=$(grep -E '^TOTAL +113 tests' conformance.log | grep -Eo '[0-9]+ failed' | grep -Eo '[0-9]+' | tail -1)
+          if [ -z "$failed" ]; then
+            echo "full-suite aggregate row (TOTAL ... 113 tests) missing from conformance.log" >&2
+            exit 1
+          fi
+          echo "failing decks: $failed (watermark allows <= $MAX_FAILING)"
+          [ "$failed" -le "$MAX_FAILING" ]
+      - name: Upload conformance log
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: conformance-log
+          path: conformance.log
+          if-no-files-found: error
+
+  release-build:
+    name: Release build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Install Rust toolchain
+        run: rustup toolchain install ${{ env.RUST_TOOLCHAIN }} --profile minimal
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+        with:
+          key: nightly-release-${{ matrix.os }}
+      - name: Build shipped binaries
+        run: cargo build --locked --release -p rspice-ui -p rspice-cli
+      - name: Stage release artifacts
+        shell: bash
+        run: |
+          mkdir -p release-artifacts
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            cp target/release/rspice.exe release-artifacts/
+            cp target/release/rspice-ui.exe release-artifacts/
+          else
+            cp target/release/rspice release-artifacts/
+            cp target/release/rspice-ui release-artifacts/
+          fi
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-${{ matrix.os }}
+          path: release-artifacts
+          if-no-files-found: error
+      - name: Generate artifact attestation
+        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763 # v4
+        with:
+          subject-path: release-artifacts/*

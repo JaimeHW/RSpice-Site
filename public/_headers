@@ -11,3 +11,6 @@
 
 /workbench/*
   Cache-Control: public, max-age=300, must-revalidate
+
+/reference/*
+  Cache-Control: public, max-age=300, must-revalidate
