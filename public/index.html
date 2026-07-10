@@ -106,23 +106,25 @@
       <div class="page-frame">
         <header class="section-title">
           <p class="eyebrow">02 / ENGINE CONTRACT</p>
-          <h2 id="engine-title">Solver policy, model identity, and evidence belong in one record.</h2>
+          <h2 id="engine-title">A simulation run should carry its own evidence.</h2>
         </header>
+        <div class="engine__board" aria-label="RSpice simulation record contract">
+          <div class="engine__board-head"><span>RUN RECORD / STRUCTURAL CONTRACT</span><span>DECK &rarr; ELABORATE &rarr; SOLVE &rarr; EVIDENCE</span><span>REVIEWABLE OUTPUT</span></div>
         <div class="engine__matrix">
           <article>
-            <span class="matrix-index">A1</span>
+            <span class="matrix-index">A1 / INPUT GRAPH</span>
             <h3>One elaborated circuit.</h3>
             <p>Netlist parsing, expressions, subcircuits, device evaluation, matrix assembly, and analysis dispatch belong to the same simulation record.</p>
             <ul><li>SPICE-compatible decks</li><li>Model and include provenance</li><li>Inspectable generated netlist</li></ul>
           </article>
           <article>
-            <span class="matrix-index">A2</span>
+            <span class="matrix-index">A2 / SOLVER STATE</span>
             <h3>Failure is output.</h3>
             <p>Unsupported model physics, non-finite results, invalid cards, and timeouts should be typed, visible conditions—not quietly rounded into an answer.</p>
             <ul><li>Explicit rejection paths</li><li>Watchdog-aware execution</li><li>Machine-readable reports</li></ul>
           </article>
           <article>
-            <span class="matrix-index">A3</span>
+            <span class="matrix-index">A3 / EVIDENCE PACKET</span>
             <h3>Evidence travels with a run.</h3>
             <p>Measurements, reference comparisons, seeds, options, model identity, and build information make a result reviewable after the plot window has closed.</p>
             <ul><li>JUnit and TAP reporting</li><li>Golden comparison</li><li>Input-linked result summary</li></ul>
@@ -131,16 +133,24 @@
         <div class="engine__tape" aria-label="RSpice engine capabilities">
           <span>MODIFIED NODAL ANALYSIS</span><i></i><span>DAMPED NEWTON</span><i></i><span>ADAPTIVE TRANSIENT</span><i></i><span>SPARSE REAL + COMPLEX PATHS</span><i></i><span>RAYON PARALLEL FAMILIES</span>
         </div>
+        </div>
       </div>
     </section>
 
     <section class="analyses" id="analyses" aria-labelledby="analyses-title">
-      <div class="page-frame analyses__layout">
+      <div class="page-frame">
+        <div class="analyses__intro">
         <header class="section-title">
           <p class="eyebrow">03 / ANALYSIS MAP</p>
-          <h2 id="analyses-title">Analysis support should be legible before the run.</h2>
-          <p class="section-title__body">RSpice has a broad engine surface, but reachability differs between the native UI, CLI, and browser targets. The list is an engineering map, not a blanket release claim.</p>
+          <h2 id="analyses-title">Analysis support, plotted as an engineering surface.</h2>
+          <p class="section-title__body">RSpice has a broad engine surface, but reachability differs between the native UI, CLI, and browser targets. The map is a capability index, not a blanket release claim.</p>
         </header>
+        <figure class="analysis-scope" aria-label="Stylized analysis-space plot">
+          <figcaption><span>ANALYSIS SPACE / SELECTED PATHS</span><span>INPUT &rarr; RESPONSE &rarr; EVIDENCE</span></figcaption>
+          <svg viewBox="0 0 560 200" role="img" aria-label="A technical plot with DC, transient, AC, and statistical analysis traces"><path class="analysis-scope__grid" d="M0 40H560M0 100H560M0 160H560M70 0V200M180 0V200M290 0V200M400 0V200M510 0V200"/><path class="analysis-scope__trace analysis-scope__trace--dc" d="M0 146C72 145 104 141 147 111S221 55 280 54S388 105 447 104S514 68 560 28"/><path class="analysis-scope__trace analysis-scope__trace--tran" d="M0 157C31 157 37 37 72 37S100 161 129 161S160 73 192 73S224 132 254 132S283 94 314 94S345 116 381 116S423 73 455 73S500 99 560 99"/><path class="analysis-scope__trace analysis-scope__trace--ac" d="M0 176C69 172 95 166 139 148S207 112 258 119S327 154 380 128S459 46 560 30"/><g class="analysis-scope__marks"><circle cx="72" cy="37" r="4"/><circle cx="280" cy="54" r="4"/><circle cx="455" cy="73" r="4"/></g><text x="13" y="28">DC / BIAS</text><text x="207" y="188">TRANSIENT / TIME</text><text x="450" y="28">AC / FREQ</text></svg>
+        </figure>
+        </div>
+        <div class="analyses__layout">
         <div class="analysis-board">
           <div class="analysis-board__head"><span>FAMILY</span><span>ENGINE PATH</span><span>NOTES</span></div>
           <article><div><code>01</code><h3>Bias / sweep</h3></div><p><code>.OP</code> <code>.DC</code> <code>.STEP</code> <code>.TF</code> <code>.SENS</code></p><small>Operating points, parameter families, transfer and sensitivity.</small></article>
@@ -149,10 +159,11 @@
           <article><div><code>04</code><h3>RF / periodic</h3></div><p><code>HB</code> <code>PSS</code> <code>STB</code> <code>S</code></p><small>Selected engine and CLI paths; use the capability status in the product surface.</small></article>
         </div>
         <aside class="analysis-note">
-          <span class="analysis-note__label">MODEL SURFACE</span>
+          <span class="analysis-note__label">MODEL SURFACE / DEVICE ATLAS</span>
           <p>BSIM4 / BSIM3 / EKV / VDMOS<br>Gummel-Poon / VBIC / HICUM<br>JFET / HEMT / GaN<br>Transmission lines / magnetics<br>XSPICE-style mixed signal<br>Compiled Verilog-A</p>
           <a href="docs.html">Read the current technical scope <span aria-hidden="true">↗</span></a>
         </aside>
+        </div>
       </div>
     </section>
 
@@ -163,16 +174,19 @@
         <header class="section-title section-title--split">
           <div>
             <p class="eyebrow">04 / PRODUCT TRUTH</p>
-            <h2 id="truth-title">What exists needs a status, not a slogan.</h2>
+            <h2 id="truth-title">Status belongs beside the surface.</h2>
           </div>
           <p>Engineering software earns trust by separating what works now, what can be evaluated, what has only been designed, and what does not exist yet.</p>
         </header>
+        <div class="truth__instrument">
+          <div class="truth__instrument-head"><span>CAPABILITY INSTRUMENT / DECLARED STATUS</span><span>NO IMPLIED ENTITLEMENT</span><span>REVISION-SPECIFIC EVIDENCE REQUIRED</span></div>
         <div class="truth-table" role="table" aria-label="RSpice product status">
           <div class="truth-table__head" role="row"><span role="columnheader">STATUS</span><span role="columnheader">SURFACE</span><span role="columnheader">WHAT IT MEANS</span><span role="columnheader">NEXT DECISION</span></div>
           <article role="row"><span class="truth-pill truth-pill--ready" role="cell">SOURCE READY</span><h3 role="cell">Native engine &amp; tools</h3><p role="cell">The Rust engine, CLI, Python bindings, validation harnesses, and desktop EGUI application are active code paths.</p><a role="cell" href="download.html">Build locally <span aria-hidden="true">↗</span></a></article>
           <article role="row"><span class="truth-pill truth-pill--test" role="cell">EXPERIMENTAL</span><h3 role="cell">WebAssembly &amp; browser IDE</h3><p role="cell">The browser surface is an evaluation target with WebGPU and single-threaded constraints—not a production web suite.</p><a role="cell" href="ide/">Open preview <span aria-hidden="true">↗</span></a></article>
           <article role="row"><span class="truth-pill truth-pill--concept" role="cell">CONCEPT</span><h3 role="cell">New Workbench UI</h3><p role="cell">The desktop, tablet, and phone interaction model is a high-fidelity mockup guiding the GUI revamp.</p><a role="cell" href="#product">Inspect concept <span aria-hidden="true">↗</span></a></article>
           <article role="row"><span class="truth-pill truth-pill--future" role="cell">ROADMAP</span><h3 role="cell">Accounts, sync, cloud &amp; sharing</h3><p role="cell">Live collaboration, cloud saves, managed simulation, and published circuit URLs are planned services; they are not live.</p><a role="cell" href="#roadmap">View architecture <span aria-hidden="true">↗</span></a></article>
+        </div>
         </div>
       </div>
     </section>
@@ -183,7 +197,7 @@
         <div class="roadmap__top">
           <header class="section-title">
             <p class="eyebrow">05 / CONNECTED RSPICE</p>
-            <h2 id="roadmap-title">Connected work is a system design—not a login button.</h2>
+            <h2 id="roadmap-title">Connected work, without surrendering the local project.</h2>
           </header>
           <p class="roadmap__lede">The goal is not to make a browser tab mandatory. It is to let an engineering team choose connected work when the control plane is ready: versioned projects, reversible sharing, accountable compute, and readable evidence.</p>
         </div>
@@ -211,7 +225,7 @@
         <header class="section-title section-title--split">
           <div>
             <p class="eyebrow">06 / PLANNED PRICING</p>
-            <h2 id="pricing-title">Commercial access should preserve local agency.</h2>
+            <h2 id="pricing-title">License the workflow. Meter the expensive work.</h2>
           </div>
           <p>These are proposed launch prices, not active checkout offers. The model is designed for commercial durability: paid engineering seats, free reviewers, and separate usage for expensive managed computation.</p>
         </header>
@@ -250,7 +264,7 @@
       <div class="page-frame final-call__inner">
         <div>
           <p class="eyebrow">RSPICE / DEVELOPMENT SIGNAL</p>
-          <h2 id="final-title">Inspect the assumption chain.</h2>
+          <h2 id="final-title">Start from the run record.</h2>
         </div>
         <div class="final-call__actions">
           <a class="button button--hot" href="ide/">Open web lab <span aria-hidden="true">↗</span></a>

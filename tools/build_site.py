@@ -13,13 +13,8 @@ from check_site import print_result, validate_site
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 SOURCE = (REPOSITORY_ROOT / "public").resolve()
-DEFAULT_WORKBENCH_SOURCE = (
-    REPOSITORY_ROOT.parent
-    / "RSpice"
-    / "mockups"
-    / "rspice-workbench-host"
-    / "public"
-    / "rspice"
+WORKBENCH_SOURCE_SUFFIX = Path(
+    "mockups/rspice-workbench-host/public/rspice"
 )
 WORKBENCH_FILES = ("index.html", "styles.css", "app.js")
 WORKBENCH_ASSET_REWRITES = {
@@ -33,6 +28,15 @@ PROTECTED_PATHS = {
     (REPOSITORY_ROOT / ".github").resolve(),
     (REPOSITORY_ROOT / "tools").resolve(),
 }
+
+
+def default_workbench_source() -> Path:
+    """Resolve both the local sibling checkout and the deploy-workflow layout."""
+    candidates = (
+        REPOSITORY_ROOT.parent / "RSpice" / WORKBENCH_SOURCE_SUFFIX,
+        REPOSITORY_ROOT.parent / WORKBENCH_SOURCE_SUFFIX,
+    )
+    return next((candidate for candidate in candidates if candidate.is_dir()), candidates[0])
 
 
 def is_within(path: Path, parent: Path) -> bool:
@@ -132,8 +136,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--workbench-source",
         type=Path,
-        default=DEFAULT_WORKBENCH_SOURCE,
-        help="existing RSpice Workbench static-host source to overlay (default: sibling RSpice mockup host)",
+        default=default_workbench_source(),
+        help="existing RSpice Workbench static-host source to overlay (default: local sibling or deploy-workflow checkout)",
     )
     return parser.parse_args()
 

@@ -49,7 +49,9 @@ accessibility basics, URL safety, deployment metadata, and the `/ide/`,
 `/play/`, and `/workbench/` overlay boundaries.
 
 Build a clean deployable copy in `dist/`. By default the builder expects the
-sibling `../RSpice` checkout used by this workspace:
+sibling `../RSpice` checkout used by this workspace. In the private client
+deployment workflow it automatically resolves the primary RSpice checkout that
+sits beside the standalone site checkout:
 
 ```shell
 python tools/build_site.py
@@ -66,6 +68,16 @@ Choose another repository-local output directory when needed:
 ```shell
 python tools/build_site.py --out build/site
 ```
+
+For local preview, do not serve `public/` directly: that editable tree
+intentionally excludes the Workbench overlay. Use the preview tool, which builds
+the same artifact that deployment consumes and disables browser caching:
+
+```shell
+python tools/serve_site.py
+```
+
+Then open `http://127.0.0.1:48917/`. Stop it with `Ctrl+C`.
 
 The build validates `public/`, replaces the selected output with an exact copy,
 overlays the existing Workbench UI and its bundled fonts at `/workbench/`,
