@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#11171b">
   <meta name="description" content="RSpice high-end EDA workflow surface gallery">
   <title>RSpice — High-end EDA surface gallery</title>
-  <link rel="stylesheet" href="styles.css?v=20260710ad">
+  <link rel="stylesheet" href="styles.css?v=20260710at">
   <link rel="stylesheet" href="surface-gallery.css?v=20260710u">
 </head>
 <body class="surface-gallery-body">
@@ -49,7 +49,6 @@
           <button id="nav-automation" type="button" role="tab" aria-selected="false" aria-controls="automation" data-target="automation"><span class="nav-number">12</span>Automation</button>
           <button id="nav-project-config" type="button" role="tab" aria-selected="false" aria-controls="project-config" data-target="project-config"><span class="nav-number">13</span>Config binding</button>
           <button id="nav-drc" type="button" role="tab" aria-selected="false" aria-controls="drc" data-target="drc"><span class="nav-number">14</span>Physical DRC</button>
-          <button id="nav-post-layout" type="button" role="tab" aria-selected="false" aria-controls="post-layout" data-target="post-layout"><span class="nav-number">15</span>Post-layout</button>
           <button id="nav-states" type="button" role="tab" aria-selected="false" aria-controls="states" data-target="states"><span class="nav-number">16</span>First-run states</button>
         </nav>
         <div class="gallery-nav-stepper" aria-label="Previous or next surface">
@@ -1553,7 +1552,7 @@
       </article>
 
       <!-- 15 · Post-layout extraction, parasitics, EM, and electrothermal -->
-      <article class="surface-screen" id="post-layout" role="tabpanel" aria-labelledby="nav-post-layout" data-title="Post-layout · extraction, parasitics, EM & electrothermal" data-description="A complete, fail-closed design contract for extracted-view binding, imported parasitic validation, reduction, source mapping, EM evidence, and electrothermal coupling—without claiming unavailable engines.">
+      <article class="surface-screen legacy-surface-retired" id="post-layout" hidden inert aria-hidden="true" data-title="Retired monolithic post-layout reference" data-description="Superseded by the canonical persistent LVS/PEX and EM/IR/electrothermal engineering documents in the primary workbench.">
         <header class="screen-head">
           <div><span class="eyebrow">POST-LAYOUT · LVS · PEX · MULTIPHYSICS</span><h2>Extracted-view, parasitic, EM and electrothermal workspace</h2><p>This surface owns identity matching, extracted netlisting, parasitics, EM and electrothermal evidence. Geometric rule checking and waiver governance remain exclusively in Physical DRC.</p></div>
           <div class="chip-row"><span class="availability production">UX · release design</span><span class="availability preview">PEX engine · roadmap</span><span class="availability compatibility">DSPF / SPEF ingest · design contract</span><span class="status-badge warn">non-runnable fixture</span></div>

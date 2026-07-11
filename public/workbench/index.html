@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#11171b">
   <meta name="description" content="RSpice Workbench for circuit design, simulation, analysis, and verification">
   <title>RSpice Workbench</title>
-  <link rel="stylesheet" href="styles.css?v=20260710ad">
+  <link rel="stylesheet" href="styles.css?v=20260711ce">
 </head>
 <body>
   <a class="skip-link" href="#workspace-main">Skip to workspace</a>
@@ -35,7 +35,7 @@
 
       <div class="title-context" aria-label="Active project">
         <span class="project-state" role="status" aria-label="All changes saved" title="All changes saved"></span>
-        <span class="title-project">Precision Sensor AFE</span>
+        <span class="title-project">Common Emitter Amplifier</span>
         <span class="crumb-separator">/</span>
         <span class="title-cell" id="title-cell">top · schematic</span>
       </div>
@@ -49,7 +49,7 @@
         <button class="icon-button" type="button" id="preferences-button" data-action="preferences" title="Preferences" aria-label="Open preferences" aria-haspopup="dialog" aria-controls="settings-dialog">
           <span class="icon" data-icon="settings"></span>
         </button>
-        <button class="avatar-button" id="account-button" type="button" title="Account and license" aria-label="Account and license" aria-haspopup="dialog" aria-controls="settings-dialog">JM</button>
+        <button class="avatar-button" id="account-button" type="button" title="Account and organization" aria-label="Account and organization" aria-haspopup="dialog" aria-controls="workflow-dialog">JM</button>
       </div>
     </header>
 
@@ -70,9 +70,9 @@
             <option>SS · −40 °C</option><option>SS · 27 °C</option><option>SS · 125 °C</option>
           </select>
         </label>
-        <button class="run-config-button" id="run-config-button" type="button" title="Open simulation plan" aria-label="Open Lab characterization simulation plan">
+        <button class="run-config-button" id="run-config-button" type="button" title="Open simulation plan" aria-label="Open BJT amplifier characterization simulation plan">
           <span class="icon" data-icon="sliders"></span>
-          <span class="run-config-copy"><strong id="run-config-title">Lab characterization</strong><small id="run-config-detail">15 PVT · 8 analyses</small></span>
+          <span class="run-config-copy"><strong id="run-config-title">BJT amplifier characterization</strong><small id="run-config-detail">15 PVT · 7 analyses</small></span>
           <span class="chevron">⌄</span>
         </button>
         <div class="run-split">
@@ -126,6 +126,7 @@
 
       <main class="center-stack" id="workspace-main" tabindex="-1">
         <div class="document-tabs" id="document-tabs" role="tablist" aria-label="Open documents"></div>
+        <button class="document-overflow-button" id="document-overflow-button" type="button" aria-label="Manage open documents" title="Open documents"><span class="icon" data-icon="chevron-down"></span></button>
         <section class="workspace-stage" id="workspace-stage" role="tabpanel" aria-label="Active workspace"></section>
 
         <div class="dock-splitter dock-splitter-bottom" id="console-splitter" role="separator" aria-label="Resize console; use up and down arrows or Home to reset" aria-orientation="horizontal" aria-valuemin="90" aria-valuemax="520" aria-valuenow="145" title="Drag to resize · Arrow keys adjust · Home resets" tabindex="0"></div>
@@ -158,7 +159,7 @@
       <div class="status-left">
         <button type="button" class="status-item" id="problem-summary" title="Open Problems"><span class="status-icon ok">✓</span><span>Schematic checks · 0 errors · 2 advisories</span></button>
         <span class="status-item status-coordinates" id="cursor-coordinates">x 24.00 · y 18.00 mm</span>
-        <span class="status-item status-selection" id="selection-status">U1 · OPA189</span>
+        <span class="status-item status-selection" id="selection-status">Q1 · 2N2222</span>
       </div>
       <div class="status-right">
         <span class="status-item status-platform"><span class="icon" data-icon="cpu"></span><span>Local · 12 threads</span></span>
@@ -169,6 +170,7 @@
   </div>
 
   <div class="menu-popover" id="menu-popover" role="menu" hidden></div>
+  <div class="surface-context-menu" id="surface-context-menu" role="menu" aria-label="Selection commands" hidden></div>
 
   <dialog class="command-dialog" id="command-dialog" aria-labelledby="command-title">
     <h2 class="sr-only" id="command-title">Search and run a command</h2>
@@ -246,11 +248,12 @@
   <dialog class="settings-dialog workflow-dialog" id="workflow-dialog" aria-labelledby="workflow-dialog-title">
     <div class="dialog-header"><div><span class="eyebrow" id="workflow-dialog-eyebrow">WORKFLOW</span><h2 id="workflow-dialog-title">RSpice workflow</h2></div><button class="icon-button dialog-close" type="button" aria-label="Close workflow">×</button></div>
     <div class="workflow-dialog-body" id="workflow-dialog-body"></div>
+    <div class="workflow-transaction-state" id="workflow-transaction-state" role="status" aria-live="polite" hidden><span class="workflow-state-indicator" aria-hidden="true"></span><span><strong id="workflow-state-title">Ready</strong><small id="workflow-state-detail">Review the resolved operation before applying it.</small></span></div>
     <div class="dialog-footer"><button class="button ghost dialog-close" type="button">Cancel</button><button class="button primary" id="workflow-dialog-primary" type="button">Apply</button></div>
   </dialog>
 
   <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
 
-  <script src="app.js?v=20260710x"></script>
+  <script src="app.js?v=20260711ce"></script>
 </body>
 </html>
