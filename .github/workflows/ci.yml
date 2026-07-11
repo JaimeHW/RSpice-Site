@@ -19,10 +19,22 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Resolve pinned RSpice reference revision
+        id: rspice-source
+        shell: bash
+        run: |
+          set -euo pipefail
+          rspice_sha=$(tr -d '[:space:]' < RSPICE_SOURCE_REVISION)
+          if [[ ! "$rspice_sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "RSPICE_SOURCE_REVISION must contain one full lowercase Git SHA" >&2
+            exit 1
+          fi
+          echo "sha=$rspice_sha" >> "$GITHUB_OUTPUT"
       - name: Checkout RSpice catalog inputs
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           repository: JaimeHW/RSpice
+          ref: ${{ steps.rspice-source.outputs.sha }}
           path: rspice-source
           token: ${{ secrets.RSPICE_SOURCE_TOKEN || github.token }}
           sparse-checkout-cone-mode: false

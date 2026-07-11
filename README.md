@@ -9,7 +9,7 @@ proprietary RSpice simulator and cloud-service source.
 This repository owns:
 
 - the deployable marketing and documentation tree under `public/`;
-- shared CSS, JavaScript, fonts, images, crawler metadata, and Cloudflare Pages
+- shared CSS, JavaScript, fonts, images, crawler metadata, and deployment
   headers under `public/`; and
 - deterministic validation and static assembly under `tools/`.
 
@@ -44,13 +44,19 @@ checkout. `tools/reference_catalog.py` reads the source README tables, CLI
 reference, workspace metadata, ngspice and Xyce manifests, nightly gate, and
 benchmark scoreboard; it writes the searchable page, a machine-readable catalog,
 and copies the source-controlled raw inputs under `public/reference/`. Refresh
-the checked-in snapshot with:
+the checked-in snapshot and its CI pin together with:
 
 ```shell
 python tools/sync_reference.py --rspice-source ../RSpice
+git -C ../RSpice rev-parse HEAD > RSPICE_SOURCE_REVISION
 ```
 
-CI repeats that command and fails when the snapshot differs. A build may also
+`RSPICE_SOURCE_REVISION` makes website CI reproducible instead of coupling an
+unchanged site commit to the simulator repository's mutable `main`. CI checks
+out that exact revision, repeats reference generation, and fails when the pin
+and checked-in snapshot differ. Production assembly is separate: the release
+controller checks out the explicitly requested site and simulator SHAs and
+regenerates the deployable reference from that exact pair. A build may also
 import a downloaded nightly artifact, but a CI conclusion is presented as a
 result only when `validation-metadata.json` identifies the exact source commit.
 Unpinned or mismatched files remain downloadable without being counted as a
@@ -119,13 +125,14 @@ repository, inside `public/`, or overlapping repository metadata and tooling.
 ## Continuous integration and deployment
 
 Every pull request and push to `main` uses a sparse RSpice checkout for the
-technical-catalog inputs and optional tracked Workbench source, validates the
-vendor snapshot, verifies the generated reference snapshot, runs the tooling
-tests, attempts to download an exact-revision nightly conformance log, validates
-the source, builds `dist/`, validates the resulting tree, and uploads it as the
+revision pinned by `RSPICE_SOURCE_REVISION`, including the technical-catalog
+inputs and optional tracked Workbench source. It validates the vendor snapshot,
+verifies the generated reference snapshot, runs the tooling tests, attempts to
+download an exact-revision nightly conformance log, validates the source, builds
+`dist/`, validates the resulting tree, and uploads it as the
 `rspice-static-site` workflow artifact.
 The artifact includes dotfiles, the Workbench overlay, generated reference data,
-and the Cloudflare Pages `_headers` file.
+and the deployment `_headers` file.
 
 The `/early-access` form has no collection endpoint today. It prepares a
 structured email to `sales@rspice.app` and stores nothing on the site. A future
@@ -137,15 +144,19 @@ When `JaimeHW/RSpice` is private, configure this repository's
 `RSPICE_SOURCE_TOKEN` Actions secret with read-only access to that repository.
 The workflow falls back to its normal token for a public source repository.
 
-After a change merges:
+After a successful `main` run, this repository's release trigger mints a
+short-lived, repository-scoped GitHub App token and dispatches the private
+`JaimeHW/RSpice-Release` controller. The controller records full site and
+simulator SHAs, requires successful CI for both exact revisions, assembles and
+tests the static site plus `/ide/` and `/play/` WebAssembly runtimes, uploads an
+inactive Cloudflare Worker version, verifies its preview URL, and only then
+promotes that exact version to `rspice.app`. Re-dispatching the already-active
+source pair exits as a verified no-op.
 
-1. Download or consume the successful `rspice-static-site` artifact.
-2. Dispatch the private client repository's `Deploy site` workflow with the
-   desired site commit or tag.
-3. Let that workflow overlay the matching `/ide/` and `/play/` runtime files and
-   deploy the assembled tree.
-4. Verify `https://rspice.app/build.json` reports the expected
-   `client_source_sha` and `site_source_sha`.
+The source repository stores no Cloudflare credential. Automatic dispatch uses
+the `RSPICE_RELEASE_APP_ID` variable, `RSPICE_RELEASE_APP_PRIVATE_KEY` secret,
+and `RSPICE_AUTO_RELEASE=true`; Cloudflare account ID and Worker token secrets
+exist only in the private release controller.
 
 The site repository never contains deployment credentials, generated
 WebAssembly, customer data, or simulator source. Do not add generated `pkg/`
