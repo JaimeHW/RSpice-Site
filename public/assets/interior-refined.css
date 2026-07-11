@@ -45,7 +45,7 @@ body.legal-page::before {
 .legal-page .site-nav a,
 .legal-page .source-link {
   color: #8c949a;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .technical-page .site-nav a:hover,
@@ -105,7 +105,7 @@ body.legal-page::before {
   max-width: 760px;
   margin-top: 13px;
   color: #9ca3a8;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.58;
 }
 
@@ -127,7 +127,7 @@ body.legal-page::before {
 .technical-hero__ledger dd {
   margin-top: 5px;
   color: #d9dddf;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .technical-layout,
@@ -179,7 +179,7 @@ body.legal-page::before {
 .legal-copy p {
   margin-top: 13px;
   color: #a0a7ab;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.62;
 }
 
@@ -219,8 +219,8 @@ body.legal-page::before {
 
 .technical-grid p {
   margin-top: 8px;
-  font-size: 11.5px;
-  line-height: 1.52;
+  font-size: 13px;
+  line-height: 1.58;
 }
 
 .technical-list {
@@ -232,7 +232,7 @@ body.legal-page::before {
   padding: 13px 0;
   border-color: #292f33;
   color: #a0a7ab;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .technical-list li::before {
@@ -253,7 +253,7 @@ body.legal-page::before {
 .technical-table td {
   padding: 11px 12px;
   color: #a8aeb2;
-  font-size: 11.5px;
+  font-size: 13px;
 }
 
 .technical-pill,
