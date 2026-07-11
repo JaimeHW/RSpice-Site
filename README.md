@@ -44,12 +44,15 @@ checkout. `tools/reference_catalog.py` reads the source README tables, CLI
 reference, workspace metadata, ngspice and Xyce manifests, nightly gate, and
 benchmark scoreboard; it writes the searchable page, a machine-readable catalog,
 and copies the source-controlled raw inputs under `public/reference/`. Refresh
-the checked-in snapshot and its CI pin together with:
+the checked-in snapshot and its CI pin together from a clean RSpice checkout:
 
 ```shell
 python tools/sync_reference.py --rspice-source ../RSpice
-git -C ../RSpice rev-parse HEAD > RSPICE_SOURCE_REVISION
 ```
+
+The sync command writes `RSPICE_SOURCE_REVISION`, `public/reference.html`,
+`public/validation.html`, and `public/reference/` from one inspected commit, so
+the snapshot cannot accidentally be paired with a different manual SHA.
 
 `RSPICE_SOURCE_REVISION` makes website CI reproducible instead of coupling an
 unchanged site commit to the simulator repository's mutable `main`. CI checks
@@ -152,6 +155,13 @@ tests the static site plus `/ide/` and `/play/` WebAssembly runtimes, uploads an
 inactive Cloudflare Worker version, verifies its preview URL, and only then
 promotes that exact version to `rspice.app`. Re-dispatching the already-active
 source pair exits as a verified no-op.
+
+For normal static-site changes, commit and push `main`; no generated WebAssembly
+or Cloudflare command is run from this repository. Site CI must pass, then the
+release controller automatically combines that exact site commit with the
+current RSpice `main`, verifies both source revisions, and promotes the result.
+Generated-reference-only changes use the sync command above, then commit the
+pin and all generated reference files together and push `main` in the same way.
 
 The source repository stores no Cloudflare credential. Automatic dispatch uses
 the `RSPICE_RELEASE_APP_ID` variable, `RSPICE_RELEASE_APP_PRIVATE_KEY` secret,

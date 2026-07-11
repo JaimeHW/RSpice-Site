@@ -1041,7 +1041,7 @@ class SiteValidator:
             if len(line) > 2_000:
                 self.error(
                     path,
-                    "Cloudflare Pages _headers lines must not exceed 2,000 characters",
+                    "Cloudflare static-asset _headers lines must not exceed 2,000 characters",
                     line_number,
                 )
         rule_count = sum(
@@ -1050,7 +1050,7 @@ class SiteValidator:
             if line and not line[0].isspace() and not line.startswith("#")
         )
         if rule_count > 100:
-            self.error(path, "Cloudflare Pages _headers must not exceed 100 rules")
+            self.error(path, "Cloudflare static-asset _headers must not exceed 100 rules")
         required_headers = (
             "Content-Security-Policy:",
             "X-Content-Type-Options:",
