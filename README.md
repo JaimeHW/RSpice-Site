@@ -28,16 +28,15 @@ with the simulator source automatically whenever that directory is present in a
 clean checkout; until then, CI validates and deploys the vendor snapshot instead
 of depending on a local-only path.
 
-It does **not** own the browser simulator runtime. The `/ide/` and `/play/`
-routes, including their WebAssembly bundles and workers, are reserved for the
-private RSpice client repository. Its release workflow overlays a verified
-browser runtime on the website artifact, records both source revisions in
-`build.json`, runs browser smoke tests, and only then publishes the assembled
-site.
+It does **not** own the browser simulator source. The `/ide/` and `/play/`
+runtimes are built from an immutable revision of an explicitly selected RSpice
+repository by `tools/deploy.py`. The local publisher overlays those generated WebAssembly
+artifacts, records both source revisions, runs browser smoke tests, and pushes
+the verified static tree to this repository's `production` branch.
 
-Keeping that assembly in the client release pipeline prevents the website from
-publishing a browser UI whose JavaScript worker and WebAssembly exports were
-built from a different client revision.
+Keeping both source revisions in one local release command prevents the website
+from publishing a browser UI whose JavaScript worker and WebAssembly exports
+were built from a different simulator revision.
 
 The `/reference` and `/validation` pages are generated from an exact RSpice Git
 checkout. `tools/reference_catalog.py` reads the source README tables, CLI
@@ -54,11 +53,11 @@ The sync command writes `RSPICE_SOURCE_REVISION`, `public/reference.html`,
 `public/validation.html`, and `public/reference/` from one inspected commit, so
 the snapshot cannot accidentally be paired with a different manual SHA.
 
-`RSPICE_SOURCE_REVISION` makes website CI reproducible instead of coupling an
+`RSPICE_SOURCE_REVISION` makes website validation reproducible instead of coupling an
 unchanged site commit to the simulator repository's mutable `main`. CI checks
 out that exact revision, repeats reference generation, and fails when the pin
-and checked-in snapshot differ. Production assembly is separate: the release
-controller checks out the explicitly requested site and simulator SHAs and
+and checked-in snapshot differ. Production assembly is separate: the local
+publisher checks out the explicitly requested site and simulator SHAs and
 regenerates the deployable reference from that exact pair. A build may also
 import a downloaded nightly artifact, but a CI conclusion is presented as a
 result only when `validation-metadata.json` identifies the exact source commit.
@@ -125,9 +124,9 @@ rewrites only deployment-relative brand/font paths in that output copy, and
 validates the resulting artifact again. It refuses destinations outside the
 repository, inside `public/`, or overlapping repository metadata and tooling.
 
-## Continuous integration and deployment
+## Validation and deployment
 
-Every pull request and push to `main` uses a sparse RSpice checkout for the
+The optional CI workflow uses a sparse RSpice checkout for the
 revision pinned by `RSPICE_SOURCE_REVISION`, including the technical-catalog
 inputs and optional tracked Workbench source. It validates the vendor snapshot,
 verifies the generated reference snapshot, runs the tooling tests, attempts to
@@ -147,30 +146,30 @@ When `JaimeHW/RSpice` is private, configure this repository's
 `RSPICE_SOURCE_TOKEN` Actions secret with read-only access to that repository.
 The workflow falls back to its normal token for a public source repository.
 
-After a successful `main` run, this repository's release trigger mints a
-short-lived, repository-scoped GitHub App token and dispatches the private
-`JaimeHW/RSpice-Release` controller. The controller records full site and
-simulator SHAs, requires successful CI for both exact revisions, assembles and
-tests the static site plus `/ide/` and `/play/` WebAssembly runtimes, uploads an
-inactive Cloudflare Worker version, verifies its preview URL, and only then
-promotes that exact version to `rspice.app`. Re-dispatching the already-active
-source pair exits as a verified no-op.
+Production does not depend on CI or any paid runner. After pushing the desired
+site and simulator commits, run from this repository:
 
-For normal static-site changes, commit and push `main`; no generated WebAssembly
-or Cloudflare command is run from this repository. Site CI must pass, then the
-release controller automatically combines that exact site commit with the
-current RSpice `main`, verifies both source revisions, and promotes the result.
-Generated-reference-only changes use the sync command above, then commit the
-pin and all generated reference files together and push `main` in the same way.
+```powershell
+py -3 tools\deploy.py C:\path\to\RSpice
+```
 
-The source repository stores no Cloudflare credential. Automatic dispatch uses
-the `RSPICE_RELEASE_APP_ID` variable, `RSPICE_RELEASE_APP_PRIVATE_KEY` secret,
-and `RSPICE_AUTO_RELEASE=true`; Cloudflare account ID and Worker token secrets
-exist only in the private release controller.
+The simulator repository is a required positional argument; deployment never
+guesses which checkout to compile. The command resolves both remote `main`
+heads, creates clean temporary
+worktrees, builds the site and both WebAssembly runtimes locally, runs desktop,
+tablet, and phone browser gates, records a deterministic manifest, and pushes
+only the verified static artifact to the `production` branch. Pin or roll back
+either source with `--site-ref <commit>` and `--rspice-ref <commit>`.
 
-The site repository never contains deployment credentials, generated
-WebAssembly, customer data, or simulator source. Do not add generated `pkg/`
-directories or secrets.
+Cloudflare Pages serves the repository's `production` branch with no build
+command and `/` as its output directory. Pages only hosts already-built static
+files; it receives no simulator checkout, build secret, GitHub App credential,
+or Cloudflare API token from this repository. The checked `_headers` file
+continues to define the production security headers.
+
+Do not manually edit the generated `production` branch or add generated `pkg/`
+directories, deployment credentials, customer data, or simulator source to
+`main`.
 
 ## History
 
