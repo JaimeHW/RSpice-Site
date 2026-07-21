@@ -732,7 +732,7 @@ def main():
     validate_site_source(site_source)
     out = validated_output_path(site_root, site_source, args.out)
     site_sha = site_source_revision(site_source)
-    client_sha = capture(["git", "rev-parse", "HEAD"])
+    client_sha = capture(["git", "-C", str(root), "rev-parse", "HEAD"])
     if not re.fullmatch(r"[0-9a-f]{40}", client_sha):
         fail("client source revision is not a full commit SHA")
     require_clean_client_checkout(root)
