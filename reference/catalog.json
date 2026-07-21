@@ -1,0 +1,815 @@
+{
+  "analyses": [
+    {
+      "Analyses": ".OP, .DC (including two-source sweeps), temperature sweeps, .STEP",
+      "Domain": "Operating point & sweeps"
+    },
+    {
+      "Analyses": ".TRAN, with LTE-controlled adaptive timestepping and checkpoint/resume segmentation",
+      "Domain": "Time domain"
+    },
+    {
+      "Analyses": ".AC, .NOISE, .PZ, .TF, .SENS, third-order Volterra .DISTO (harmonic and two-tone intermodulation)",
+      "Domain": "Small-signal"
+    },
+    {
+      "Analyses": "Operating-point Monte Carlo parameter variation, process corners",
+      "Domain": "Statistical"
+    },
+    {
+      "Analyses": "Periodic steady state (shooting), harmonic balance, two-port S-parameters with Touchstone export",
+      "Domain": "Periodic / RF"
+    },
+    {
+      "Analyses": ".MEAS over TRAN/DC/AC/NOISE with GOAL/TOL pass-fail gating, .FOUR; THD/IMD, eye-diagram, and jitter metrics",
+      "Domain": "Post-processing"
+    }
+  ],
+  "benchmarks": {
+    "generated_with": "rspice-bench",
+    "host": {
+      "cpu_count": 10,
+      "os": "macos aarch64"
+    },
+    "methodology": "wall-clock of the full child process (parse + solve + output) timed with std::time::Instant around spawn/wait; child stdin/stdout/stderr attached to the null device; one untimed warmup run per deck/simulator precedes the timed repeats; cold OS cache not controlled",
+    "ngspice_exe": "/Users/jameswhitfield/Downloads/ngspice-46/src/ngspice",
+    "ngspice_note": null,
+    "repeats": 5,
+    "results": [
+      {
+        "both_succeeded": true,
+        "deck": "diode_rectifier.cir",
+        "ngspice_all_ok": true,
+        "ngspice_ms": {
+          "mean": 25.4871334,
+          "median": 25.56675,
+          "min": 25.133
+        },
+        "rspice_all_ok": true,
+        "rspice_ms": {
+          "mean": 20.169925,
+          "median": 18.728541,
+          "min": 18.340875
+        },
+        "speedup_median": 1.365122355233117
+      },
+      {
+        "both_succeeded": true,
+        "deck": "divider_ac.cir",
+        "ngspice_all_ok": true,
+        "ngspice_ms": {
+          "mean": 38.517900000000004,
+          "median": 37.713,
+          "min": 37.548375
+        },
+        "rspice_all_ok": true,
+        "rspice_ms": {
+          "mean": 19.316257999999998,
+          "median": 19.198791,
+          "min": 18.693458
+        },
+        "speedup_median": 1.9643424421881566
+      },
+      {
+        "both_succeeded": true,
+        "deck": "mos_array_4096.cir",
+        "ngspice_all_ok": true,
+        "ngspice_ms": {
+          "mean": 1868.1543166,
+          "median": 1820.4829579999998,
+          "min": 1784.170792
+        },
+        "rspice_all_ok": true,
+        "rspice_ms": {
+          "mean": 3016.3985584,
+          "median": 3007.7295,
+          "min": 2979.987625
+        },
+        "speedup_median": 0.6052681792029502
+      },
+      {
+        "both_succeeded": true,
+        "deck": "rc_ladder_100.cir",
+        "ngspice_all_ok": true,
+        "ngspice_ms": {
+          "mean": 134.06195799999998,
+          "median": 135.441083,
+          "min": 130.8555
+        },
+        "rspice_all_ok": true,
+        "rspice_ms": {
+          "mean": 95.2526414,
+          "median": 94.65899999999999,
+          "min": 92.910375
+        },
+        "speedup_median": 1.430831542695359
+      },
+      {
+        "both_succeeded": true,
+        "deck": "rc_ladder_1000.cir",
+        "ngspice_all_ok": true,
+        "ngspice_ms": {
+          "mean": 1161.0873502,
+          "median": 1113.030875,
+          "min": 1110.21175
+        },
+        "rspice_all_ok": true,
+        "rspice_ms": {
+          "mean": 833.9780082,
+          "median": 832.452584,
+          "min": 829.9847500000001
+        },
+        "speedup_median": 1.3370501772627088
+      },
+      {
+        "both_succeeded": true,
+        "deck": "rc_ladder_10000.cir",
+        "ngspice_all_ok": true,
+        "ngspice_ms": {
+          "mean": 1467.2823166000003,
+          "median": 1452.115917,
+          "min": 1390.45575
+        },
+        "rspice_all_ok": true,
+        "rspice_ms": {
+          "mean": 981.3490834,
+          "median": 972.762792,
+          "min": 962.754333
+        },
+        "speedup_median": 1.492774938497031
+      },
+      {
+        "both_succeeded": true,
+        "deck": "ring51.cir",
+        "ngspice_all_ok": true,
+        "ngspice_ms": {
+          "mean": 231.1818832,
+          "median": 231.314583,
+          "min": 229.186542
+        },
+        "rspice_all_ok": true,
+        "rspice_ms": {
+          "mean": 506.3047,
+          "median": 505.896459,
+          "min": 502.77366599999993
+        },
+        "speedup_median": 0.4572370074644069
+      }
+    ],
+    "rspice_exe": "/Users/jameswhitfield/RSpice/target/release/rspice"
+  },
+  "cli_tables": [
+    {
+      "context": "RSpice CLI / Commands / rspice run \u2014 Execute Simulations / Output options",
+      "headers": [
+        "Flag",
+        "Description"
+      ],
+      "rows": [
+        [
+          "-o, --output <FILE>",
+          "Output file for results. With several analysis cards in one deck, each analysis writes its own tagged file: out.csv \u2192 out.op.csv, out.tran.csv, ..."
+        ],
+        [
+          "-f, --format <FORMAT>",
+          "Output format: raw, ascii, csv, json, tsv, hdf5 (default: config output.format, else raw)"
+        ],
+        [
+          "--save <SIGNAL>",
+          "Limit exported signals, replacing the netlist .SAVE/.PROBE selection: V(out), V(a,b), I(v1), @m1[id], all (repeatable)"
+        ],
+        [
+          "--meas",
+          "Print .MEAS measurement results"
+        ],
+        [
+          "--summary <FILE>",
+          "Write a versioned JSON run summary \u2014 build/run identity, execution counts and timing, effective resource limits, typed failures, every measurement, result files, and overall verdict \u2014 to FILE, or stdout with -"
+        ],
+        [
+          "--progress",
+          "Show a live percentage bar during transient analysis (the engine reports its completed fraction)"
+        ],
+        [
+          "--compress",
+          "Enable waveform compression for long simulations"
+        ],
+        [
+          "--compress-tol <TOL>",
+          "Compression tolerance (default: config compressiontolerance, else 1e-4; requires --compress)"
+        ]
+      ]
+    },
+    {
+      "context": "RSpice CLI / Commands / rspice run \u2014 Execute Simulations / Run-discipline options",
+      "headers": [
+        "Flag",
+        "Description"
+      ],
+      "rows": [
+        [
+          "--timeout <SECONDS>",
+          "Abort the run after this budget; exits 124. Transient and DC sweeps stop at the next safe point. Ctrl-C stops the same way and exits 130"
+        ],
+        [
+          "--allow-failed-meas",
+          "Exit 0 even when .MEAS measurements fail (default: exit 3)"
+        ],
+        [
+          "--allow-nonfinite",
+          "Export results containing NaN/Inf instead of failing (default: simulation error)"
+        ],
+        [
+          "--checkpoint <FILE>",
+          "Save the transient integrator state when the run completes, for later --resume"
+        ],
+        [
+          "--resume <FILE>",
+          "Continue a transient from a saved checkpoint; the deck must be byte-identical (fingerprint-checked) and a segmented run reproduces the uninterrupted waveform"
+        ],
+        [
+          "--tran-stop <TIME>",
+          "Override the .TRAN stop time without editing the deck, so checkpoint segments share identical source"
+        ]
+      ]
+    },
+    {
+      "context": "RSpice CLI / Commands / rspice run \u2014 Execute Simulations / Simulation options",
+      "headers": [
+        "Flag",
+        "Description"
+      ],
+      "rows": [
+        [
+          "--temp <TEMP>",
+          "Override simulation temperature (Celsius)"
+        ],
+        [
+          "--maxiter <N>",
+          "Maximum Newton-Raphson iterations"
+        ],
+        [
+          "--abstol <TOL>",
+          "Absolute convergence tolerance"
+        ],
+        [
+          "--reltol <TOL>",
+          "Relative convergence tolerance"
+        ],
+        [
+          "--residual-reltol <TOL>",
+          "Relative residual tolerance for equation convergence checks"
+        ],
+        [
+          "--voltage-abstol <TOL>",
+          "Voltage absolute tolerance (VNTOL)"
+        ],
+        [
+          "--current-abstol <TOL>",
+          "Current absolute tolerance"
+        ],
+        [
+          "--charge-abstol <TOL>",
+          "Charge absolute tolerance (CHGTOL)"
+        ],
+        [
+          "--min-step <TIME>",
+          "Minimum transient timestep"
+        ],
+        [
+          "--max-step <TIME>",
+          "Maximum transient timestep"
+        ],
+        [
+          "--integration-method <M>",
+          "Transient integrator: trap, gear, trapgear (default), euler"
+        ],
+        [
+          "--trtol <TOL>",
+          "Transient truncation-error tolerance (TRTOL)"
+        ],
+        [
+          "--gmin <G>",
+          "Initial GMIN conductance for convergence aids"
+        ],
+        [
+          "--convergence <MODE>",
+          "DC convergence preset: fast, default, robust"
+        ],
+        [
+          "-I, --include <DIR>",
+          "Add a search directory for .include/.lib references (repeatable)"
+        ],
+        [
+          "-D, --define <NAME=VALUE>",
+          "Override or define a netlist parameter; values accept SPICE suffixes, e.g. -D RLOAD=4.7k (repeatable)"
+        ]
+      ]
+    },
+    {
+      "context": "RSpice CLI / Commands / rspice run \u2014 Execute Simulations / Analysis-mode options",
+      "headers": [
+        "Flag",
+        "Description"
+      ],
+      "rows": [
+        [
+          "--monte-carlo <N>",
+          "Run N Monte Carlo iterations (operating-point variation); independent runs solve in parallel across cores with seed-stable sampling"
+        ],
+        [
+          "--seed <SEED>",
+          "Random seed for Monte Carlo; the default seed 1 makes runs reproducible (requires --monte-carlo)"
+        ],
+        [
+          "--mc-distribution <D>",
+          "Variation distribution: gaussian (default), uniform, worst-case"
+        ],
+        [
+          "--mc-spread <S>",
+          "Relative spread: sigma for gaussian, tolerance otherwise (default: 0.01)"
+        ],
+        [
+          "--mc-param <NAME>",
+          "Restrict variation to specific parameters (repeatable)"
+        ],
+        [
+          "--pss-freq <FREQ>",
+          "PSS fundamental frequency in Hz"
+        ],
+        [
+          "--pss-harmonics <N>",
+          "Number of PSS harmonics (default: 9)"
+        ],
+        [
+          "--pss-tstab <TIME>",
+          "PSS stabilization time before the shooting method (default: auto)"
+        ],
+        [
+          "--hb-freq <FREQ>",
+          "Harmonic balance fundamental frequency in Hz"
+        ],
+        [
+          "--hb-harmonics <N>",
+          "Number of HB harmonics (default: 9)"
+        ],
+        [
+          "--pz-input <NODE>",
+          "Pole-zero input node (name or index)"
+        ],
+        [
+          "--pz-output <NODE>",
+          "Pole-zero output node (requires --pz-input)"
+        ],
+        [
+          "--sens-output <NODE>",
+          "Sensitivity analysis output node (name or index)"
+        ],
+        [
+          "--sens-param <PARAM>",
+          "Parameter name for sensitivity analysis (requires --sens-output)"
+        ],
+        [
+          "--sens-value <VALUE>",
+          "Nominal parameter value (default: 1.0; requires --sens-param)"
+        ],
+        [
+          "--sparam <NODES>",
+          "Two-port S-parameter extraction over the deck's .AC sweep: four port nodes as \"P1+,P1-,P2+,P2-\" (use 0 for grounded references). Writes Touchstone when -o ends in .s2p, else the standard complex table formats"
+        ],
+        [
+          "--sparam-z0 <OHMS>",
+          "S-parameter reference impedance (default: 50)"
+        ],
+        [
+          "--corners <LIST>",
+          "Process corners, comma-separated, e.g. tt,ss,ff"
+        ],
+        [
+          "--corner-lib <FILE>",
+          "Library with one .lib <corner> ... .endl section per corner; each corner re-elaborates the deck with its section applied (requires --corners)"
+        ],
+        [
+          "-j, --jobs <N>",
+          "Parallel workers for corner sweeps (default: 1). Corner outputs are tagged per corner so workers never collide; results are byte-identical to a serial sweep"
+        ]
+      ]
+    },
+    {
+      "context": "RSpice CLI / Commands / rspice run \u2014 Execute Simulations / Reporting options",
+      "headers": [
+        "Flag",
+        "Description"
+      ],
+      "rows": [
+        [
+          "--report-format <FORMAT>",
+          "CI report format: junit, tap"
+        ],
+        [
+          "--report-file <FILE>",
+          "CI report output file (requires --report-format)"
+        ],
+        [
+          "--meas-format <FORMAT>",
+          "Machine-readable .MEAS format: json, csv"
+        ],
+        [
+          "--meas-file <FILE>",
+          ".MEAS output file (defaults to JSON if --meas-format is omitted)"
+        ]
+      ]
+    },
+    {
+      "context": "RSpice CLI / Commands / rspice info \u2014 Netlist Information",
+      "headers": [
+        "Flag",
+        "Description"
+      ],
+      "rows": [
+        [
+          "-d, --detailed",
+          "Show detailed element information"
+        ],
+        [
+          "--models",
+          "Show model definitions"
+        ],
+        [
+          "--hierarchy",
+          "Show subcircuit hierarchy"
+        ],
+        [
+          "--params",
+          "Show parameter values"
+        ],
+        [
+          "--json",
+          "Output as JSON"
+        ]
+      ]
+    },
+    {
+      "context": "RSpice CLI / Commands / rspice check \u2014 Validate Netlist",
+      "headers": [
+        "Flag",
+        "Description"
+      ],
+      "rows": [
+        [
+          "--connectivity",
+          "Warn about floating nodes"
+        ],
+        [
+          "--models",
+          "Check for undefined models"
+        ],
+        [
+          "--strict",
+          "Treat warnings as errors"
+        ],
+        [
+          "--json",
+          "Output as JSON"
+        ]
+      ]
+    },
+    {
+      "context": "RSpice CLI / Commands / rspice compare \u2014 Golden File Comparison",
+      "headers": [
+        "Flag",
+        "Description"
+      ],
+      "rows": [
+        [
+          "--abstol <TOL>",
+          "Absolute tolerance (default: 1e-9)"
+        ],
+        [
+          "--reltol <TOL>",
+          "Relative tolerance (default: 1e-6)"
+        ],
+        [
+          "--variables <VAR>",
+          "Compare specific variables only (repeatable; default: all)"
+        ],
+        [
+          "--fail-fast",
+          "Stop on first difference"
+        ],
+        [
+          "--json",
+          "Output differences as JSON"
+        ],
+        [
+          "--allow-truncated",
+          "Tolerate point-count mismatches and compare the overlap"
+        ],
+        [
+          "--ignore-missing",
+          "Tolerate golden variables missing from the result"
+        ],
+        [
+          "--bless",
+          "Accept the result as the new reference: copies it over the golden file when they differ, or creates the golden file if it does not exist"
+        ],
+        [
+          "--interpolate",
+          "Linearly resample the result onto the golden file's scale, so runs with different time grids compare point-for-point (never extrapolates)"
+        ]
+      ]
+    },
+    {
+      "context": "RSpice CLI / Commands / rspice convert \u2014 Format Conversion",
+      "headers": [
+        "Flag",
+        "Description"
+      ],
+      "rows": [
+        [
+          "--to <FORMAT>",
+          "Output format (required)"
+        ],
+        [
+          "--from <FORMAT>",
+          "Input format (auto-detected from the extension if omitted)"
+        ],
+        [
+          "--variables <VAR>",
+          "Variables to keep, by full (V(out)) or bare (out) name (repeatable; default: all)"
+        ],
+        [
+          "--start <VALUE>",
+          "Keep points with scale \u2265 this time/frequency"
+        ],
+        [
+          "--stop <VALUE>",
+          "Keep points with scale \u2264 this time/frequency"
+        ]
+      ]
+    },
+    {
+      "context": "RSpice CLI / Commands / rspice compile-va \u2014 Compile Verilog-A",
+      "headers": [
+        "Flag",
+        "Description"
+      ],
+      "rows": [
+        [
+          "-o, --output <FILE>",
+          "Write a JSON interface summary: model name, terminals, internal node count, parameters with defaults and bounds"
+        ],
+        [
+          "-I, --include <DIR>",
+          "Add an include directory (repeatable)"
+        ],
+        [
+          "--strict",
+          "Enable strict LRM compliance mode"
+        ],
+        [
+          "--detailed",
+          "Show detailed compilation information"
+        ],
+        [
+          "--show-usage",
+          "Generate a usage example in the output"
+        ]
+      ]
+    },
+    {
+      "context": "RSpice CLI / Configuration File",
+      "headers": [
+        "Variable",
+        "Effect"
+      ],
+      "rows": [
+        [
+          "RSPICETEMPERATURE",
+          "Default simulation temperature (Celsius)"
+        ],
+        [
+          "RSPICEOUTPUTFORMAT",
+          "Default output format"
+        ],
+        [
+          "RSPICEINCLUDEPATH",
+          "Include search paths, platform path separator (; on Windows, : elsewhere)"
+        ],
+        [
+          "RSPICELIBRARYPATH",
+          "Model library paths, platform path separator"
+        ],
+        [
+          "RSPICEMAX<RESOURCE>",
+          "Override any [resources] key in uppercase, for example RSPICEMAXBATCHRUNS or RSPICEMAXNETLISTBYTES"
+        ]
+      ]
+    },
+    {
+      "context": "RSpice CLI / Exit Codes",
+      "headers": [
+        "Code",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "0",
+          "Success: simulation ran and every check passed"
+        ],
+        [
+          "1",
+          "Simulation error (convergence failure, non-finite results, Verilog-A compile failure, conversion failure)"
+        ],
+        [
+          "2",
+          "Usage error (invalid arguments)"
+        ],
+        [
+          "3",
+          "Verification failure: a .MEAS failed or did not evaluate, or compare found mismatches"
+        ],
+        [
+          "65",
+          "Input format error (netlist parse failure, singular topology from check)"
+        ],
+        [
+          "66",
+          "Input file not found"
+        ],
+        [
+          "70",
+          "Internal error"
+        ],
+        [
+          "74",
+          "I/O error (failed to read input or write output)"
+        ],
+        [
+          "78",
+          "Configuration error"
+        ],
+        [
+          "124",
+          "Run exceeded --timeout"
+        ],
+        [
+          "130",
+          "Interrupted (Ctrl-C)"
+        ]
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "Command": "rspice run",
+      "Description": "Execute simulations"
+    },
+    {
+      "Command": "rspice health",
+      "Description": "Probe process liveness or parser-to-solver readiness"
+    },
+    {
+      "Command": "rspice info",
+      "Description": "Print parsed netlist information"
+    },
+    {
+      "Command": "rspice check",
+      "Description": "Validate syntax and connectivity"
+    },
+    {
+      "Command": "rspice compare",
+      "Description": "Compare output against a golden result"
+    },
+    {
+      "Command": "rspice convert",
+      "Description": "Convert between RAW, ASCII RAW, CSV, JSON, TSV, and HDF5"
+    },
+    {
+      "Command": "rspice compile-va",
+      "Description": "Compile Verilog-A models"
+    },
+    {
+      "Command": "rspice completions",
+      "Description": "Generate shell completion scripts"
+    }
+  ],
+  "devices": [
+    {
+      "Family": "MOSFET",
+      "Models": "Native BSIM4 v4.8 (LEVEL=14/54, canonical mode set), BSIM3v3.3 (LEVEL=8/9/49, CAPMOD=2/3), VDMOS, EKV3, Berkeley MOS1/MOS2/MOS3/MOS6, and legacy BSIM1/BSIM2; generated Verilog-A builtins are canonical for BSIM-SOI (LEVEL=10/55/56/57) and EKV 2.6 (LEVEL=260); unsupported MOS levels fail closed until generated or native support and validation are added"
+    },
+    {
+      "Family": "Bipolar",
+      "Models": "Gummel-Poon BJT (default / LEVEL=1) plus generated Verilog-A builtins for VBIC (LEVEL=4/9/11/12/13), HICUM, and MEXTRAM where bundled sources are available; unsupported advanced BJT levels fail explicitly until generated support lands"
+    },
+    {
+      "Family": "Junction",
+      "Models": "Diode, JFET level 1 and native Parker-Skellern JFET2 (NJF/PJF LEVEL=2, default/best-available), an internal Xyce modified-Shockley JFET2 compatibility mode, MES/MESA/HFET-family Z devices, GaN HEMT"
+    },
+    {
+      "Family": "Passives",
+      "Models": "R / C / L with temperature coefficients, coupled inductors and multi-winding transformers, saturable inductor (Jiles\u2013Atherton hysteresis)"
+    },
+    {
+      "Family": "Transmission lines",
+      "Models": "Ideal, lossy (LTRA, TXL), coupled (CPL)"
+    },
+    {
+      "Family": "Sources",
+      "Models": "Independent V/I with PULSE, SIN, EXP, PWL, SFFM, AM, and TRNOISE white + 1/f waveforms; E/F/G/H controlled sources; B behavioral sources; PWL file sources"
+    },
+    {
+      "Family": "Switches & macromodels",
+      "Models": "Voltage- and current-controlled switches, op-amp macromodel"
+    },
+    {
+      "Family": "Mixed-signal",
+      "Models": "XSPICE-style analog/digital elements, tri-state drivers, A/D\u2013D/A bridges"
+    },
+    {
+      "Family": "Verilog-A",
+      "Models": "Compiled behavioral modules (below)"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "repository": "https://github.com/JaimeHW/RSpice",
+    "revision": "1efe7d9541f8cfe54e95099e42d296340fefe40e",
+    "revision_date": "2026-07-20T22:12:50-05:00",
+    "rust_version": "1.94",
+    "short_revision": "1efe7d9541f8",
+    "version": "0.1.0"
+  },
+  "validation": {
+    "ci": {
+      "available": false,
+      "conformance": {
+        "aggregate_found": false
+      },
+      "files": [],
+      "junit": {
+        "errors": 0,
+        "failures": 0,
+        "files": 0,
+        "skipped": 0,
+        "tests": 0
+      },
+      "revision_match": null,
+      "run_conclusion": null,
+      "run_url": null,
+      "source_revision": null
+    },
+    "ngspice_manifest": {
+      "entries": 49,
+      "modes": {
+        "locked_grid": 2,
+        "measures": 3,
+        "reference_unsolvable": 1,
+        "scripted_control": 23,
+        "smoke": 20
+      }
+    },
+    "nightly": {
+      "configured_total": 113,
+      "max_failing": 2,
+      "rust_toolchain": "1.94.0"
+    },
+    "xyce_manifest": {
+      "contracts": {
+        "requires_upstream_wrapper": 2123
+      },
+      "entries": 2123
+    }
+  },
+  "workspace": [
+    {
+      "Crate": "rspice-core",
+      "Purpose": "Simulation engine: device models, analyses, netlist parser, validation harnesses"
+    },
+    {
+      "Crate": "rspice-cli",
+      "Purpose": "Command-line interface for simulation, validation, conversion, and reporting"
+    },
+    {
+      "Crate": "rspice-ui",
+      "Purpose": "Desktop application for schematic editing and waveform inspection"
+    },
+    {
+      "Crate": "rspice-veriloga",
+      "Purpose": "Verilog-A parser, semantic pipeline, bytecode VM/native JIT runtime, generated-Rust backend"
+    },
+    {
+      "Crate": "rspice-python",
+      "Purpose": "Python bindings built with PyO3"
+    },
+    {
+      "Crate": "rspice-wasm",
+      "Purpose": "WebAssembly bindings for the simulation engine"
+    },
+    {
+      "Crate": "rspice-bench",
+      "Purpose": "Whole-process benchmark rig against local ngspice"
+    }
+  ]
+}

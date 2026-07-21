@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071015">
+  <meta name="color-scheme" content="dark">
+  <title>RSpice — Rust analog, mixed-signal, and RF simulator</title>
+  <meta name="description" content="RSpice is a Rust analog, mixed-signal, and RF circuit simulator with sparse nonlinear and complex solvers, compact models, desktop, CLI, Python, and WebAssembly interfaces, verification tooling, and planned collaborative services.">
+  <link rel="canonical" href="https://rspice.app/">
+  <link rel="icon" href="assets/brand/rspice.ico" sizes="any">
+  <link rel="apple-touch-icon" href="assets/brand/icon-256.png">
+  <link rel="preload" href="assets/fonts/IBMPlexSans-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="assets/fonts/IBMPlexMono-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="assets/field.css">
+  <link rel="stylesheet" href="assets/landing-refined.css">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="RSpice">
+  <meta property="og:url" content="https://rspice.app/">
+  <meta property="og:title" content="RSpice — Rust analog, mixed-signal, and RF simulator">
+  <meta property="og:description" content="Sparse circuit simulation, compact models, verification, and desktop, CLI, Python, and WebAssembly interfaces over one Rust engine.">
+  <meta property="og:image" content="https://rspice.app/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="RSpice analog and mixed-signal circuit simulation">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="RSpice — Rust analog, mixed-signal, and RF simulator">
+  <meta name="twitter:description" content="A Rust circuit simulator with desktop, CLI, Python, and WebAssembly interfaces.">
+  <meta name="twitter:image" content="https://rspice.app/assets/og.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "RSpice",
+    "url": "https://rspice.app/",
+    "applicationCategory": "EngineeringApplication",
+    "operatingSystem": "Windows, macOS, Linux, Web",
+    "description": "A Rust-based analog, mixed-signal, and RF circuit simulator with sparse solvers, compact models, verification tooling, and desktop, CLI, Python, and WebAssembly interfaces."
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <canvas class="landing-field" data-landing-field aria-hidden="true"></canvas>
+
+  <header class="topbar" data-topbar>
+    <div class="topbar__inner">
+      <a class="identity" href="#top" aria-label="RSpice home">
+        <img src="assets/brand/logo.svg" width="31" height="31" alt="">
+        <span>RSpice</span>
+      </a>
+      <button class="nav-trigger" type="button" aria-controls="site-nav" aria-expanded="false" data-nav-trigger>
+        <span class="visually-hidden">Open navigation</span>
+        <span aria-hidden="true"></span><span aria-hidden="true"></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary navigation" data-site-nav>
+        <a href="#engine">Engine</a>
+        <a href="#analyses">Analyses</a>
+        <a href="#truth">Status</a>
+        <a href="reference.html">Reference</a>
+        <a href="validation.html">Validation</a>
+        <a href="docs.html">Docs</a>
+      </nav>
+      <div class="topbar__actions">
+        <a class="source-link" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Source <span aria-hidden="true">↗</span></a>
+        <a class="launch-link" href="ide/">Open WASM lab <span class="launch-link__tag">experimental</span></a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero__field" aria-hidden="true"></div>
+      <div class="page-frame hero__frame">
+        <div class="status-line">
+          <span><i class="status-line__dot"></i>ENGINEERING BUILD / ACTIVE DEVELOPMENT</span>
+          <span>SOURCE BUILD · HOSTED SERVICES NOT ACTIVE</span>
+        </div>
+
+        <div class="hero__brief">
+          <div class="hero__copy">
+            <p class="eyebrow">01 / RSPICE WORKBENCH / ANALOG · MIXED-SIGNAL · RF</p>
+            <h1 id="hero-title">Circuit simulation built around an inspectable run record.</h1>
+          </div>
+          <p class="hero__lede">RSpice joins SPICE-compatible netlist elaboration, nonlinear and complex sparse solving, compact models, verification, and four local interfaces in one Rust workspace. The current Workbench design below is rendered as HTML at 1440 × 900 and scales to the available viewport.</p>
+          <div class="hero__info">
+            <dl class="hero__facts" aria-label="RSpice engineering scope"><div><dt>REAL SOLVE</dt><dd>KLU-class sparse path</dd></div><div><dt>COMPLEX SOLVE</dt><dd>faer / AC families</dd></div><div><dt>HOSTS</dt><dd>Desktop / CLI / Python / WASM</dd></div></dl>
+            <div class="hero__actions"><a class="button button--hot" href="ide/">Open WASM lab <span aria-hidden="true">↗</span></a><a class="button button--quiet" href="reference.html">Search technical reference</a></div>
+          </div>
+        </div>
+        <dl class="hero-dossier" aria-label="Generated source inventory">
+          <div><dt>SOURCE REVISION</dt><dd><a href="reference.html"><span data-catalog-field="source.short_revision">c216a0922ae3</span></a></dd></div>
+          <div><dt>WORKSPACE</dt><dd>v<span data-catalog-field="source.version">0.1.0</span> / Rust <span data-catalog-field="source.rust_version">1.94</span></dd></div>
+          <div><dt>NIGHTLY GATE</dt><dd><span data-catalog-field="validation.nightly.configured_total">113</span> ngspice decks configured</dd></div>
+          <div><dt>RETAINED CORPUS</dt><dd><span data-catalog-field="validation.xyce_manifest.entries">2123</span> Xyce contracts</dd></div>
+          <div><dt>HOSTED STATE</dt><dd>Identity / sync / compute not active</dd></div>
+        </dl>
+        <div class="workbench__shell" id="product">
+          <div class="workbench__toolbar"><span>CURRENT GUI MOCKUP / NON-INTERACTIVE</span><span>1440 × 900 HTML / AUTO-FIT</span></div>
+          <figure class="workbench__screen">
+            <div class="workbench__screen-frame">
+              <iframe src="workbench-frame.html" title="Non-interactive RSpice Workbench GUI" sandbox="allow-scripts allow-same-origin" tabindex="-1"></iframe>
+              <span class="workbench__screen-blocker" aria-hidden="true"></span>
+            </div>
+            <figcaption><span>Hierarchy, schematic capture, checks, run controls, and property inspection in the current Workbench design. This frame renders HTML at its source dimensions; it is not the released egui application.</span><span>FIG. 01 / GUI MOCKUP</span></figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="architecture product-section" id="architecture" aria-labelledby="architecture-title">
+      <div class="page-frame">
+        <header class="section-title section-title--split dossier-heading">
+          <div>
+            <p class="eyebrow">02 / SYSTEM ARCHITECTURE</p>
+            <h2 id="architecture-title">One run moves through explicit, inspectable stages.</h2>
+          </div>
+          <p>RSpice does not treat a simulation as a plot disconnected from its inputs. The parsed deck, elaborated hierarchy, selected model implementations, solver controls, status, measurements, and exported datasets form one run contract.</p>
+        </header>
+
+        <div class="architecture-map" aria-label="RSpice simulation data flow">
+          <div class="architecture-map__head"><span>RUN PIPELINE / NATIVE CORE</span><span>INPUT IDENTITY RETAINED THROUGH EXPORT</span></div>
+          <div class="architecture-map__flow">
+            <article><span>01</span><small>PARSE</small><h3>Deck &amp; directives</h3><p>Cards, expressions, analysis order, saves, measures, includes, and libraries.</p></article><i aria-hidden="true"></i>
+            <article><span>02</span><small>ELABORATE</small><h3>Resolved design</h3><p>Flattened subcircuits, evaluated parameters, model sections, and instance graph.</p></article><i aria-hidden="true"></i>
+            <article><span>03</span><small>ASSEMBLE</small><h3>MNA systems</h3><p>Real or complex sparse matrices, device state, sources, and analysis-specific stamps.</p></article><i aria-hidden="true"></i>
+            <article><span>04</span><small>SOLVE</small><h3>Analysis family</h3><p>Continuation, Newton, transient integration, sweeps, or frequency-domain execution.</p></article><i aria-hidden="true"></i>
+            <article><span>05</span><small>QUALIFY</small><h3>Result record</h3><p>Status, measurements, comparison evidence, provenance, and machine-readable output.</p></article>
+          </div>
+        </div>
+
+        <div class="architecture-detail-grid">
+          <article class="engine-contract">
+            <header><span>ENGINE CONTRACT</span><strong>rspice-core</strong></header>
+            <dl>
+              <div><dt>NETLIST</dt><dd><code>.SUBCKT</code>, <code>.PARAM</code>, expressions, <code>.INCLUDE</code>, <code>.LIB</code>, <code>.OPTIONS</code>, <code>.TEMP</code></dd></div>
+              <div><dt>REAL PATH</dt><dd>In-tree KLU-class sparse factorization for nonlinear and time-domain systems</dd></div>
+              <div><dt>COMPLEX PATH</dt><dd>faer-backed sparse solves for AC and related complex analysis families</dd></div>
+              <div><dt>PARALLELISM</dt><dd>Rayon across AC sweeps, Monte Carlo runs, and configured process-corner workers</dd></div>
+              <div><dt>FAILURE MODEL</dt><dd>Typed parse, topology, convergence, non-finite, timeout, verification, and I/O outcomes</dd></div>
+            </dl>
+          </article>
+
+          <div class="host-matrix" role="table" aria-label="RSpice interface matrix">
+            <div class="host-matrix__head" role="row"><span role="columnheader">HOST</span><span role="columnheader">EXECUTION</span><span role="columnheader">PRIMARY USE</span><span role="columnheader">STATE</span></div>
+            <article role="row"><strong role="cell">Desktop</strong><span role="cell">Native / egui / wgpu</span><p role="cell">Schematic capture, local projects, analysis configuration, and waveform inspection.</p><em role="cell">SOURCE BUILD</em></article>
+            <article role="row"><strong role="cell">CLI</strong><span role="cell">Native / batch</span><p role="cell">Deck execution, reports, conversion, comparison, time budgets, and CI gating.</p><em role="cell">SOURCE BUILD</em></article>
+            <article role="row"><strong role="cell">Python</strong><span role="cell">PyO3 / NumPy</span><p role="cell">Programmatic DC, transient, and AC results inside numerical workflows.</p><em role="cell">SOURCE BUILD</em></article>
+            <article role="row"><strong role="cell">Browser</strong><span role="cell">WASM / single thread</span><p role="cell">Netlist summaries plus selected DC, AC, and transient result snapshots.</p><em role="cell">EXPERIMENTAL</em></article>
+            <article role="row"><strong role="cell">Hosted runner</strong><span role="cell">Managed service</span><p role="cell">Planned queued sweeps, retained artifacts, organization policy, and result links.</p><em role="cell">NOT ACTIVE</em></article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="engine product-section" id="engine" aria-labelledby="engine-title">
+      <span class="anchor-alias" id="capabilities" aria-hidden="true"></span>
+      <div class="page-frame">
+        <header class="section-title">
+          <p class="eyebrow">03 / SOLVER &amp; RUN RECORD</p>
+          <h2 id="engine-title">Inputs, solver status, and verification output stay linked.</h2>
+        </header>
+        <div class="engine__board" aria-label="RSpice simulation run contents">
+          <div class="engine__board-head"><span>RUN CONTENTS</span><span>NETLIST &rarr; ELABORATION &rarr; ANALYSIS &rarr; OUTPUT</span><span>SERIALIZABLE RECORD</span></div>
+        <div class="engine__matrix">
+          <article>
+            <span class="matrix-index">A1 / ELABORATED INPUT</span>
+            <h3>Resolved deck and model graph</h3>
+            <p>The run records parsed cards, evaluated parameters, flattened subcircuits, include paths, model selection, and the generated netlist used for assembly.</p>
+            <ul><li>SPICE-compatible decks</li><li>Model and include provenance</li><li>Inspectable generated netlist</li></ul>
+          </article>
+          <article>
+            <span class="matrix-index">A2 / EXECUTION STATUS</span>
+            <h3>Typed solver outcomes</h3>
+            <p>Unsupported model physics, invalid cards, non-convergence, non-finite values, comparison failures, and timeouts return distinct statuses.</p>
+            <ul><li>Explicit rejection paths</li><li>Watchdog-aware execution</li><li>Machine-readable reports</li></ul>
+          </article>
+          <article>
+            <span class="matrix-index">A3 / VERIFICATION OUTPUT</span>
+            <h3>Measurements and comparison artifacts</h3>
+            <p>Measurements, golden-reference differences, random seeds, solver options, model identity, and build information remain attached to exported results.</p>
+            <ul><li>JUnit and TAP reporting</li><li>Golden comparison</li><li>Input-linked result summary</li></ul>
+          </article>
+        </div>
+        <div class="engine__tape" aria-label="RSpice engine capabilities">
+          <span>MODIFIED NODAL ANALYSIS</span><i></i><span>DAMPED NEWTON</span><i></i><span>ADAPTIVE TRANSIENT</span><i></i><span>SPARSE REAL + COMPLEX PATHS</span><i></i><span>RAYON PARALLEL FAMILIES</span>
+        </div>
+        </div>
+        <div class="solver-rack" aria-labelledby="solver-rack-title">
+          <div class="solver-rack__head"><div><span>SOLVER SUBSYSTEMS</span><h3 id="solver-rack-title">Numerical controls exposed as engineering decisions.</h3></div><p>The engine distinguishes convergence aids, matrix backends, integration policy, reproducibility, and termination conditions instead of reducing every failure to “simulation failed.”</p></div>
+          <div class="solver-rack__grid">
+            <article><span>DC EQUILIBRIUM</span><h4>Damped Newton with continuation</h4><p>Merit-based line search, model-aware limiting, gmin stepping, source stepping, and pseudo-transient continuation establish the nonlinear operating state.</p><dl><div><dt>CONTROL</dt><dd><code>--maxiter</code> / <code>--gmin</code></dd></div><div><dt>PRESETS</dt><dd>fast / default / robust</dd></div></dl></article>
+            <article><span>REAL SPARSE PATH</span><h4>KLU-class factorization</h4><p>The in-tree sparse path handles real-valued MNA systems for operating point, sweeps, and transient steps without routing through a dense fallback.</p><dl><div><dt>CHECKS</dt><dd>pivot / residual / finite</dd></div><div><dt>OUTCOME</dt><dd>typed singularity or solve status</dd></div></dl></article>
+            <article><span>COMPLEX SPARSE PATH</span><h4>faer-backed AC systems</h4><p>Complex small-signal systems retain magnitude and phase for AC-family results, noise, transfer, and frequency-domain extraction.</p><dl><div><dt>FAMILIES</dt><dd>AC / NOISE / PZ / RF paths</dd></div><div><dt>SWEEP</dt><dd>frequency points parallelizable</dd></div></dl></article>
+            <article><span>TIME INTEGRATION</span><h4>Adaptive LTE-controlled transient</h4><p>Trap, Gear, automatic trap/Gear, and Euler modes operate under minimum and maximum step bounds, truncation error control, source breakpoints, and safe cancellation points.</p><dl><div><dt>CONTROL</dt><dd><code>--trtol</code> / min / max step</dd></div><div><dt>STATE</dt><dd>checkpoint / exact-deck resume</dd></div></dl></article>
+            <article><span>PARALLEL FAMILIES</span><h4>Deterministic independent work</h4><p>AC points, Monte Carlo samples, and configured corner workers use Rayon where runs can be separated without sharing mutable solver state.</p><dl><div><dt>MC</dt><dd>seed-stable sampling</dd></div><div><dt>CORNERS</dt><dd>collision-free tagged outputs</dd></div></dl></article>
+            <article><span>TERMINATION</span><h4>Failure states survive export</h4><p>Parse, topology, convergence, non-finite, timeout, interruption, measurement, comparison, configuration, and I/O outcomes remain distinguishable to callers and CI.</p><dl><div><dt>TIMEOUT</dt><dd>exit 124</dd></div><div><dt>VERIFY</dt><dd>exit 3</dd></div></dl></article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="analyses" id="analyses" aria-labelledby="analyses-title">
+      <div class="page-frame">
+        <div class="analyses__intro">
+        <header class="section-title">
+          <p class="eyebrow">04 / ANALYSIS MAP</p>
+          <h2 id="analyses-title">Implemented analyses and current exposure.</h2>
+          <p class="section-title__body">Core analyses run through the native engine. Selected statistical, periodic, and RF paths use deck, CLI, or IDE-specific entry points; the status column distinguishes complete paths from partial kernels.</p>
+        </header>
+        <figure class="analysis-scope" aria-label="Stylized analysis-space plot">
+          <figcaption><span>REPRESENTATIVE RESPONSE FAMILIES</span><span>DC · TRAN · AC</span></figcaption>
+          <svg viewBox="0 0 560 200" role="img" aria-label="A technical plot with DC, transient, AC, and statistical analysis traces"><path class="analysis-scope__grid" d="M0 40H560M0 100H560M0 160H560M70 0V200M180 0V200M290 0V200M400 0V200M510 0V200"/><path class="analysis-scope__trace analysis-scope__trace--dc" d="M0 146C72 145 104 141 147 111S221 55 280 54S388 105 447 104S514 68 560 28"/><path class="analysis-scope__trace analysis-scope__trace--tran" d="M0 157C31 157 37 37 72 37S100 161 129 161S160 73 192 73S224 132 254 132S283 94 314 94S345 116 381 116S423 73 455 73S500 99 560 99"/><path class="analysis-scope__trace analysis-scope__trace--ac" d="M0 176C69 172 95 166 139 148S207 112 258 119S327 154 380 128S459 46 560 30"/><g class="analysis-scope__marks"><circle cx="72" cy="37" r="4"/><circle cx="280" cy="54" r="4"/><circle cx="455" cy="73" r="4"/></g><text x="13" y="28">DC / BIAS</text><text x="207" y="188">TRANSIENT / TIME</text><text x="450" y="28">AC / FREQ</text></svg>
+        </figure>
+        </div>
+        <div class="analyses__layout">
+          <div class="analysis-board" role="table" aria-label="RSpice analysis support matrix">
+            <div class="analysis-board__head" role="row"><span role="columnheader">FAMILY</span><span role="columnheader">COMMAND / ROUTE</span><span role="columnheader">ENGINE BEHAVIOR</span><span role="columnheader">STATUS</span></div>
+            <article role="row"><div role="cell"><code>01</code><h3>Operating point &amp; sweeps</h3></div><p class="analysis-path" role="cell"><code>.OP</code> <code>.DC</code> <code>.STEP</code> <code>.TEMP</code> <code>.TF</code> <code>.SENS</code></p><small role="cell">Solves the nonlinear bias state, including nested two-source DC sweeps, temperature and parameter families, transfer functions, and small-signal sensitivity.</small><span class="analysis-status analysis-status--core" role="cell">CORE</span></article>
+            <article role="row"><div role="cell"><code>02</code><h3>Transient &amp; spectral</h3></div><p class="analysis-path" role="cell"><code>.TRAN</code> <code>.FOUR</code> <code>THD</code> <code>IMD</code></p><small role="cell">LTE-controlled adaptive timestepping with checkpoint/resume segmentation, followed by Fourier, distortion, eye-diagram, and jitter post-processing paths.</small><span class="analysis-status analysis-status--core" role="cell">CORE</span></article>
+            <article role="row"><div role="cell"><code>03</code><h3>Linear frequency domain</h3></div><p class="analysis-path" role="cell"><code>.AC</code> <code>.NOISE</code> <code>.PZ</code></p><small role="cell">Complex small-signal sweeps, input/output-referred noise, and pole-zero extraction over the elaborated device and model graph.</small><span class="analysis-status analysis-status--core" role="cell">CORE</span></article>
+            <article role="row"><div role="cell"><code>04</code><h3>Measurement &amp; verification</h3></div><p class="analysis-path" role="cell"><code>.MEAS</code> <code>GOAL</code> <code>TOL</code> <code>COMPARE</code></p><small role="cell">Measures TRAN, DC, AC, and NOISE results; gates runs against tolerances; compares golden data; and emits machine-readable pass/fail reports.</small><span class="analysis-status analysis-status--core" role="cell">CORE</span></article>
+            <article role="row"><div role="cell"><code>05</code><h3>Statistical &amp; corners</h3></div><p class="analysis-path" role="cell"><code>.MC</code> <code>--monte-carlo</code> <code>--corners</code></p><small role="cell">Runs seeded operating-point parameter variation and process-corner campaigns. Exposure currently spans selected deck, CLI, and IDE entry points.</small><span class="analysis-status analysis-status--selected" role="cell">SELECTED</span></article>
+            <article role="row"><div role="cell"><code>06</code><h3>Periodic &amp; RF</h3></div><p class="analysis-path" role="cell"><code>PSS</code> <code>HB</code> <code>.STB</code> <code>S-PARAM</code></p><small role="cell">Includes shooting PSS, harmonic balance, stability, and two-port S-parameter paths with Touchstone export. Availability is analysis- and interface-specific.</small><span class="analysis-status analysis-status--selected" role="cell">SELECTED</span></article>
+            <article role="row"><div role="cell"><code>07</code><h3>Advanced analysis boundary</h3></div><p class="analysis-path" role="cell"><code>PAC</code> <code>PNOISE</code> <code>PXF</code> <code>PSTB</code> <code>ENV</code> <code>.DISTO</code></p><small role="cell">Conversion-matrix, monodromy, envelope, and multirate mathematics exist below the product layer. They do not yet have complete circuit extraction; <code>.DISTO</code> currently maps to AC rather than a Volterra engine.</small><span class="analysis-status analysis-status--partial" role="cell">KERNEL / PARTIAL</span></article>
+          </div>
+        </div>
+
+        <div class="capability-ledger" aria-labelledby="capability-ledger-title">
+          <div class="capability-ledger__head"><h3 id="capability-ledger-title">IMPLEMENTED DEVICE, DECK, AND HOST FEATURES</h3><span>DEVICE → DECK → SOLVE → EXPORT</span></div>
+          <div class="capability-ledger__grid">
+            <article><span>01 / SEMICONDUCTOR MODELS</span><h3>MOS and bipolar models</h3><p>Native models cover the principal silicon paths; bundled Verilog-A sources provide generated implementations for additional compact-model families.</p><ul><li>BSIM4 v4.8, BSIM3v3.3, VDMOS, EKV3, MOS1/2/3/6, BSIM1/2</li><li>Generated BSIM-SOI and EKV 2.6 built-ins where sources are bundled</li><li>Gummel-Poon plus generated VBIC, HICUM, and MEXTRAM where sources are bundled</li></ul></article>
+            <article><span>02 / DEVICES &amp; INTERCONNECT</span><h3>Junction, magnetic, and line devices</h3><p>Device registration includes junction models, magnetic components, and ideal or lossy transmission-line elements.</p><ul><li>Diode, JFET/JFET2, MES/MESA/HFET families, and GaN HEMT</li><li>Temperature-aware R/C/L, coupled and multi-winding transformers</li><li>Jiles–Atherton saturable inductors; ideal, LTRA, TXL, and CPL lines</li></ul></article>
+            <article><span>03 / SOURCES &amp; MIXED SIGNAL</span><h3>Sources, controlled elements, and bridges</h3><p>Independent and controlled sources provide time-domain stimulus, behavioral expressions, switching, and analog/digital conversion.</p><ul><li>PULSE, SIN, EXP, PWL, SFFM, AM, TRNOISE, and PWL file sources</li><li>E/F/G/H controlled and B behavioral sources; controlled switches</li><li>XSPICE-style analog/digital elements, tri-state drivers, and A/D–D/A bridges</li></ul></article>
+            <article><span>04 / DECK &amp; MODEL PIPELINE</span><h3>Netlist elaboration and Verilog-A</h3><p>The parser resolves parameters, includes, libraries, and subcircuits before matrix assembly; Verilog-A uses interpreted, JIT, and generated-Rust paths.</p><ul><li><code>.SUBCKT</code>, <code>.PARAM</code>, expressions, <code>.INCLUDE</code>, and <code>.LIB</code></li><li><code>.OPTIONS</code>, <code>.TEMP</code>, engineering suffixes, and flattened elaboration</li><li>Verilog-A parser, semantic IR, bytecode VM, native JIT, and generated-Rust backends</li></ul></article>
+            <article><span>05 / AUTOMATION &amp; VALIDATION</span><h3>CLI reports and regression tests</h3><p>CLI exit codes and report formats allow measurement failures, timeouts, invalid results, and golden-reference mismatches to stop CI jobs.</p><ul><li><code>run</code>, <code>info</code>, <code>check</code>, <code>compare</code>, <code>convert</code>, and <code>compile-va</code></li><li>Typed exit codes, timeouts, JUnit, TAP, JSON summaries, and measurement files</li><li>ngspice and Xyce corpus harnesses with explicit oracles and failure tracking</li></ul></article>
+            <article><span>06 / INTERFACES &amp; DATA</span><h3>Desktop, Python, WASM, and formats</h3><p>The egui application, CLI, Python bindings, and WebAssembly bindings use the same core, with target-specific analysis exposure.</p><ul><li>egui/wgpu desktop Workbench, CLI, Python/NumPy, and WebAssembly bindings</li><li>SPICE RAW, ASCII RAW, CSV, TSV, JSON, HDF5, and Touchstone output</li><li>Native desktop is the primary target; browser support is experimental and mobile UI remains a design target</li></ul></article>
+          </div>
+          <a class="capability-ledger__link" href="docs.html">Read the revision-specific technical scope and limitations <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="models product-section" id="models" aria-labelledby="models-title">
+      <div class="page-frame">
+        <header class="section-title section-title--split dossier-heading">
+          <div>
+            <p class="eyebrow">05 / DEVICE &amp; MODEL SYSTEM</p>
+            <h2 id="models-title">Model coverage includes an explicit physics boundary.</h2>
+          </div>
+          <p>Native device implementations and generated Verilog-A devices share the simulator, but they are not presented as interchangeable black boxes. Requested modes that are not implemented are rejected with typed errors rather than silently approximated.</p>
+        </header>
+
+        <div class="model-ledger" role="table" aria-label="RSpice device and model coverage">
+          <div class="model-ledger__head" role="row"><span role="columnheader">FAMILY</span><span role="columnheader">IMPLEMENTATION</span><span role="columnheader">CURRENT COVERAGE</span><span role="columnheader">BOUNDARY</span></div>
+          <article role="row"><div role="cell"><code>M</code><h3>MOSFET</h3></div><span role="cell">Native + generated</span><p role="cell">BSIM4 v4.8, BSIM3v3.3, VDMOS, EKV3, MOS1/2/3/6, legacy BSIM1/2; generated BSIM-SOI and EKV 2.6 where bundled sources are available.</p><small role="cell">Unsupported levels and unported mode selectors fail explicitly.</small></article>
+          <article role="row"><div role="cell"><code>Q</code><h3>Bipolar</h3></div><span role="cell">Native + generated</span><p role="cell">Gummel-Poon BJT plus generated VBIC, HICUM, and MEXTRAM implementations where redistributable Verilog-A sources are bundled.</p><small role="cell">Generated devices are canonical when their source package is enabled.</small></article>
+          <article role="row"><div role="cell"><code>D/J/Z</code><h3>Junction &amp; HEMT</h3></div><span role="cell">Native</span><p role="cell">Diode, JFET level 1, Parker-Skellern JFET2, an internal Xyce JFET2 compatibility mode, MES/MESA/HFET-family devices, and a physics-style GaN HEMT path.</p><small role="cell">CMC ASM-HEMT and MVSG qualification remains future work.</small></article>
+          <article role="row"><div role="cell"><code>R/C/L/K</code><h3>Passive &amp; magnetic</h3></div><span role="cell">Native</span><p role="cell">Temperature-aware resistance, capacitance, and inductance; coupled and multi-winding transformers; Jiles–Atherton saturable-inductor hysteresis.</p><small role="cell">State and history participate in transient checkpointing.</small></article>
+          <article role="row"><div role="cell"><code>T/O/P</code><h3>Interconnect</h3></div><span role="cell">Native</span><p role="cell">Ideal lines, LTRA and TXL lossy paths, and CPL coupled transmission-line elements for time- and frequency-domain use.</p><small role="cell">Analysis availability follows each registered device path.</small></article>
+          <article role="row"><div role="cell"><code>A/X</code><h3>Mixed signal</h3></div><span role="cell">Native compatibility</span><p role="cell">XSPICE-style analog/digital elements, tri-state drivers, controlled switches, behavioral sources, and A/D–D/A bridges.</p><small role="cell">Digital/event surface maturity varies by element.</small></article>
+          <article role="row"><div role="cell"><code>VA</code><h3>Verilog-A</h3></div><span role="cell">Compiler pipeline</span><p role="cell">Parser, semantic analysis, canonical IR, bytecode VM, x64-first native JIT, and a generated-Rust backend for feature-gated built-ins.</p><small role="cell">Native JIT requests either construct fully or return a typed error.</small></article>
+        </div>
+
+        <div class="model-pipeline">
+          <div class="model-pipeline__head"><span>VERILOG-A PRODUCT PATH</span><span>SOURCE-OWNED MODEL IDENTITY</span></div>
+          <div class="model-pipeline__flow">
+            <article><span>01</span><h3>Model source</h3><p>External module or bundled CMC package with its original source identity.</p></article><i aria-hidden="true"></i>
+            <article><span>02</span><h3>Semantic IR</h3><p>Parsed disciplines, parameters, branches, contributions, and typed expressions.</p></article><i aria-hidden="true"></i>
+            <article><span>03</span><h3>Execution backend</h3><p>Bytecode VM, requested native JIT, or generated Rust for bundled built-ins.</p></article><i aria-hidden="true"></i>
+            <article><span>04</span><h3>Registered device</h3><p>Explicit model level, parameter schema, runtime state, and analysis stamps.</p></article><i aria-hidden="true"></i>
+            <article><span>05</span><h3>Qualification</h3><p>Focused tests, oracle replay, corpus decks, and typed unsupported behavior.</p></article>
+          </div>
+        </div>
+        <div class="physics-boundary"><strong>FAIL-CLOSED MODEL POLICY</strong><p>For example, a BSIM4 card that requests unported gate/body resistance networks, NQS behavior, material modes, or unsupported mode selectors is rejected. A plausible current from incomplete physics is not treated as a successful simulation.</p><a href="reference.html#devices">Search the generated device reference <span aria-hidden="true">&nearr;</span></a></div>
+      </div>
+    </section>
+
+    <section class="workflow product-section" id="workflow" aria-labelledby="workflow-title">
+      <div class="page-frame">
+        <header class="section-title section-title--split dossier-heading">
+          <div>
+            <p class="eyebrow">06 / ENGINEERING WORKFLOW</p>
+            <h2 id="workflow-title">The Workbench design spans design entry through review evidence.</h2>
+          </div>
+          <p>The workflow below describes the current HTML Workbench redesign rendered at the top of this page. The native egui application and simulation engine already exist; this redesigned shell is a design target, not a claim that every panel is released.</p>
+        </header>
+
+        <div class="workflow-console">
+          <div class="workflow-console__head"><span>WORKBENCH INFORMATION ARCHITECTURE</span><span>DESKTOP-FIRST / RESPONSIVE TARGET</span><span class="surface-state surface-state--design">GUI REDESIGN</span></div>
+          <div class="workflow-console__body">
+            <nav class="workflow-rail" aria-label="Workbench workflow stages"><span class="is-active">01 DESIGN</span><span>02 PLAN</span><span>03 RUN</span><span>04 RESULTS</span><span>05 VERIFY</span><span>06 AUTOMATE</span></nav>
+            <div class="workflow-stages">
+              <article><div><code>01</code><h3>Project, hierarchy, and schematic</h3><span class="surface-state surface-state--mixed">SOURCE + DESIGN</span></div><p>Project files, cell hierarchy, symbols, instances, nets, ports, parameters, model references, and generated netlists stay navigable from the same design context.</p><ul><li>Hierarchy and net navigation</li><li>Component shelf and property inspector</li><li>Connectivity and annotation checks</li><li>Source-to-netlist traceability</li></ul></article>
+              <article><div><code>02</code><h3>Analysis plan and run set</h3><span class="surface-state surface-state--design">GUI REDESIGN</span></div><p>Analyses, PVT dimensions, corners, parameter sweeps, seeds, solver policy, outputs, and qualification checks form a versioned simulation plan rather than a transient dialog state.</p><ul><li>Analysis-specific advanced options</li><li>Corner and temperature matrix</li><li>Resource and parallel-worker policy</li><li>Preflight checks before execution</li></ul></article>
+              <article><div><code>03</code><h3>Jobs, targets, and diagnostics</h3><span class="surface-state surface-state--mixed">ENGINE + DESIGN</span></div><p>Local runs and planned remote jobs expose queued, running, completed, cancelled, timed-out, failed, and verification-blocked states with retained diagnostics.</p><ul><li>Per-task run-set progress</li><li>Stop at safe solver boundaries</li><li>Residual and convergence history</li><li>Input and build fingerprint</li></ul></article>
+              <article><div><code>04</code><h3>Datasets and visualizations</h3><span class="surface-state surface-state--mixed">SOURCE + DESIGN</span></div><p>Waveforms, spectra, measurements, tables, overlays, and exported datasets remain scoped to an immutable result manifest so a viewer cannot silently combine incompatible runs.</p><ul><li>Time, frequency, XY, eye, and statistical views</li><li>A/B cursors and derived expressions</li><li>Dataset comparison and export</li><li>Result provenance in the inspector</li></ul></article>
+              <article><div><code>05</code><h3>Verification and sign-off evidence</h3><span class="surface-state surface-state--design">GUI REDESIGN</span></div><p>Specification matrices, corner coverage, regression comparisons, model qualification, reliability checks, review comments, and approvals are represented as evidence attached to a run.</p><ul><li>Requirements-to-measurement mapping</li><li>Pass, fail, not evaluated, and blocked</li><li>Golden reference differences</li><li>Report and audit export</li></ul></article>
+              <article><div><code>06</code><h3>Automation and reproducibility</h3><span class="surface-state surface-state--source">SOURCE BUILD</span></div><p>CLI, Python, reports, deterministic seeds, checkpoints, output conversion, and explicit exit codes let the same engineering checks operate outside the graphical client.</p><ul><li>JUnit, TAP, JSON, and measurement files</li><li>Golden compare and reviewed bless flow</li><li>Python/NumPy result access</li><li>Shell completions and configuration files</li></ul></article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="automation product-section" id="automation" aria-labelledby="automation-title">
+      <div class="page-frame">
+        <header class="section-title section-title--split dossier-heading">
+          <div>
+            <p class="eyebrow">07 / AUTOMATION &amp; DATA</p>
+            <h2 id="automation-title">Batch execution is an engineering interface, not a secondary export path.</h2>
+          </div>
+          <p>The CLI executes deck analyses in declared order, reports measurements, enforces time budgets, distinguishes verification failures from simulator failures, and writes analysis-shaped datasets for downstream tools.</p>
+        </header>
+
+        <div class="automation-grid">
+          <figure class="cli-terminal">
+            <figcaption><span>CI RUN / MEASUREMENT GATE</span><span>EXIT STATUS IS PART OF THE CONTRACT</span></figcaption>
+            <pre><code><span class="prompt">$</span> rspice run afe.sp \
+    --corners tt,ss,ff \
+    --corner-lib pdk/corners.lib \
+    --timeout 600 \
+    --meas --meas-format json \
+    --report-format junit \
+    --report-file results.xml \
+    --summary run-summary.json
+
+<span class="output">TRAN   accepted  1,053 points
+MEAS   vpeak     4.999773e+00  PASS
+MEAS   risetime  2.197215e-04  PASS
+RUN    3 corners / 0 failed
+EXIT   0</span></code></pre>
+          </figure>
+
+          <div class="exit-contract" role="table" aria-label="Selected RSpice CLI exit codes">
+            <div class="exit-contract__head" role="row"><span role="columnheader">CODE</span><span role="columnheader">CLASS</span><span role="columnheader">MEANING</span></div>
+            <article role="row"><code role="cell">0</code><strong role="cell">SUCCESS</strong><p role="cell">Simulation ran and every configured check passed.</p></article>
+            <article role="row"><code role="cell">1</code><strong role="cell">SIMULATION</strong><p role="cell">Convergence, non-finite, Verilog-A compile, or conversion failure.</p></article>
+            <article role="row"><code role="cell">3</code><strong role="cell">VERIFICATION</strong><p role="cell">A measurement failed or could not evaluate, or golden comparison mismatched.</p></article>
+            <article role="row"><code role="cell">65</code><strong role="cell">INPUT</strong><p role="cell">Netlist parse failure or singular topology found by checking.</p></article>
+            <article role="row"><code role="cell">124</code><strong role="cell">TIME BUDGET</strong><p role="cell">Run exceeded <code>--timeout</code> and stopped at a safe point.</p></article>
+            <article role="row"><code role="cell">130</code><strong role="cell">INTERRUPTED</strong><p role="cell">Ctrl-C requested controlled termination.</p></article>
+            <a href="reference.html#options">All commands, flags, and exit codes <span aria-hidden="true">&nearr;</span></a>
+          </div>
+        </div>
+
+        <div class="data-contracts">
+          <article><span>RESULT FORMATS</span><h3>RAW / ASCII / CSV / TSV / JSON / HDF5</h3><p>Multi-analysis decks receive tagged outputs. Table-shaped TF, pole-zero, and sensitivity results use compatible formats rather than being forced into an unsuitable HDF5 section.</p></article>
+          <article><span>RF DATA</span><h3>Complex tables / Touchstone</h3><p>Two-port extraction writes S11, S21, S12, and S22 across the deck’s AC sweep, with <code>.s2p</code> output when Touchstone is selected.</p></article>
+          <article><span>REPORTS</span><h3>JUnit / TAP / JSON summary</h3><p>Tool version, per-run status, measurements, written files, and the overall verdict can be consumed without parsing terminal prose.</p></article>
+          <article><span>PYTHON</span><h3>PyO3 / NumPy arrays</h3><p>DC, transient, and AC result data can be returned directly to Python for numerical analysis, regression work, and custom plotting.</p></article>
+          <article><span>WEBASSEMBLY</span><h3>JSON-serializable snapshots</h3><p>The experimental single-threaded browser binding exposes netlist summaries and selected DC, AC, and transient execution without a hosted upload.</p></article>
+          <article><span>REPRODUCIBILITY</span><h3>Seeds / fingerprints / checkpoints</h3><p>Monte Carlo defaults to a deterministic seed; transient resume requires a byte-identical deck fingerprint; outputs retain run configuration and model identity.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="evidence product-section" id="evidence" aria-labelledby="evidence-title">
+      <div class="page-frame">
+        <header class="section-title section-title--split dossier-heading">
+          <div>
+            <p class="eyebrow">08 / VALIDATION EVIDENCE</p>
+            <h2 id="evidence-title">Configured gates, retained corpora, and raw files stay separate from pass claims.</h2>
+          </div>
+          <p>The public validation page is regenerated from the exact RSpice source commit. A CI conclusion is shown only when the downloaded artifact names that same commit; otherwise the site reports configuration and inventories without inventing a pass percentage.</p>
+        </header>
+
+        <div class="evidence-ledger">
+          <article><span>SOURCE</span><strong data-catalog-field="source.short_revision">c216a0922ae3</strong><p>Commit used for the generated reference and validation inventory.</p></article>
+          <article><span>NIGHTLY RATCHET</span><strong><span data-catalog-field="validation.nightly.configured_total">113</span> decks</strong><p>Configured aggregate; no more than <span data-catalog-field="validation.nightly.max_failing">2</span> failing decks.</p></article>
+          <article><span>NGSPICE MANIFEST</span><strong><span data-catalog-field="validation.ngspice_manifest.entries">49</span> entries</strong><p>Numeric, smoke, locked-grid, measure, scripted, and expected-unsolvable modes.</p></article>
+          <article><span>XYCE MANIFEST</span><strong><span data-catalog-field="validation.xyce_manifest.entries">2123</span> contracts</strong><p>Retained deck and wrapper requirements, not a claim of successful execution.</p></article>
+        </div>
+
+        <div class="evidence-method">
+          <article><span>01</span><h3>Unit &amp; integration</h3><p>Parser, expressions, device equations, assembly, solvers, analyses, formats, and interface errors.</p></article>
+          <article><span>02</span><h3>Oracle replay</h3><p>Retained inputs and outputs for history-coupled devices and numerical state transitions.</p></article>
+          <article><span>03</span><h3>ngspice corpus</h3><p>Deck-by-deck execution with probe-aware floors, relative tolerance, watchdogs, and explicit aggregate output.</p></article>
+          <article><span>04</span><h3>Xyce contracts</h3><p>Runtime decks plus retained wrapper requirements that remain visible until the harness implements them.</p></article>
+          <article><span>05</span><h3>Benchmark context</h3><p>Source-controlled host, executable paths, repeats, deck names, medians, and raw scoreboard JSON.</p></article>
+        </div>
+        <div class="evidence-actions"><a class="button button--hot" href="validation.html">Open revision-pinned validation</a><a class="button button--quiet" href="reference/catalog.json">Inspect catalog JSON</a><a class="button button--quiet" href="parity.html">Read comparison methodology</a></div>
+      </div>
+    </section>
+
+    <section class="truth product-section" id="truth" aria-labelledby="truth-title">
+      <span class="anchor-alias" id="availability" aria-hidden="true"></span>
+      <span class="anchor-alias" id="platforms" aria-hidden="true"></span>
+      <div class="page-frame">
+        <header class="section-title section-title--split">
+          <div>
+            <p class="eyebrow">09 / AVAILABILITY</p>
+            <h2 id="truth-title">Current availability by host and service.</h2>
+          </div>
+          <p>Source code, the experimental browser path, the Workbench mockup, and planned hosted services are separate deliverables with different availability.</p>
+        </header>
+        <div class="truth__instrument">
+          <div class="truth__instrument-head"><span>AVAILABILITY MATRIX</span><span>CURRENT PUBLIC STATUS</span><span>CHECK THE SOURCE REVISION</span></div>
+        <div class="truth-table" role="table" aria-label="RSpice product status">
+          <div class="truth-table__head" role="row"><span role="columnheader">STATUS</span><span role="columnheader">COMPONENT</span><span role="columnheader">CURRENT SCOPE</span><span role="columnheader">DETAIL</span></div>
+          <article role="row"><span class="truth-pill truth-pill--ready" role="cell">SOURCE BUILD</span><h3 role="cell">Native engine &amp; tools</h3><p role="cell">The Rust engine, CLI, Python bindings, validation harnesses, and desktop egui application are present in the public source tree.</p><a role="cell" href="download.html">Build from source <span aria-hidden="true">↗</span></a></article>
+          <article role="row"><span class="truth-pill truth-pill--ready" role="cell">SOURCE BUILD</span><h3 role="cell">Verilog-A toolchain</h3><p role="cell">Parser, semantic IR, bytecode VM, x64-first JIT, standalone compilation, and generated-Rust built-in paths are present behind their applicable features.</p><a role="cell" href="reference.html">Inspect compiler surface <span aria-hidden="true">&nearr;</span></a></article>
+          <article role="row"><span class="truth-pill truth-pill--test" role="cell">EXPERIMENTAL</span><h3 role="cell">WebAssembly &amp; browser IDE</h3><p role="cell">The WASM interface exposes netlist summaries plus DC, AC, and transient runs; WebGPU and single-thread limits apply.</p><a role="cell" href="ide/">Open WASM lab <span aria-hidden="true">↗</span></a></article>
+          <article role="row"><span class="truth-pill truth-pill--concept" role="cell">MOCKUP</span><h3 role="cell">New Workbench UI</h3><p role="cell">The embedded desktop, tablet, and phone layouts are HTML design mockups, not the current egui application.</p><a role="cell" href="#product">Inspect mockup <span aria-hidden="true">↗</span></a></article>
+          <article role="row"><span class="truth-pill truth-pill--test" role="cell">GENERATED</span><h3 role="cell">Reference &amp; validation status</h3><p role="cell">The catalog, gate configuration, manifest counts, benchmark context, and raw files are generated from the source commit named on each page.</p><a role="cell" href="validation.html">Open generated status <span aria-hidden="true">&nearr;</span></a></article>
+          <article role="row"><span class="truth-pill truth-pill--future" role="cell">ROADMAP</span><h3 role="cell">Accounts, sync, cloud &amp; sharing</h3><p role="cell">Live collaboration, cloud saves, managed simulation, and published circuit URLs are planned services; they are not live.</p><a role="cell" href="#roadmap">View hosted plan <span aria-hidden="true">↗</span></a></article>
+        </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="roadmap" id="roadmap" aria-labelledby="roadmap-title">
+      <span class="anchor-alias" id="connected" aria-hidden="true"></span>
+      <div class="page-frame">
+        <div class="roadmap__top">
+          <header class="section-title">
+            <p class="eyebrow">10 / HOSTED SERVICES</p>
+            <h2 id="roadmap-title">Local projects remain usable without hosted services.</h2>
+          </header>
+          <p class="roadmap__lede">Planned services add identity, project synchronization, collaboration, managed simulation, and public or private result links. Local files and local simulation remain independent of those services.</p>
+        </div>
+
+        <div class="roadmap__route" aria-label="Planned RSpice connected service architecture">
+          <article class="route-node route-node--now"><span>01 / NOW</span><h3>Local project</h3><p>Files, models, engine, and results stay on the engineer’s device.</p></article>
+          <i aria-hidden="true"></i>
+          <article class="route-node"><span>02 / PLANNED</span><h3>Identity boundary</h3><p>Authentication belongs to the future application service, not the public website.</p></article>
+          <i aria-hidden="true"></i>
+          <article class="route-node"><span>03 / PLANNED</span><h3>Versioned projects</h3><p>File revisions, permissions, presence, comments, and public, unlisted, or private sharing.</p></article>
+          <i aria-hidden="true"></i>
+          <article class="route-node"><span>04 / PLANNED</span><h3>Managed simulation</h3><p>Queued runs, runner selection, cost estimates, retained outputs, and shareable result URLs.</p></article>
+        </div>
+
+        <div class="roadmap__notes">
+          <article><span>ACCOUNT LOCATION</span><h3>Accounts belong to the application service.</h3><p>The public site remains account-free. Registration, organization management, billing, and authenticated project access will use the hosted application.</p></article>
+          <article><span>SHARING POLICY</span><h3>Every shared URL includes visibility controls.</h3><p>Planned result pages distinguish public, unlisted, and private access and retain the input revision, run configuration, expiration, revocation, and export settings.</p></article>
+          <article><span>COMPUTE BILLING</span><h3>Runner time and storage are separate usage.</h3><p>Local simulation does not require a hosted plan. Managed corner, Monte Carlo, and optimization jobs show estimated runner and storage cost before submission.</p></article>
+        </div>
+
+        <div class="connected-ledger" role="table" aria-label="Planned connected service scope">
+          <div class="connected-ledger__head" role="row"><span role="columnheader">SERVICE</span><span role="columnheader">PLANNED CONTRACT</span><span role="columnheader">DATA BOUNDARY</span><span role="columnheader">CURRENT STATE</span></div>
+          <article role="row"><strong role="cell">Identity &amp; organizations</strong><p role="cell">Registration, SSO options, organization membership, editor/reviewer roles, seat assignment, and billing ownership.</p><span role="cell">Hosted identity and policy data; no circuit upload required for a local license.</span><em role="cell">NOT ACTIVE</em></article>
+          <article role="row"><strong role="cell">Cloud project saves</strong><p role="cell">Versioned files, model references, project revisions, restore points, branch/merge policy, and per-project retention.</p><span role="cell">Opt-in project content encrypted in transit and at rest; local-only projects remain local.</span><em role="cell">NOT ACTIVE</em></article>
+          <article role="row"><strong role="cell">Live collaboration</strong><p role="cell">Presence, selections, comments, review threads, edit conflict handling, and an auditable history tied to project revisions.</p><span role="cell">Only authorized project members and invited reviewers; role-controlled write access.</span><em role="cell">NOT ACTIVE</em></article>
+          <article role="row"><strong role="cell">Managed simulation</strong><p role="cell">Preflight, runner class, queue state, resource estimate, cancellation, logs, retained datasets, and downloadable artifacts.</p><span role="cell">Submitted run package and selected model dependencies; private-runner option planned for controlled environments.</span><em role="cell">NOT ACTIVE</em></article>
+          <article role="row"><strong role="cell">Published circuits &amp; results</strong><p role="cell">Proposed short URLs for a circuit, frozen result, report, or interactive viewer with public, unlisted, private, expiring, and revocable visibility.</p><span role="cell">A publication is a deliberate copy with its own visibility and revision, not an implicit exposure of the source project.</span><em role="cell">NOT ACTIVE</em></article>
+          <article role="row"><strong role="cell">Governance &amp; audit</strong><p role="cell">Organization policy, SSO enforcement, export controls, audit records, retention policy, support bundles, and administrative exports.</p><span role="cell">Enterprise control plane; private runner and offline licensing remain separate deployment choices.</span><em role="cell">NOT ACTIVE</em></article>
+        </div>
+
+        <div class="service-boundary">
+          <article><span>LOCAL PRODUCT</span><h3>Files and simulation do not depend on an RSpice account.</h3><p>Native desktop, CLI, Python, local model libraries, and local result export remain usable when hosted services are unavailable or intentionally disabled.</p></article>
+          <article><span>CONNECTED PRODUCT</span><h3>Accounts belong where authenticated project state lives.</h3><p>The future application service—not this public site—owns registration, sessions, organization policy, billing, collaboration, managed jobs, and shared URLs.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="pricing" id="pricing" aria-labelledby="pricing-title">
+      <div class="page-frame">
+        <header class="section-title section-title--split">
+          <div>
+            <p class="eyebrow">11 / LICENSING PLAN</p>
+            <h2 id="pricing-title">Proposed seat licenses and hosted-compute billing.</h2>
+          </div>
+          <p>These prices are planning assumptions, not active offers. Commercial editing uses named seats; view-only review is free; managed runner time and storage are billed separately.</p>
+        </header>
+
+        <div class="price-grid">
+          <article>
+            <div><span>EVALUATION / ACADEMIC</span><h3>Evaluation</h3></div>
+            <p class="price"><strong>$0</strong><small>source and non-commercial preview</small></p>
+            <ul><li>Source-built local engine, CLI, and desktop tools</li><li>Experimental browser preview</li><li>Personal, educational, and evaluation use</li><li>No hosted storage or managed compute included</li><li>Community issue tracking; no response SLA</li></ul>
+            <a href="download.html">Build from source <span aria-hidden="true">↗</span></a>
+          </article>
+          <article class="price-grid__featured">
+            <div><span>COMMERCIAL</span><h3>Professional</h3></div>
+            <p class="price"><strong>$149</strong><small>named user / month, billed annually</small></p>
+            <ul><li>Commercial native license at launch</li><li>Desktop, CLI, Python, and CI workflows</li><li>Local projects and local simulation without cloud dependency</li><li>Version updates and standard technical support</li><li>Optional metered managed compute after service launch</li></ul>
+            <a href="early-access.html?plan=professional">Describe an evaluation <span aria-hidden="true">&nearr;</span></a>
+          </article>
+          <article>
+            <div><span>COLLABORATIVE</span><h3>Team</h3></div>
+            <p class="price"><strong>$249</strong><small>editor / month, billed annually</small></p>
+            <ul><li>Professional license plus hosted project editing after launch</li><li>Versioned saves, roles, comments, review, and audit history</li><li>View-only reviewers stay free</li><li>Included monthly hosted-service allowance proposed</li><li>Managed compute billed beyond included allowance</li></ul>
+            <a href="early-access.html?plan=team">Describe an evaluation <span aria-hidden="true">&nearr;</span></a>
+          </article>
+          <article>
+            <div><span>CONTROLLED ENVIRONMENTS</span><h3>Enterprise</h3></div>
+            <p class="price"><strong>Custom</strong><small>annual commitment</small></p>
+            <ul><li>Offline, floating, and private-runner plans</li><li>SSO, organization policy, retention, and audit export</li><li>Vendor security and deployment review</li><li>Qualification assistance and negotiated support terms</li><li>Annual minimum with volume and multi-year pricing</li></ul>
+            <a href="early-access.html?plan=enterprise">Describe requirements <span aria-hidden="true">&nearr;</span></a>
+          </article>
+        </div>
+        <p class="pricing__note">No account, payment flow, cloud storage, managed compute, or subscription checkout is active on this site today. Any hosted compute will be billed separately from seats.</p>
+
+        <div class="commercial-model">
+          <article><span>SEAT REVENUE</span><h3>Annual named-user licenses</h3><p>Professional and Team prices are shown as monthly equivalents but billed annually. This supports predictable engineering budgets and recurring product development.</p></article>
+          <article><span>REVIEW ACCESS</span><h3>Free viewers, paid editors</h3><p>Stakeholders can inspect and comment without consuming an editor seat; users who modify projects, plans, or organization policy require a paid seat.</p></article>
+          <article><span>USAGE REVENUE</span><h3>Compute and retained storage</h3><p>Hosted runner class, wall time, memory tier, retained artifact volume, and storage duration are metered separately with an estimate before submission.</p></article>
+          <article><span>ENTERPRISE REVENUE</span><h3>Control-plane and support terms</h3><p>Offline activation, floating entitlement, SSO, private runners, audit export, deployment review, and response commitments sit behind an annual minimum.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-call" aria-labelledby="final-title">
+      <div class="page-frame final-call__inner">
+        <div>
+          <p class="eyebrow">SOURCE / BROWSER EVALUATION</p>
+          <h2 id="final-title">Build the CLI or run the experimental WASM path.</h2>
+        </div>
+        <div class="final-call__actions">
+          <a class="button button--hot" href="ide/">Open WASM lab <span aria-hidden="true">↗</span></a>
+          <a class="button button--quiet" href="early-access.html?plan=evaluation">Prepare an evaluation inquiry</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="page-frame footer__grid">
+      <div class="footer__identity">
+        <a class="identity" href="#top"><img src="assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a>
+        <p>Rust circuit simulator with desktop, CLI, Python, and WebAssembly interfaces.</p>
+      </div>
+      <div><h2>Technical</h2><a href="reference.html">Generated reference</a><a href="validation.html">Validation status</a><a href="parity.html">Methodology</a><a href="docs.html">Scope and builds</a></div>
+      <div><h2>Project</h2><a href="changelog.html">Development record</a><a href="download.html">Build from source</a><a href="early-access.html">Early access</a><a href="privacy.html">Privacy</a></div>
+      <div><h2>Contact</h2><a href="mailto:hello@rspice.app">General</a><a href="mailto:sales@rspice.app">Commercial</a><a href="https://github.com/JaimeHW/RSpice-Site/security" target="_blank" rel="noopener">Security</a></div>
+    </div>
+    <div class="page-frame footer__base"><span>© <span data-year>2026</span> RSpice</span><span>SOURCE BUILD / HOSTED SERVICES NOT ACTIVE</span><span>IBM Plex under SIL OFL</span></div>
+  </footer>
+
+  <script src="assets/landing-field.js" defer></script>
+  <script src="assets/landing-data.js" defer></script>
+  <script src="assets/field.js" defer></script>
+</body>
+</html>

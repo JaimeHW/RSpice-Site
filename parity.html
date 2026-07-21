@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071015">
+  <meta name="color-scheme" content="dark">
+  <title>Validation methodology &mdash; RSpice</title>
+  <meta name="description" content="RSpice validation methodology: source-level tests, oracle replay, corpus harnesses, and explicit handling of unsupported or unresolved paths.">
+  <link rel="canonical" href="https://rspice.app/parity">
+  <link rel="icon" href="assets/brand/rspice.ico" sizes="any">
+  <link rel="apple-touch-icon" href="assets/brand/icon-256.png">
+  <link rel="stylesheet" href="assets/field.css">
+  <link rel="stylesheet" href="assets/technical.css">
+  <link rel="stylesheet" href="assets/interior-refined.css">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Validation methodology &mdash; RSpice">
+  <meta property="og:description" content="How RSpice compares simulator results, records unsupported cases, and builds revision-pinned validation reports.">
+  <meta property="og:image" content="https://rspice.app/assets/og.png">
+</head>
+<body class="technical-page">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="topbar" data-topbar>
+    <div class="topbar__inner">
+      <a class="identity" href="index.html" aria-label="RSpice home"><img src="assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a>
+      <button class="nav-trigger" type="button" aria-controls="site-nav" aria-expanded="false" data-nav-trigger><span class="visually-hidden">Open navigation</span><span aria-hidden="true"></span><span aria-hidden="true"></span></button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary navigation" data-site-nav>
+        <a href="index.html#engine">Engine</a><a href="index.html#analyses">Analyses</a><a href="index.html#truth">Status</a><a href="reference.html">Reference</a><a href="validation.html">Validation</a><a href="docs.html">Docs</a>
+      </nav>
+      <div class="topbar__actions"><a class="source-link" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a><a class="launch-link" href="ide/">Open WASM lab <span class="launch-link__tag">experimental</span></a></div>
+    </div>
+  </header>
+
+  <main id="main">
+    <header class="technical-hero">
+      <div class="page-frame technical-hero__grid">
+        <div>
+          <p class="eyebrow">RSPICE / VALIDATION METHODOLOGY</p>
+          <h1>How RSpice compares results and records failures.</h1>
+          <p class="technical-hero__lede">The source tree includes unit tests, integration tests, oracle replay for history-coupled models, and corpus harnesses for ngspice and Xyce decks. The generated status page separates configured gates from exact-revision CI results.</p>
+        </div>
+        <dl class="technical-hero__ledger" aria-label="Validation methodology status">
+          <div><dt>UNIT &amp; INTEGRATION</dt><dd>Source test targets</dd></div>
+          <div><dt>ORACLE CORPORA</dt><dd>ngspice / Xyce paths</dd></div>
+          <div><dt>STATUS PAGE</dt><dd>Source revision identified</dd></div>
+          <div><dt>CI RESULT</dt><dd>Accepted only on exact SHA</dd></div>
+        </dl>
+      </div>
+    </header>
+
+    <div class="page-frame technical-layout">
+      <aside class="technical-index" aria-label="Validation methodology sections">
+        <p>ON THIS PAGE</p>
+        <a href="#principle">Result states</a><a href="#layers">Test layers</a><a href="#contracts">Comparison inputs</a><a href="#rerun">Test commands</a><a href="#release">Release report</a>
+      </aside>
+
+      <article class="technical-document">
+        <section class="technical-section" id="principle">
+          <p class="technical-number">01 / PRINCIPLE</p>
+          <h2>Solved, unsupported, non-convergent, timed-out, and mismatched are separate states.</h2>
+          <p>Harness output records whether a deck solved, requested unsupported behavior, failed convergence, exceeded its watchdog, produced non-finite data, or differed from its reference beyond tolerance.</p>
+          <div class="technical-callout"><strong>PUBLIC COUNTS</strong><span>The <a href="validation.html">validation status</a> publishes source-controlled gate and manifest counts for its named commit. It labels a pass result only when a downloaded CI artifact identifies that exact commit.</span></div>
+        </section>
+
+        <section class="technical-section" id="layers">
+          <p class="technical-number">02 / TEST LAYERS</p>
+          <h2>Unit, replay, and corpus tests cover different failure modes.</h2>
+          <div class="technical-grid technical-grid--three">
+            <article><span>01 / LOCAL</span><h3>Unit &amp; integration</h3><p>Targets cover parser rules, device equations, matrix assembly, solver behavior, analyses, output conversion, and interface errors.</p></article>
+            <article><span>02 / HISTORY</span><h3>Oracle replay</h3><p>Retained reference inputs and outputs exercise history-dependent device runtimes and numerical state transitions.</p></article>
+            <article><span>03 / CORPUS</span><h3>External decks</h3><p>ngspice and Xyce harnesses discover retained decks, compare executed outputs, report unsupported cases, and supervise each process with a watchdog.</p></article>
+          </div>
+          <p>The ngspice harness uses probe-aware absolute floors with relative tolerance. The Xyce harness retains unsupported wrapper requirements in its manifest rather than omitting those decks.</p>
+        </section>
+
+        <section class="technical-section" id="contracts">
+          <p class="technical-number">03 / COMPARISON INPUTS</p>
+          <h2>Match comparison data to the analysis.</h2>
+          <div class="technical-table-wrap"><table class="technical-table"><thead><tr><th>CASE</th><th>REQUIRED DATA</th><th>INSUFFICIENT DATA</th></tr></thead><tbody>
+            <tr><td>DC / operating point</td><td>Node and branch values, model and option identity, convergence outcome, and tolerances.</td><td>A plotted point without solver and netlist provenance.</td></tr>
+            <tr><td>Transient</td><td>Probe-aware waveform comparison, accepted time grid or locked-grid replay where timing matters, and measurement checks.</td><td>A visual overlay with no sample, tolerance, or timebase definition.</td></tr>
+            <tr><td>AC / frequency</td><td>Complex values, sweep parameters, model identity, and an explicit comparison transform.</td><td>A magnitude trace that hides phase, interpolation, or point selection.</td></tr>
+            <tr><td>Unsupported path</td><td>Typed refusal or quarantine entry tied to the input and capability boundary.</td><td>Silently skipping an analysis and calling the deck a pass.</td></tr>
+          </tbody></table></div>
+          <div class="technical-callout"><strong>QUARANTINE</strong><span>A quarantined deck remains in the report with its reason, reproduction path, and owner until it becomes supported or is intentionally removed.</span></div>
+        </section>
+
+        <section class="technical-section" id="rerun">
+          <p class="technical-number">04 / RERUN TARGETS</p>
+          <h2>Run tests against the exact source revision.</h2>
+          <p>Representative validation commands are documented in the source repository. Run them from the exact checkout and retain the output with the build/toolchain context when evaluating a change.</p>
+          <figure class="technical-code"><figcaption><span>shell / representative source targets</span><span>exact target names may evolve with source</span></figcaption><pre><code>cargo test --release -p rspice-core
+cargo test --release -p rspice-core --test ngspice_regression
+cargo test --release -p rspice-core --test xyce_regression</code></pre></figure>
+          <p class="technical-note">The source repository defines current target names, feature flags, fixtures, platform requirements, tolerance policy, and CI wiring.</p>
+          <div class="technical-actions"><a class="button button--hot" href="validation.html">Open generated status</a><a class="button button--quiet" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Inspect validation source <span aria-hidden="true">&nearr;</span></a><a class="button button--quiet" href="docs.html#validation">Technical scope</a></div>
+        </section>
+
+        <section class="technical-section" id="release">
+          <p class="technical-number">05 / RELEASE REPORT</p>
+          <h2>Requirements for a generated validation summary.</h2>
+          <ul class="technical-list">
+            <li><span><strong>Pin every result:</strong> source commit, reference corpus revision, model bundle, host, toolchain, options, and platform belong with the report.</span></li>
+            <li><span><strong>Publish the exceptions:</strong> unsupported, skipped, quarantined, and performance-limited cases must stay queryable rather than being collapsed into a headline percentage.</span></li>
+            <li><span><strong>Link raw artifacts:</strong> release summaries link to machine-readable reports, not only charts or prose.</span></li>
+            <li><span><strong>Separate targets:</strong> engine, desktop UI, browser, and hosted-service results use independent qualification gates.</span></li>
+          </ul>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="page-frame footer__grid">
+      <div class="footer__identity"><a class="identity" href="index.html"><img src="assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a><p>Rust circuit simulator with desktop, CLI, Python, and WebAssembly interfaces.</p></div>
+      <div><h2>Technical</h2><a href="reference.html">Generated reference</a><a href="validation.html">Validation status</a><a href="parity.html">Methodology</a><a href="docs.html">Scope and builds</a></div>
+      <div><h2>Project</h2><a href="changelog.html">Development record</a><a href="download.html">Build from source</a><a href="early-access.html">Early access</a><a href="privacy.html">Privacy</a></div>
+      <div><h2>Contact</h2><a href="mailto:hello@rspice.app">General</a><a href="mailto:sales@rspice.app">Commercial</a><a href="https://github.com/JaimeHW/RSpice-Site/security" target="_blank" rel="noopener">Security</a></div>
+    </div>
+    <div class="page-frame footer__base"><span>&copy; <span data-year>2026</span> RSpice</span><span>SOURCE BUILD / HOSTED SERVICES NOT ACTIVE</span><span>IBM Plex under SIL OFL</span></div>
+  </footer>
+  <script src="assets/field.js" defer></script>
+</body>
+</html>

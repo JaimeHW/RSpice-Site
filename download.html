@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071015">
+  <meta name="color-scheme" content="dark">
+  <title>Build &amp; evaluate &mdash; RSpice</title>
+  <meta name="description" content="Build the RSpice Rust simulator from source or evaluate its experimental browser preview. Signed production installers are not available yet.">
+  <link rel="canonical" href="https://rspice.app/download">
+  <link rel="icon" href="assets/brand/rspice.ico" sizes="any">
+  <link rel="apple-touch-icon" href="assets/brand/icon-256.png">
+  <link rel="stylesheet" href="assets/field.css">
+  <link rel="stylesheet" href="assets/technical.css">
+  <link rel="stylesheet" href="assets/interior-refined.css">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Build &amp; evaluate &mdash; RSpice">
+  <meta property="og:description" content="Source-build and browser-evaluation paths for RSpice.">
+  <meta property="og:image" content="https://rspice.app/assets/og.png">
+</head>
+<body class="technical-page">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="topbar" data-topbar>
+    <div class="topbar__inner">
+      <a class="identity" href="index.html" aria-label="RSpice home"><img src="assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a>
+      <button class="nav-trigger" type="button" aria-controls="site-nav" aria-expanded="false" data-nav-trigger><span class="visually-hidden">Open navigation</span><span aria-hidden="true"></span><span aria-hidden="true"></span></button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary navigation" data-site-nav>
+        <a href="index.html#engine">Engine</a><a href="index.html#analyses">Analyses</a><a href="index.html#truth">Status</a><a href="reference.html">Reference</a><a href="validation.html">Validation</a><a href="docs.html">Docs</a>
+      </nav>
+      <div class="topbar__actions"><a class="source-link" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a><a class="launch-link" href="ide/">Open WASM lab <span class="launch-link__tag">experimental</span></a></div>
+    </div>
+  </header>
+
+  <main id="main">
+    <header class="technical-hero">
+      <div class="page-frame technical-hero__grid">
+        <div>
+          <p class="eyebrow">RSPICE / BUILD &amp; EVALUATE</p>
+          <h1>Build the CLI, desktop application, or browser target.</h1>
+          <p class="technical-hero__lede">Signed installers and account-backed downloads are not published. The current routes are a Rust source build and an experimental client-side WebAssembly lab.</p>
+        </div>
+        <dl class="technical-hero__ledger" aria-label="Current availability">
+          <div><dt>NATIVE</dt><dd>Build from source</dd></div>
+          <div><dt>BROWSER</dt><dd>Experimental local evaluation</dd></div>
+          <div><dt>ACCOUNTS</dt><dd>Not active</dd></div>
+          <div><dt>INSTALLERS</dt><dd>Not published</dd></div>
+        </dl>
+      </div>
+    </header>
+
+    <div class="page-frame technical-layout">
+      <aside class="technical-index" aria-label="Build and evaluation sections">
+        <p>ON THIS PAGE</p>
+        <a href="#availability">Availability</a><a href="#native">Native build</a><a href="#browser">Browser preview</a><a href="#commercial">Commercial path</a><a href="#accounts">Accounts</a>
+      </aside>
+
+      <article class="technical-document">
+        <section class="technical-section" id="availability">
+          <p class="technical-number">01 / AVAILABILITY</p>
+          <h2>Source is the current native distribution.</h2>
+          <p>The public repository contains the engine, interfaces, models, and tests. A checkout identifies its exact implementation revision; signed packages and supported-platform matrices are not yet published.</p>
+          <div class="technical-grid technical-grid--three">
+            <article><span><span class="technical-pill">AVAILABLE</span></span><h3>Rust source</h3><p>The public repository provides the engine, CLI, UI, Python bindings, WASM bindings, and test material.</p></article>
+            <article><span><span class="technical-pill technical-pill--warning">EXPERIMENTAL</span></span><h3>Web lab</h3><p>The browser route is a constrained, client-side evaluation target rather than a hosted compute service.</p></article>
+            <article><span><span class="technical-pill technical-pill--future">NOT AVAILABLE</span></span><h3>Commercial delivery</h3><p>There are no signed installers, entitlements, billing accounts, hosted projects, or published support terms.</p></article>
+          </div>
+        </section>
+
+        <section class="technical-section" id="native">
+          <p class="technical-number">02 / NATIVE BUILD</p>
+          <h2>Build the CLI or egui desktop application.</h2>
+          <p>The CLI accepts decks and writes result files; the desktop package provides the native graphical application. Both build against the checked-out <code>rspice-core</code> revision.</p>
+          <figure class="technical-code"><figcaption><span>shell / checkout and CLI</span><span>first evaluation route</span></figcaption><pre><code>git clone https://github.com/JaimeHW/RSpice.git
+cd RSpice
+cargo build --release -p rspice-cli
+target/release/rspice run example.sp</code></pre></figure>
+          <figure class="technical-code"><figcaption><span>shell / desktop UI</span><span>native graphical path</span></figcaption><pre><code>cd RSpice
+cargo run --release -p rspice-ui</code></pre></figure>
+          <div class="technical-callout"><strong>DEVELOPMENT BUILD</strong><span>No released installer, platform support window, or commercial qualification accompanies the current source build. Validate the revision and model path against your own reference cases.</span></div>
+        </section>
+
+        <section class="technical-section" id="browser">
+          <p class="technical-number">03 / BROWSER PREVIEW</p>
+          <h2>Browser path: summaries, DC, AC, and transient.</h2>
+          <p>The experimental lab runs the WebAssembly binding in the browser. It does not create accounts, synchronize projects, allocate managed runners, or expose every native analysis.</p>
+          <ul class="technical-list">
+            <li><span><strong>Available:</strong> netlist summaries and client-side DC operating-point, AC, and transient result snapshots.</span></li>
+            <li><span><strong>Not available:</strong> parallel campaigns, managed storage, hosted runners, collaboration, or full parity with the native interfaces.</span></li>
+            <li><span><strong>Data path:</strong> the current lab has no account or project-sync service.</span></li>
+          </ul>
+          <div class="technical-actions"><a class="button button--hot" href="ide/">Open WASM lab <span aria-hidden="true">&nearr;</span></a><a class="button button--quiet" href="index.html#truth">Read availability</a></div>
+        </section>
+
+        <section class="technical-section" id="commercial">
+          <p class="technical-number">04 / COMMERCIAL PATH</p>
+          <h2>Proposed license structure.</h2>
+          <p>The current plan uses paid native editing seats, free view-only review, and separate usage billing for managed runner time and storage. Checkout is not active.</p>
+          <div class="technical-grid">
+            <article><span>SEATS</span><h3>Native license</h3><p>A commercial seat covers desktop, CLI, Python, and CI use without requiring hosted storage or simulation.</p></article>
+            <article><span>USAGE</span><h3>Hosted runner and storage usage</h3><p>Managed jobs and retained outputs use separate metering so estimated cost can be shown before submission.</p></article>
+          </div>
+          <div class="technical-actions"><a class="button button--quiet" href="index.html#pricing">View licensing assumptions</a><a class="button button--quiet" href="early-access.html?plan=professional">Describe a commercial evaluation</a></div>
+        </section>
+
+        <section class="technical-section" id="accounts">
+          <p class="technical-number">05 / ACCOUNT BOUNDARY</p>
+          <h2>Account services will use a separate application service.</h2>
+          <p>Future registration, organization management, billing, project access, collaboration, publishing, and cloud execution belong to the authenticated application. The public site remains account-free.</p>
+          <div class="technical-callout"><strong>NOT LIVE</strong><span>There is no registration, sign-in, password reset, subscription portal, cloud save, shared project URL, or managed simulation service active on this website today.</span></div>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="page-frame footer__grid">
+      <div class="footer__identity"><a class="identity" href="index.html"><img src="assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a><p>Rust circuit simulator with desktop, CLI, Python, and WebAssembly interfaces.</p></div>
+      <div><h2>Technical</h2><a href="reference.html">Generated reference</a><a href="validation.html">Validation status</a><a href="parity.html">Methodology</a><a href="docs.html">Scope and builds</a></div>
+      <div><h2>Project</h2><a href="changelog.html">Development record</a><a href="download.html">Build from source</a><a href="early-access.html">Early access</a><a href="privacy.html">Privacy</a></div>
+      <div><h2>Contact</h2><a href="mailto:hello@rspice.app">General</a><a href="mailto:sales@rspice.app">Commercial</a><a href="https://github.com/JaimeHW/RSpice-Site/security" target="_blank" rel="noopener">Security</a></div>
+    </div>
+    <div class="page-frame footer__base"><span>&copy; <span data-year>2026</span> RSpice</span><span>SOURCE BUILD / HOSTED SERVICES NOT ACTIVE</span><span>IBM Plex under SIL OFL</span></div>
+  </footer>
+  <script src="assets/field.js" defer></script>
+</body>
+</html>

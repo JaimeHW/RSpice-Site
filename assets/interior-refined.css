@@ -1,0 +1,367 @@
+/* Shared graphite editorial system for documentation, status, and legal pages. */
+
+body.technical-page,
+body.legal-page {
+  --void: #090b0d;
+  --ink: #0b0d0f;
+  --deep: #0d1013;
+  --panel: #12161a;
+  --panel-high: #171c20;
+  --line: #30363b;
+  --line-soft: rgba(216, 222, 226, 0.13);
+  --text: #e8ebed;
+  --muted: #9ca3a8;
+  --dim: #697177;
+  --mint: #f2b824;
+  --mint-soft: #ffdc76;
+  --violet: #91a8a3;
+  --violet-soft: #bbc9c6;
+  --acid: #f2b824;
+  position: relative;
+  background: #090b0d;
+}
+
+body.technical-page::before,
+body.legal-page::before {
+  background:
+    radial-gradient(ellipse 96% 68% at 50% -18%, rgba(74, 82, 86, 0.18), transparent 62%),
+    linear-gradient(180deg, #0c0f11 0%, #090b0d 76%);
+}
+
+.technical-page .topbar,
+.legal-page .topbar {
+  border-color: #282d31;
+  background: rgba(9, 11, 13, 0.96);
+  backdrop-filter: blur(16px);
+}
+
+.technical-page .topbar__inner,
+.legal-page .topbar__inner {
+  min-height: 62px;
+}
+
+.technical-page .site-nav a,
+.technical-page .source-link,
+.legal-page .site-nav a,
+.legal-page .source-link {
+  color: #8c949a;
+  font-size: 11px;
+}
+
+.technical-page .site-nav a:hover,
+.technical-page .source-link:hover,
+.legal-page .site-nav a:hover,
+.legal-page .source-link:hover {
+  color: #f2b824;
+}
+
+.technical-page .launch-link,
+.legal-page .launch-link {
+  min-height: 34px;
+  border-color: #4b4330;
+  background: #15140f;
+  color: #f7d779;
+}
+
+.technical-page .launch-link:hover,
+.legal-page .launch-link:hover {
+  background: #211d11;
+}
+
+.technical-page .launch-link__tag,
+.legal-page .launch-link__tag {
+  background: #f2b824;
+  color: #15120a;
+}
+
+.technical-hero,
+.legal-hero {
+  padding: 38px 0 32px;
+  border-color: #282d31;
+  background: transparent;
+}
+
+.technical-hero::after {
+  display: none;
+}
+
+.technical-hero__grid {
+  grid-template-columns: minmax(0, 1.12fr) minmax(360px, 0.88fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: center;
+}
+
+.technical-hero h1,
+.legal-hero h1 {
+  max-width: 780px;
+  margin-top: 10px;
+  font-size: clamp(29px, 3.05vw, 41px);
+  letter-spacing: -0.047em;
+  line-height: 1.03;
+}
+
+.technical-hero__lede,
+.legal-hero p:last-child {
+  max-width: 760px;
+  margin-top: 13px;
+  color: #9ca3a8;
+  font-size: 14px;
+  line-height: 1.58;
+}
+
+.technical-hero__ledger {
+  border-color: #30363b;
+}
+
+.technical-hero__ledger div {
+  min-height: 65px;
+  padding: 11px 12px;
+  border-color: #30363b;
+  background: rgba(15, 19, 22, 0.92);
+}
+
+.technical-hero__ledger dt {
+  color: #737b81;
+}
+
+.technical-hero__ledger dd {
+  margin-top: 5px;
+  color: #d9dddf;
+  font-size: 11px;
+}
+
+.technical-layout,
+.legal-layout {
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: clamp(34px, 5vw, 68px);
+  padding: 36px 0 76px;
+}
+
+.technical-index,
+.legal-index {
+  top: 84px;
+}
+
+.technical-index a,
+.legal-index a {
+  border-color: #292f33;
+  color: #92999e;
+}
+
+.technical-index a:hover,
+.legal-index a:hover {
+  color: #f2b824;
+}
+
+.technical-section {
+  padding-bottom: 39px;
+  border-color: #292f33;
+}
+
+.technical-section + .technical-section {
+  margin-top: 39px;
+}
+
+.technical-number,
+.legal-number {
+  color: #cba23a;
+}
+
+.technical-section h2,
+.legal-copy h2 {
+  margin-top: 10px;
+  font-size: clamp(23px, 2.25vw, 31px);
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+}
+
+.technical-section p,
+.legal-copy p {
+  margin-top: 13px;
+  color: #a0a7ab;
+  font-size: 14px;
+  line-height: 1.62;
+}
+
+.technical-callout,
+.legal-callout {
+  margin-top: 18px;
+  border-color: #f2b824;
+  background: rgba(242, 184, 36, 0.055);
+}
+
+.technical-callout > strong,
+.legal-callout strong {
+  color: #e1b84f;
+}
+
+.technical-grid {
+  margin-top: 20px;
+  border-color: #30363b;
+}
+
+.technical-grid > article {
+  min-height: 154px;
+  padding: 17px 18px;
+  border-color: #30363b;
+  background: rgba(15, 19, 22, 0.94);
+}
+
+.technical-grid > article > span,
+.technical-label {
+  color: #cba23a;
+}
+
+.technical-grid h3 {
+  margin-top: 15px;
+  font-size: 16px;
+}
+
+.technical-grid p {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.58;
+}
+
+.technical-list {
+  margin-top: 18px;
+  border-color: #292f33;
+}
+
+.technical-list li {
+  padding: 13px 0;
+  border-color: #292f33;
+  color: #a0a7ab;
+  font-size: 13px;
+}
+
+.technical-list li::before {
+  color: #f2b824;
+}
+
+.technical-table-wrap {
+  margin-top: 18px;
+  border-color: #30363b;
+  background: rgba(14, 18, 21, 0.9);
+}
+
+.technical-table th,
+.technical-table td {
+  border-color: #292f33;
+}
+
+.technical-table td {
+  padding: 11px 12px;
+  color: #a8aeb2;
+  font-size: 13px;
+}
+
+.technical-pill,
+.technical-pill--future,
+.technical-pill--warning {
+  border-color: #62552f;
+  color: #dfbd60;
+}
+
+.technical-code {
+  margin-top: 18px;
+  border-color: #30363b;
+  background: #0d1114;
+}
+
+.technical-code figcaption {
+  border-color: #30363b;
+}
+
+.technical-code pre {
+  color: #cbd0d2;
+}
+
+.technical-page .button--hot,
+.legal-page .button--hot {
+  border-color: #f2b824;
+  background: #f2b824;
+  color: #15120a;
+}
+
+.technical-page .button--quiet,
+.legal-page .button--quiet {
+  border-color: #454c51;
+  background: #111417;
+}
+
+.legal-copy > section {
+  margin-bottom: 39px;
+  padding-bottom: 39px;
+  border-color: #292f33;
+}
+
+.technical-page .footer,
+.legal-page .footer {
+  background: transparent;
+}
+
+.technical-page .footer__base,
+.legal-page .footer__base {
+  border-color: #282d31;
+}
+
+@media (max-width: 930px) {
+  .technical-hero__grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .technical-hero__ledger {
+    max-width: none;
+  }
+
+  .technical-layout,
+  .legal-layout {
+    grid-template-columns: 1fr;
+    gap: 29px;
+  }
+
+  .technical-index,
+  .legal-index {
+    position: static;
+  }
+
+  .technical-grid--three {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .technical-hero,
+  .legal-hero {
+    padding: 31px 0 27px;
+  }
+
+  .technical-hero h1,
+  .legal-hero h1 {
+    font-size: clamp(28px, 8.5vw, 36px);
+  }
+
+  .technical-hero__ledger {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .technical-hero__ledger div {
+    min-height: 58px;
+  }
+
+  .technical-layout,
+  .legal-layout {
+    padding: 30px 0 58px;
+  }
+
+  .technical-grid,
+  .technical-grid--three {
+    grid-template-columns: 1fr;
+  }
+
+  .technical-grid > article {
+    min-height: 0;
+  }
+}
