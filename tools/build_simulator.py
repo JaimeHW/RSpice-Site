@@ -57,6 +57,17 @@ def run(cmd, **kw):
     return subprocess.run(cmd, check=True, **kw)
 
 
+def run_cargo_build(cmd, root):
+    """Retry one transient Windows compiler-process failure."""
+    try:
+        return run(cmd, cwd=root)
+    except subprocess.CalledProcessError:
+        if os.name != "nt":
+            raise
+        print("cargo build failed once on Windows; retrying from cached artifacts")
+        return run(cmd, cwd=root)
+
+
 def capture(cmd):
     return subprocess.run(cmd, capture_output=True, text=True, check=True).stdout.strip()
 
@@ -746,11 +757,17 @@ def main():
 
     # 2. build
     print("building rspice-ui (browser IDE, bin target)...")
-    run(["cargo", "build", "--locked", "-p", "rspice-ui", "--bins",
-         "--target", "wasm32-unknown-unknown", "--release"], cwd=root)
+    run_cargo_build(
+        ["cargo", "build", "--locked", "-p", "rspice-ui", "--bins",
+         "--target", "wasm32-unknown-unknown", "--release"],
+        root,
+    )
     print("building rspice-wasm (engine playground)...")
-    run(["cargo", "build", "--locked", "-p", "rspice-wasm", "--lib",
-         "--target", "wasm32-unknown-unknown", "--release"], cwd=root)
+    run_cargo_build(
+        ["cargo", "build", "--locked", "-p", "rspice-wasm", "--lib",
+         "--target", "wasm32-unknown-unknown", "--release"],
+        root,
+    )
 
     # 3. assemble
     assemble_site_sources(site_root, root, site_source, out)
