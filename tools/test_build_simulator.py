@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -169,6 +170,19 @@ class BuildSiteGateTests(unittest.TestCase):
         self.assertIn("--enable-features=Vulkan", args)
         self.assertIn("--use-vulkan=swiftshader", args)
         self.assertIn("--dump-dom", args)
+
+    def test_windows_cargo_build_retries_once(self) -> None:
+        with mock.patch.object(build_site.os, "name", "nt"), mock.patch.object(
+            build_site, "run"
+        ) as run:
+            run.side_effect = [
+                subprocess.CalledProcessError(101, ["cargo", "build"]),
+                None,
+            ]
+
+            build_site.run_cargo_build(["cargo", "build"], ROOT)
+
+            self.assertEqual(run.call_count, 2)
 
     def test_ide_gate_requires_startup_error_lifecycle_hooks(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
