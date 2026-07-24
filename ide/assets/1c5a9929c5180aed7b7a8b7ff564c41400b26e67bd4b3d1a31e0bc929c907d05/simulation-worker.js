@@ -26,16 +26,19 @@ async function loadCompressedWasm() {
 let initPromise = null;
 let runWorkerRequest = null;
 let runVerilogACompileRequest = null;
-const WORKER_PROTOCOL_VERSION = 3;
+let runHardcopyRequest = null;
+const WORKER_PROTOCOL_VERSION = 7;
+const WORKER_REQUEST_PROTOCOL_VERSION = 5;
+const HARDCOPY_PROTOCOL_VERSION = 1;
 
 function asErrorMessage(error) {
   return error instanceof Error ? error.message : String(error);
 }
 
-function responseTransferList(response) {
+function protocolResponseTransferList(response, expectedProtocolVersion) {
   if (
     !response ||
-    response.protocolVersion !== WORKER_PROTOCOL_VERSION ||
+    response.protocolVersion !== expectedProtocolVersion ||
     !Array.isArray(response.buffers)
   ) {
     return [];
@@ -50,6 +53,14 @@ function responseTransferList(response) {
   return Array.from(transferBuffers);
 }
 
+function responseTransferList(response) {
+  return protocolResponseTransferList(response, WORKER_PROTOCOL_VERSION);
+}
+
+function hardcopyResponseTransferList(response) {
+  return protocolResponseTransferList(response, HARDCOPY_PROTOCOL_VERSION);
+}
+
 async function initializeWorkerModule() {
   const module = await import(executableAsset("rspice-ui.js").href);
   await module.default({ module_or_path: await loadCompressedWasm() });
@@ -59,8 +70,12 @@ async function initializeWorkerModule() {
   if (typeof module.runRspiceUiVerilogACompileRequest !== "function") {
     throw new Error("RSpice worker package is missing its Verilog-A compiler executor.");
   }
+  if (typeof module.runRspiceUiHardcopyRequest !== "function") {
+    throw new Error("RSpice worker package is missing its hardcopy executor.");
+  }
   runWorkerRequest = module.runRspiceUiWorkerRequest;
   runVerilogACompileRequest = module.runRspiceUiVerilogACompileRequest;
+  runHardcopyRequest = module.runRspiceUiHardcopyRequest;
 }
 
 async function ensureReady() {
@@ -68,6 +83,8 @@ async function ensureReady() {
     initPromise = initializeWorkerModule().catch((error) => {
       initPromise = null;
       runWorkerRequest = null;
+      runVerilogACompileRequest = null;
+      runHardcopyRequest = null;
       throw error;
     });
   }
@@ -76,6 +93,34 @@ async function ensureReady() {
 
 self.addEventListener("message", (event) => {
   const message = event.data || {};
+  if (message.type === "run-hardcopy") {
+    void (async () => {
+      try {
+        await ensureReady();
+        const request = message.request;
+        if (
+          !request ||
+          !request.metadata ||
+          request.metadata.protocolVersion !== HARDCOPY_PROTOCOL_VERSION ||
+          !Array.isArray(request.buffers)
+        ) {
+          throw new Error("Unsupported or malformed RSpice hardcopy request transport.");
+        }
+        const response = runHardcopyRequest(request);
+        postMessage(
+          { type: "hardcopy-result", id: message.id, response },
+          hardcopyResponseTransferList(response),
+        );
+      } catch (error) {
+        postMessage({
+          type: "hardcopy-error",
+          id: message.id ?? 0,
+          error: asErrorMessage(error),
+        });
+      }
+    })();
+    return;
+  }
   if (message.type === "compile-veriloga") {
     void (async () => {
       try {
@@ -99,7 +144,15 @@ self.addEventListener("message", (event) => {
   void (async () => {
     try {
       await ensureReady();
-      const response = runWorkerRequest(message.request);
+      const request = message.request;
+      if (
+        !request ||
+        request.protocolVersion !== WORKER_REQUEST_PROTOCOL_VERSION ||
+        !Array.isArray(request.buffers)
+      ) {
+        throw new Error("Unsupported or malformed RSpice worker request transport.");
+      }
+      const response = runWorkerRequest(request);
       postMessage(
         { type: "result", id: message.id, response },
         responseTransferList(response),

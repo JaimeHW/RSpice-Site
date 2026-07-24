@@ -7,18 +7,18 @@
     },
     "rspice": {
       "repository": "JaimeHW/RSpice",
-      "sha": "1efe7d9541f8cfe54e95099e42d296340fefe40e"
+      "sha": "adeebaaec4f4cdf8bbd98bee6e47dc4b90ffdb75"
     }
   },
   "build": {
-    "built_utc": "2026-07-21T03:25:19Z",
+    "built_utc": "2026-07-24T21:52:19Z",
     "publisher": "local-static-branch",
     "rust": "rustc 1.94.0 (4a4ef493e 2026-03-02)"
   },
   "artifact": {
     "file_count": 67,
-    "byte_count": 28290457,
-    "tree_sha256": "ce7b0abc47a2b2c5d31b340434b1177e3e441eada33712db3d176d3b30344d8f",
+    "byte_count": 31939839,
+    "tree_sha256": "de5a2b71a333697f416985ff992e9366ca292070a87fe9e7fcd3329ca4cc5bea",
     "files": [
       {
         "path": ".nojekyll",
@@ -153,7 +153,7 @@
       {
         "path": "build.json",
         "size": 340,
-        "sha256": "8d1e09ac5f64fb1cc378a4ede4b02f035e2bfbc61a47e188cdfef770adb02460"
+        "sha256": "41d5547710a6ab0f3a70dac6092a528d52aaaed594f07fe9e496f18fe26a643e"
       },
       {
         "path": "changelog.html",
@@ -181,24 +181,24 @@
         "sha256": "b5decd666c8b4f21c71c6619c2f44f02d3f19eb1445d4450346b14ded36e5d2c"
       },
       {
-        "path": "ide/assets/cbb5e908f3c5dda28560cda8ee0dac3f251d059971658a251348269cd08f7728/rspice-ui.js",
-        "size": 164765,
-        "sha256": "2d77db39ad27513700f729e89e0a7468cf5a9698f632a3ea341153715f48ad68"
+        "path": "ide/assets/1c5a9929c5180aed7b7a8b7ff564c41400b26e67bd4b3d1a31e0bc929c907d05/rspice-ui.js",
+        "size": 166541,
+        "sha256": "89362b7a36bace72245836bdcc0811e8c3a76c6d3d660e39163960215871fec0"
       },
       {
-        "path": "ide/assets/cbb5e908f3c5dda28560cda8ee0dac3f251d059971658a251348269cd08f7728/rspice-ui_bg.wasm.gz",
-        "size": 16242140,
-        "sha256": "857130b1bfca797f43bd804fcf9e2035717b123ed1f4efcc2111e3d01ddd7b3e"
+        "path": "ide/assets/1c5a9929c5180aed7b7a8b7ff564c41400b26e67bd4b3d1a31e0bc929c907d05/rspice-ui_bg.wasm.gz",
+        "size": 19735261,
+        "sha256": "9cad0f5a50ee695cc599d53590bc7c88aa4ca2884918b97889007d738f02944d"
       },
       {
-        "path": "ide/assets/cbb5e908f3c5dda28560cda8ee0dac3f251d059971658a251348269cd08f7728/simulation-worker.js",
-        "size": 3664,
-        "sha256": "dcba9b7ea1247187362fc45cd5033dadf5e63db13ed110a92c800dd334083cfb"
+        "path": "ide/assets/1c5a9929c5180aed7b7a8b7ff564c41400b26e67bd4b3d1a31e0bc929c907d05/simulation-worker.js",
+        "size": 5507,
+        "sha256": "65a3cfcdab24a3cda0464d24e306cbd9097e7ad671477770767d8490a302d672"
       },
       {
         "path": "ide/index.html",
         "size": 10139,
-        "sha256": "d624365654e40de5d38117556c90540cabf34ff857bd2d2e65345aef65480fba"
+        "sha256": "54f6407f990300c7e4017754f13c7c29d8be9c0add842f9ec33b024b3e9d1814"
       },
       {
         "path": "index.html",
@@ -232,8 +232,8 @@
       },
       {
         "path": "play/pkg/rspice_wasm_bg.wasm",
-        "size": 7518674,
-        "sha256": "3ca307400c43612cd315bf37fcf3a9f429611fb06c024ded54c9ed3302bc2119"
+        "size": 7671316,
+        "sha256": "b1ebc7888671d8be4df3a29c8f1745c5871f377ae0bd3220bf76662d3c5acaa6"
       },
       {
         "path": "privacy.html",
@@ -243,7 +243,7 @@
       {
         "path": "reference/catalog.json",
         "size": 23739,
-        "sha256": "f9826647fcb5101b2485b0918a90fc40c48dcb6d47c8bc2ddc4145ea35b7ec1e"
+        "sha256": "b7a36f09fc153918be82c4b1b4c88a70284454046ab73f09de76df91da981188"
       },
       {
         "path": "reference/raw/benchmark-scoreboard.json",
@@ -268,7 +268,7 @@
       {
         "path": "reference.html",
         "size": 47938,
-        "sha256": "5ec041236184dba73aa82947572241cc29295f4b4fabca0e21d492bf821a404d"
+        "sha256": "7c39e86de29a665506c495aa15fd3c451c3323fdadb36bcc6810a32111e2c184"
       },
       {
         "path": "robots.txt",
@@ -283,7 +283,7 @@
       {
         "path": "validation.html",
         "size": 8246,
-        "sha256": "4440deac0162ad85fd35c0dd4e7c6d9134d4dbacee0aeae272c4c378912244f6"
+        "sha256": "499052d9a9f732560e76eaee7340cc61ba9231998cf59c3468b9e18c808a0e60"
       },
       {
         "path": "workbench/app.js",
