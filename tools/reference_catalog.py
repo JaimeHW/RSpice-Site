@@ -597,7 +597,8 @@ def copy_source_artifacts(source: Path, output: Path) -> None:
     raw = output / "reference" / "raw"
     raw.mkdir(parents=True, exist_ok=True)
     for relative, destination_name in SOURCE_ARTIFACTS.items():
-        shutil.copy2(source / relative, raw / destination_name)
+        # These are text manifests; checkout EOL policy must not change the site.
+        (raw / destination_name).write_text(read_utf8(source / relative), encoding="utf-8", newline="\n")
 
 
 def copy_ci_artifacts(directory: Path | None, output: Path) -> list[dict[str, Any]]:

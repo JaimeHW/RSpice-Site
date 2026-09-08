@@ -10,6 +10,8 @@ from unittest import mock
 
 from reference_catalog import (
     collect_catalog,
+    copy_source_artifacts,
+    SOURCE_ARTIFACTS,
     parse_conformance_log,
     parse_markdown_tables,
     require_table,
@@ -128,6 +130,19 @@ class MarkdownTableTests(unittest.TestCase):
 
 
 class ValidationParserTests(unittest.TestCase):
+    def test_source_downloads_have_identical_bytes_across_checkout_line_endings(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for ending in (b"\n", b"\r\n"):
+                for name in SOURCE_ARTIFACTS:
+                    source = root / "source" / name
+                    source.parent.mkdir(parents=True, exist_ok=True)
+                    source.write_bytes(ending.join((b"first", b"second", b"")))
+                copy_source_artifacts(root / "source", root / "output")
+                for name in SOURCE_ARTIFACTS.values():
+                    self.assertEqual((root / "output/reference/raw" / name).read_bytes(),
+                                     b"first\nsecond\n")
+
     def test_parses_nightly_gate_and_conformance_aggregate(self) -> None:
         workflow = 'RUST_TOOLCHAIN: "1.94.0"\nMAX_FAILING: "2"\n# TOTAL +113 tests\n'
         self.assertEqual(
