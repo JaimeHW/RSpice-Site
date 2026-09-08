@@ -47,7 +47,8 @@ def default_workbench_source() -> Path:
         REPOSITORY_ROOT.parent / WORKBENCH_SOURCE_SUFFIX,
         SOURCE / "workbench",
     )
-    return next((candidate for candidate in candidates if candidate.is_dir()), candidates[0])
+    return next((candidate for candidate in candidates
+                 if all((candidate / name).is_file() for name in WORKBENCH_FILES)), candidates[0])
 
 
 def default_rspice_source() -> Path:

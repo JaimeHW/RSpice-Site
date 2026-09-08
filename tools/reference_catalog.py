@@ -126,8 +126,10 @@ def parse_markdown_tables(text: str) -> list[dict[str, Any]]:
     return tables
 
 
-def require_table(tables: list[dict[str, Any]], final_heading: str) -> dict[str, Any]:
-    matches = [table for table in tables if table["context"].split(" / ")[-1] == final_heading]
+def require_table(tables: list[dict[str, Any]], final_heading: str | None,
+                  headers: list[str] | None = None) -> dict[str, Any]:
+    matches = [table for table in tables if (final_heading is None or table["context"].split(" / ")[-1] == final_heading)
+               and (headers is None or table["headers"] == headers)]
     if len(matches) != 1:
         raise ValueError(f"expected exactly one Markdown table under '{final_heading}'")
     return matches[0]
@@ -350,8 +352,8 @@ def collect_catalog(
         },
         "analyses": table_records(require_table(root_tables, "Analyses")),
         "devices": table_records(require_table(root_tables, "Devices")),
-        "commands": table_records(require_table(root_tables, "Command line")),
-        "workspace": table_records(require_table(root_tables, "Workspace")),
+        "commands": table_records(require_table(root_tables, "Command line", ["Command", "Purpose"])),
+        "workspace": table_records(require_table(root_tables, None, ["Crate", "Purpose"])),
         "cli_tables": useful_cli_tables,
         "validation": {
             "nightly": nightly,
@@ -440,12 +442,14 @@ def render_reference(catalog: dict[str, Any]) -> str:
     revision_url = f"{source['repository']}/commit/{source['revision']}"
     rows: list[str] = []
     item_count = 0
+    analysis_headers = "".join(f"<th>{escape(header)}</th>" for header in catalog["analyses"][0])
 
     for record in catalog["analyses"]:
         item_count += 1
         values = list(record.values())
+        cells = "".join(f"<td>{escape(value)}</td>" for value in values)
         rows.append(
-            f'<tr data-reference-item data-search-text="{escape(search_text(*values))}"><td>{escape(values[0])}</td><td><code>{escape(values[1])}</code></td></tr>'
+            f'<tr data-reference-item data-search-text="{escape(search_text(*values))}">{cells}</tr>'
         )
     analysis_rows = "\n".join(rows)
 
@@ -507,7 +511,7 @@ def render_reference(catalog: dict[str, Any]) -> str:
     </header>
     <div class="page-frame reference-layout">
       <section class="reference-search" aria-labelledby="reference-search-title"><div><p class="technical-number">CATALOG SEARCH</p><h2 id="reference-search-title">Filter {item_count} generated entries.</h2></div><label><span class="visually-hidden">Search technical reference</span><input type="search" placeholder="Try BSIM4, --timeout, PSS, JUnit…" autocomplete="off" spellcheck="false" data-reference-search></label><p data-reference-count>{item_count} entries shown</p></section>
-      <section class="reference-section" data-reference-section id="analyses"><header><div><p class="technical-number">01 / ANALYSES</p><h2>Analysis families</h2></div></header><div class="technical-table-wrap"><table class="technical-table"><thead><tr><th>DOMAIN</th><th>ANALYSES</th></tr></thead><tbody>{analysis_rows}</tbody></table></div></section>
+      <section class="reference-section" data-reference-section id="analyses"><header><div><p class="technical-number">01 / ANALYSES</p><h2>Analysis families</h2></div></header><div class="technical-table-wrap"><table class="technical-table"><thead><tr>{analysis_headers}</tr></thead><tbody>{analysis_rows}</tbody></table></div></section>
       <section class="reference-section" data-reference-section id="devices"><header><div><p class="technical-number">02 / DEVICES</p><h2>Device and compact-model families</h2></div></header><div class="technical-table-wrap"><table class="technical-table"><thead><tr><th>FAMILY</th><th>MODELS</th></tr></thead><tbody>{device_rows}</tbody></table></div></section>
       <section class="reference-section" data-reference-section id="commands"><header><div><p class="technical-number">03 / CLI COMMANDS</p><h2>Top-level commands</h2></div></header><div class="technical-table-wrap"><table class="technical-table"><thead><tr><th>COMMAND</th><th>DESCRIPTION</th></tr></thead><tbody>{command_rows}</tbody></table></div></section>
       <section class="reference-section" data-reference-section id="options"><header><div><p class="technical-number">04 / CLI OPTIONS</p><h2>Command options, configuration, and exit codes</h2></div></header>{''.join(cli_groups)}</section>

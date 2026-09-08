@@ -156,8 +156,24 @@ py -3 tools\deploy.py C:\path\to\RSpice
 The simulator repository is a required positional argument; deployment never
 guesses which checkout to compile. The command resolves both remote `main`
 heads, creates clean temporary
-worktrees, builds the site and both WebAssembly runtimes locally, runs desktop,
-tablet, and phone browser gates, records a deterministic manifest, and pushes
+worktrees, builds the site, the separate UI/simulation-worker images, and the
+engine playground locally. Both UI images include the generated device catalog;
+only the worker image enables `browser-worker`. Assembly preserves client-owned
+JavaScript and packages both compressed modules, the loader, and the Python
+runtime in one content-addressed `/ide/assets/<hash>/` directory.
+
+Client-owned Chrome gates check JIT solver execution, actual UI startup at desktop,
+portrait and compact viewport sizes, playground transient solves, and Python
+breakpoint/evaluate/step behavior under the packaged security headers. Set
+`CHROME` and `CHROMEDRIVER` when those
+programs are not discoverable automatically. These viewport checks do not qualify
+physical tablet/touch input or the full engineering workflow. Browser evidence is
+retained under the Cargo target directory. A `browser-qualification.json` receipt
+binds the successful checks to every packaged IDE/playground file and `_headers`. Publication
+rejects absent/failed qualification, changed inputs, or missing runtime assets;
+`--skip-headless` assembly output is for local development only.
+
+The deployment command records a deterministic manifest and pushes
 only the verified static artifact to the `production` branch. Pin or roll back
 either source with `--site-ref <commit>` and `--rspice-ref <commit>`.
 

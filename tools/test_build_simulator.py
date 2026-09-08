@@ -1,6 +1,8 @@
 import importlib.util
 import contextlib
+import gzip
 import io
+import os
 import shutil
 import subprocess
 import tempfile
@@ -10,7 +12,7 @@ from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
-RSPICE_ROOT = ROOT.parent / "RSpice"
+RSPICE_ROOT = Path(os.environ.get("RSPICE_TEST_SOURCE", ROOT.parent / "RSpice"))
 BUILD_SITE_PATH = ROOT / "tools" / "build_simulator.py"
 SPEC = importlib.util.spec_from_file_location("build_site", BUILD_SITE_PATH)
 build_site = importlib.util.module_from_spec(SPEC)
@@ -24,6 +26,20 @@ def assert_gate_fails(testcase: unittest.TestCase, func, *args) -> None:
 
 
 class BuildSiteGateTests(unittest.TestCase):
+    def test_failed_client_jit_probe_keeps_its_diagnostics_visible(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            script = root / "tools/ci/check_wasm_jit_browser.py"
+            script.parent.mkdir(parents=True)
+            script.write_text('import sys\nprint("solver probe reached")\nprint("expected ABI 9; got 8", file=sys.stderr)\nsys.exit(1)\n', encoding="utf-8")
+            output, errors = io.StringIO(), io.StringIO()
+            with contextlib.redirect_stdout(output), contextlib.redirect_stderr(errors):
+                with self.assertRaises(subprocess.CalledProcessError):
+                    build_site.headless_solve_gate(root, "a" * 64, root, root)
+            self.assertIn("solver probe reached", output.getvalue())
+            self.assertIn("expected ABI 9; got 8", errors.getvalue())
+            self.assertFalse((root / "browser-qualification.json").exists())
+
     @staticmethod
     def make_site_source(path: Path) -> None:
         (path / "assets").mkdir(parents=True)
@@ -38,14 +54,17 @@ class BuildSiteGateTests(unittest.TestCase):
             RSPICE_ROOT / "crates" / "rspice-ui" / "web" / "index.html",
             ide / "index.html",
         )
-        shutil.copy2(
-            RSPICE_ROOT / "crates" / "rspice-ui" / "web" / "simulation-worker.js",
-            ide / "simulation-worker.js",
-        )
-        (pkg / "rspice-ui.js").write_text(
-            "export { initSync, __wbg_init as default };\n", encoding="utf-8"
-        )
-        (pkg / "rspice-ui_bg.wasm").write_bytes(b"\x00asm\x01\x00\x00\x00")
+        for name in ("simulation-worker.js", "wasm-loader.js", "automation-worker.js"):
+            shutil.copy2(RSPICE_ROOT / "crates/rspice-ui/web" / name, ide / name)
+        for name, _ in build_site.UI_MODULES:
+            (pkg / (name + ".js")).write_text(
+                "export { initSync, __wbg_init as default };\n", encoding="utf-8")
+            payload = b"\x00asm\x01\x00\x00\x00"
+            if name == "rspice-ui-worker":
+                payload += b"\x00\x02\x01w"  # distinct valid custom section
+            (pkg / (name + "_bg.wasm")).write_bytes(payload)
+        (ide / "python").mkdir()
+        (ide / "python/rspice_browser_bootstrap.py").write_text("# runtime fixture\n", encoding="utf-8")
 
     def test_site_source_boundary_rejects_client_runtime_routes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -148,6 +167,10 @@ class BuildSiteGateTests(unittest.TestCase):
             (site / "assets" / "site.css").write_text("body{}", encoding="utf-8")
             (ui / "index.html").write_text("ide", encoding="utf-8")
             (ui / "simulation-worker.js").write_text("ide worker", encoding="utf-8")
+            (ui / "wasm-loader.js").write_text("module loader", encoding="utf-8")
+            (ui / "automation-worker.js").write_text("Python worker", encoding="utf-8")
+            (ui / "python").mkdir()
+            (ui / "python/runtime.wasm").write_bytes(b"python fixture")
             (ui / "README.md").write_text("do not deploy", encoding="utf-8")
             (play / "index.html").write_text("play", encoding="utf-8")
             (play / "engine-worker.js").write_text("play worker", encoding="utf-8")
@@ -160,16 +183,8 @@ class BuildSiteGateTests(unittest.TestCase):
             self.assertEqual((out / "play" / "index.html").read_text(encoding="utf-8"), "play")
             self.assertFalse((out / "ide" / "README.md").exists())
             self.assertFalse((out / "play" / ".gitignore").exists())
+            self.assertEqual((out / "ide/python/runtime.wasm").read_bytes(), b"python fixture")
 
-    def test_headless_chrome_args_keep_webgpu_available(self) -> None:
-        args = build_site.chrome_headless_args("chrome", "http://127.0.0.1:8000/ide/")
-
-        self.assertNotIn("--disable-gpu", args)
-        self.assertIn("--enable-unsafe-webgpu", args)
-        self.assertIn("--ignore-gpu-blocklist", args)
-        self.assertIn("--enable-features=Vulkan", args)
-        self.assertIn("--use-vulkan=swiftshader", args)
-        self.assertIn("--dump-dom", args)
 
     def test_windows_cargo_build_retries_once(self) -> None:
         with mock.patch.object(build_site.os, "name", "nt"), mock.patch.object(
@@ -215,24 +230,31 @@ class BuildSiteGateTests(unittest.TestCase):
     def test_executable_asset_identity_changes_with_any_payload_byte(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             asset_root = Path(tmp)
-            (asset_root / "simulation-worker.js").write_text("worker", encoding="utf-8")
-            (asset_root / "rspice-ui.js").write_text("module", encoding="utf-8")
+            for name in build_site.IDE_EXECUTABLE_FILES:
+                (asset_root / name).write_bytes(b"fixture")
+            (asset_root / "python").mkdir()
+            (asset_root / "python/runtime").write_bytes(b"python fixture")
             wasm = asset_root / "rspice-ui_bg.wasm.gz"
             wasm.write_bytes(b"compressed fixture")
 
             first = build_site.executable_asset_identity(asset_root)
             self.assertEqual(first, build_site.executable_asset_identity(asset_root))
-            wasm.write_bytes(wasm.read_bytes() + b"\x01")
-            second = build_site.executable_asset_identity(asset_root)
-
             self.assertRegex(first, r"^[0-9a-f]{64}$")
-            self.assertNotEqual(first, second)
+            for name in (*build_site.IDE_EXECUTABLE_FILES, "python/runtime"):
+                payload = (asset_root / name).read_bytes()
+                (asset_root / name).write_bytes(payload + b"\x01")
+                self.assertNotEqual(first, build_site.executable_asset_identity(asset_root), name)
+                (asset_root / name).write_bytes(payload)
 
     def test_packaging_removes_mutable_outputs_and_gate_accepts_exact_digest(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp)
             ide = out / "ide"
             self.make_ide_build_outputs(ide)
+            scripts = {name: (ide / name).read_bytes() for name in
+                       ("simulation-worker.js", "wasm-loader.js", "automation-worker.js")}
+            modules = {name: (ide / "pkg" / (name + "_bg.wasm")).read_bytes()
+                       for name, _ in build_site.UI_MODULES}
 
             identity = build_site.package_ide_executable_assets(ide)
 
@@ -240,10 +262,26 @@ class BuildSiteGateTests(unittest.TestCase):
             self.assertTrue((ide / "assets" / identity).is_dir())
             self.assertFalse((ide / "simulation-worker.js").exists())
             self.assertFalse((ide / "pkg").exists())
+            self.assertFalse((ide / "python").exists())
+            assets = ide / "assets" / identity
+            for name, payload in scripts.items():
+                self.assertEqual((assets / name).read_bytes(), payload, "client source was rewritten")
+            for name, payload in modules.items():
+                self.assertEqual(gzip.decompress((assets / (name + "_bg.wasm.gz")).read_bytes()), payload)
             self.assertIn(
-                './assets/%s' % identity,
+                '/ide/assets/%s' % identity,
                 (ide / "index.html").read_text(encoding="utf-8"),
             )
+
+    def test_missing_worker_module_rejects_ui_only_outputs_before_mutation(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            ide = Path(tmp) / "ide"
+            self.make_ide_build_outputs(ide)
+            (ide / "pkg/rspice-ui-worker_bg.wasm").unlink()
+            ui_before = (ide / "pkg/rspice-ui_bg.wasm").read_bytes()
+            assert_gate_fails(self, build_site.package_ide_executable_assets, ide)
+            self.assertEqual((ide / "pkg/rspice-ui_bg.wasm").read_bytes(), ui_before)
+            self.assertFalse((ide / ".executable-asset-stage").exists())
 
     def test_ide_gate_rejects_absent_and_mismatched_digest_directories(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -276,19 +314,14 @@ class BuildSiteGateTests(unittest.TestCase):
             worker.write_text(worker.read_text(encoding="utf-8") + "\n// tampered\n")
             assert_gate_fails(self, build_site.gate_ide_worker, out)
 
-        for alias in (
-            "simulation-worker.js",
-            "rspice-ui.js",
-            "rspice-ui_bg.wasm.gz",
-            "pkg",
-        ):
+        for alias in (*build_site.IDE_EXECUTABLE_FILES, "pkg", "python"):
             with self.subTest(alias=alias), tempfile.TemporaryDirectory() as tmp:
                 out = Path(tmp)
                 ide = out / "ide"
                 self.make_ide_build_outputs(ide)
                 build_site.package_ide_executable_assets(ide)
                 mutable = ide / alias
-                if alias == "pkg":
+                if alias in ("pkg", "python"):
                     mutable.mkdir()
                 else:
                     mutable.write_bytes(b"mutable alias")
@@ -339,75 +372,29 @@ class BuildSiteGateTests(unittest.TestCase):
                 checkout,
             )
 
-    def test_playground_gate_requires_ac_worker_route(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            out = Path(tmp)
-            play = out / "play"
-            play.mkdir()
-            (play / "engine-worker.js").write_text(
-                """
-                import init, {
-                  summarizeNetlist,
-                  runDcOperatingPoint,
-                  runTransientAnalysis,
-                } from "./pkg/rspice_wasm.js";
-                switch (operation) {
-                  case "summary": break;
-                  case "op": break;
-                  case "tran": break;
-                }
-                """,
-                encoding="utf-8",
-            )
+    def test_client_source_qualification_propagates_failure(self) -> None:
+        with mock.patch.object(build_site, "run") as run:
+            build_site.qualify_client_sources(ROOT)
+            self.assertEqual(len(run.call_args_list), 3)
+            self.assertEqual([Path(call.args[0][-1]).name for call in run.call_args_list],
+                             ["test_ide_worker.py", "test_automation_runtime_assets.py", "test_wasm_playground.py"])
+        with mock.patch.object(build_site, "run", side_effect=subprocess.CalledProcessError(1, ["python"])):
+            with self.assertRaises(subprocess.CalledProcessError):
+                build_site.qualify_client_sources(ROOT)
 
-            assert_gate_fails(self, build_site.gate_playground_worker, out)
-
-    def test_headless_dom_gate_requires_playground_solve_markers(self) -> None:
-        assert_gate_fails(self, build_site.validate_playground_dom, "<html></html>")
-
-        build_site.validate_playground_dom(
-            '<html><body><span>worker ready</span><p>solved in 0.01 ms</p></body></html>'
-        )
-
-    def test_headless_dom_gate_rejects_broken_ide_route(self) -> None:
-        assert_gate_fails(self, build_site.validate_ide_dom, "<html></html>")
-        assert_gate_fails(
-            self,
-            build_site.validate_ide_dom,
-            '<canvas id="rspice_canvas"></canvas><p class="err">module failed</p>',
-        )
-
-        build_site.validate_ide_dom(
-            '<html><body><canvas id="rspice_canvas"></canvas></body></html>'
-        )
-
-    def test_headless_dom_gate_requires_ide_worker_smoke_solve(self) -> None:
-        assert_gate_fails(self, build_site.validate_ide_worker_smoke_dom, "<html></html>")
-        assert_gate_fails(
-            self,
-            build_site.validate_ide_worker_smoke_dom,
-            '<pre id="ide-worker-smoke">ide worker error: boom</pre>',
-        )
-
-        build_site.validate_ide_worker_smoke_dom(
-            '<html><body><pre id="ide-worker-smoke">ide worker solved</pre></body></html>'
-        )
-
-    def test_source_worker_contract_gate_requires_progress_bridge(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            runner_dir = root / "crates" / "rspice-ui" / "src" / "simulation" / "runner"
-            runner_dir.mkdir(parents=True)
-            (runner_dir / "worker_contract.rs").write_text(
-                "pub(crate) struct WorkerResponse;\n",
-                encoding="utf-8",
-            )
-            (runner_dir / "wasm_worker.rs").write_text(
-                'match message_type.as_str() { "result" => handle_result_message(), _ => {} }\n',
-                encoding="utf-8",
-            )
-
-            assert_gate_fails(self, build_site.gate_ide_worker_sources, root)
+    def test_catalog_images_build_separately_with_worker_feature_isolation(self) -> None:
+        with mock.patch.object(build_site, "run_cargo_build") as build:
+            build_site.build_ui_images(ROOT)
+        commands = [call.args[0] for call in build.call_args_list]
+        self.assertEqual([cmd[cmd.index("--bin") + 1] for cmd in commands],
+                         ["rspice-ui", "rspice-ui-worker"])
+        for command in commands:
+            self.assertIn("--locked", command)
+            self.assertNotIn("--bins", command)
+            self.assertEqual(command[command.index("--profile") + 1], "web-release")
+            self.assertIn("generated-veriloga-catalog", command[command.index("--features") + 1].split(","))
+        self.assertNotIn("browser-worker", commands[0][commands[0].index("--features") + 1].split(","))
+        self.assertIn("browser-worker", commands[1][commands[1].index("--features") + 1].split(","))
 
 
 if __name__ == "__main__":

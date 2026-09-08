@@ -10,6 +10,8 @@ from pathlib import Path
 from reference_catalog import (
     parse_conformance_log,
     parse_markdown_tables,
+    require_table,
+    render_reference,
     parse_nightly_configuration,
     validation_artifact_data,
     workspace_metadata,
@@ -17,6 +19,36 @@ from reference_catalog import (
 
 
 class MarkdownTableTests(unittest.TestCase):
+    def test_repository_table_identity_survives_heading_rename(self) -> None:
+        for heading in ("Workspace", "Repository"):
+            tables = parse_markdown_tables(f"## {heading}\n| Crate | Purpose |\n| --- | --- |\n| rspice-ui | IDE |\n")
+            self.assertEqual(require_table(tables, None, ["Crate", "Purpose"])["rows"], [["rspice-ui", "IDE"]])
+
+    def test_reference_keeps_analysis_notes_visible_and_escaped(self) -> None:
+        catalog = {"source": {"repository": "https://example.test", "revision": "a" * 40,
+                              "short_revision": "a" * 12, "revision_date": "2026-09-08", "version": "1", "rust_version": "1"},
+                   "analyses": [{"Analysis": "Transient", "Invoked by": ".TRAN", "Notes": "limit < 5"}],
+                   "devices": [], "commands": [], "workspace": [], "cli_tables": []}
+        page = render_reference(catalog)
+        self.assertIn("<th>Notes</th>", page)
+        self.assertIn("<td>limit &lt; 5</td>", page)
+
+    def test_command_table_is_selected_by_schema_beside_exit_codes(self) -> None:
+        tables = parse_markdown_tables("""### Command line
+| Command | Purpose |
+| --- | --- |
+| rspice run | Execute analyses |
+
+| Exit code | Meaning |
+| --- | --- |
+| 0 | Success |
+""")
+        self.assertEqual(require_table(tables, "Command line", ["Command", "Purpose"])["rows"],
+                         [["rspice run", "Execute analyses"]])
+        for invalid in (tables[1:], [*tables, tables[0]]):
+            with self.assertRaises(ValueError):
+                require_table(invalid, "Command line", ["Command", "Purpose"])
+
     def test_ignores_fenced_headings_and_uses_nearby_bold_label(self) -> None:
         source = """# CLI
 ## Commands

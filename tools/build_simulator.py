@@ -13,13 +13,13 @@ overlays its browser runtimes on an already-built RSpice-Site tree.
 
 Stages:
   1. toolchain gate    - wasm-bindgen CLI must match Cargo.lock
-  2. build             - rspice-ui (IDE, bin target) + rspice-wasm
-                         (playground, lib) for wasm32, release
+  2. build             - separate UI and simulation-worker images with the
+                         generated device catalog, plus the engine playground
   3. assemble          - RSpice-Site/dist + client-owned browser shells,
                          generated wasm packages, and build.json
   4. static gates      - \0asm magic + wasm-bindgen export signature
-  5. headless gate     - serve _site, load play/ and the IDE worker smoke
-                         page in headless Chrome, require completed solves
+  5. headless gate     - client-owned JIT, production UI startup, playground
+                         solve, and Python debugger checks in Chrome
 
 Any failed gate exits non-zero; tools/deploy.py owns publication.
 Pure stdlib, no third-party deps - runs the same on the Ubuntu CI runner
@@ -36,15 +36,24 @@ import json
 import os
 import re
 import shutil
-import socket
 import subprocess
 import sys
-import time
+import tempfile
 from pathlib import Path
 
 
 ASSET_ROOT_PLACEHOLDER = "__RSPICE_ASSET_ROOT__"
 IMMUTABLE_ASSET_ID_RE = re.compile(r"[0-9a-f]{64}")
+UI_PROFILE = "web-release"
+UI_MODULES = (
+    ("rspice-ui", ("generated-veriloga-catalog",)),
+    ("rspice-ui-worker", ("browser-worker", "generated-veriloga-catalog")),
+)
+IDE_EXECUTABLE_FILES = (
+    "simulation-worker.js", "wasm-loader.js", "automation-worker.js",
+    "rspice-ui.js", "rspice-ui_bg.wasm.gz",
+    "rspice-ui-worker.js", "rspice-ui-worker_bg.wasm.gz",
+)
 
 
 def fail(msg):
@@ -68,8 +77,23 @@ def run_cargo_build(cmd, root):
         return run(cmd, cwd=root)
 
 
-def capture(cmd):
-    return subprocess.run(cmd, capture_output=True, text=True, check=True).stdout.strip()
+def build_ui_images(root):
+    for name, features in UI_MODULES:
+        print("building %s..." % name)
+        # Separate invocations keep the worker feature out of the interactive image.
+        run_cargo_build(
+            ["cargo", "build", "--locked", "-p", "rspice-ui", "--bin", name,
+             "--features", ",".join(features), "--target", "wasm32-unknown-unknown",
+             "--profile", UI_PROFILE], root)
+
+
+def qualify_client_sources(root):
+    for name in ("test_ide_worker.py", "test_automation_runtime_assets.py", "test_wasm_playground.py"):
+        run([sys.executable, "-B", str(root / "tools/ci" / name)], cwd=root)
+
+
+def capture(cmd, **kw):
+    return subprocess.run(cmd, capture_output=True, text=True, check=True, **kw).stdout.strip()
 
 
 # 1. toolchain gate
@@ -118,7 +142,7 @@ def require_tokens(path, source, tokens):
 
 def stamped_ide_asset_identity(index_source):
     match = re.search(
-        r'const RELEASE_ASSET_ROOT = "\./assets/([0-9a-f]{64})";',
+        r'const RELEASE_ASSET_ROOT = "/ide/assets/([0-9a-f]{64})";',
         index_source,
     )
     if not match:
@@ -148,8 +172,9 @@ def gate_ide_worker(out):
         "__RSPICE_SIM_WORKER_ERROR",
         'executableAsset("simulation-worker.js")',
         'executableAsset("rspice-ui.js")',
-        'executableAsset("rspice-ui_bg.wasm.gz")',
-        'new DecompressionStream("gzip")',
+        '"rspice-ui_bg.wasm.gz"',
+        'import(executableAsset("wasm-loader.js").href)',
+        'await loadWasm(wasmModule)',
         'addEventListener("error"',
         'addEventListener("messageerror"',
     ))
@@ -158,9 +183,10 @@ def gate_ide_worker(out):
     if "innerHTML =" in index_source:
         fail(str(index) + " must render startup errors with text nodes, not innerHTML")
     require_tokens(worker, worker_source, (
-        'import(executableAsset("rspice-ui.js").href)',
-        'executableAsset("rspice-ui_bg.wasm.gz")',
-        'new DecompressionStream("gzip")',
+        'import(executableAsset("rspice-ui-worker.js").href)',
+        '"rspice-ui-worker_bg.wasm.gz"',
+        'import(executableAsset("wasm-loader.js").href)',
+        'await loadWasm(wasmModule)',
         "runRspiceUiWorkerRequest",
         "responseTransferList(response)",
         "ArrayBuffer.isView(view)",
@@ -171,23 +197,14 @@ def gate_ide_worker(out):
         'type: "result"',
         'type: "error"',
     ))
-    for required in ("rspice-ui.js", "rspice-ui_bg.wasm.gz"):
+    for required in IDE_EXECUTABLE_FILES:
         if not (asset_root / required).is_file():
             fail(str(asset_root / required) + " is missing")
-    expected_entries = {
-        "simulation-worker.js",
-        "rspice-ui.js",
-        "rspice-ui_bg.wasm.gz",
-    }
+    expected_entries = {*IDE_EXECUTABLE_FILES, "python"}
     actual_entries = {entry.name for entry in asset_root.iterdir()}
     if actual_entries != expected_entries:
         fail("IDE executable asset directory contains unexpected outputs")
-    mutable_aliases = (
-        out / "ide" / "simulation-worker.js",
-        out / "ide" / "rspice-ui.js",
-        out / "ide" / "rspice-ui_bg.wasm.gz",
-        out / "ide" / "pkg",
-    )
+    mutable_aliases = [out / "ide" / name for name in (*IDE_EXECUTABLE_FILES, "pkg", "python")]
     if any(alias.exists() or alias.is_symlink() for alias in mutable_aliases):
         fail("IDE release contains a mutable executable asset alias")
     if executable_asset_identity(asset_root) != asset_identity:
@@ -196,281 +213,57 @@ def gate_ide_worker(out):
     return asset_identity
 
 
-def gate_ide_worker_sources(root):
-    contract = root / "crates" / "rspice-ui" / "src" / "simulation" / "runner" / "worker_contract.rs"
-    bridge = root / "crates" / "rspice-ui" / "src" / "simulation" / "runner" / "wasm_worker.rs"
-    contract_source = contract.read_text(encoding="utf-8")
-    bridge_source = bridge.read_text(encoding="utf-8")
-
-    require_tokens(contract, contract_source, (
-        "WorkerProgressSnapshot",
-        "WorkerResponseTransport",
-        "WorkerF64Series",
-        "worker_response_transport_value",
-        "worker_response_from_value",
-        "validate_worker_response_id",
-        "Float64Array",
-        "emit_worker_progress_snapshot",
-        'JsValue::from_str("progress")',
-        "run_simulation_thread_with_progress_observer",
-    ))
-    require_tokens(bridge, bridge_source, (
-        '"progress" => handle_progress_message',
-        "active_progress",
-        "WorkerProgressSnapshot",
-        "worker_response_from_value",
-        "validate_worker_response_id",
-        "set_onmessageerror(Some",
-        "drop_cached_worker",
-        "__RSPICE_SIM_WORKER_ERROR",
-        "__RSPICE_SIM_WORKER_URL",
-        "let worker_url = global_worker_url()?",
-        "new_with_options(&worker_url, &options)",
-    ))
-    if 'new_with_options("./simulation-worker.js"' in bridge_source:
-        fail(str(bridge) + " recreates a worker through a mutable path")
-    print("ok: ide worker source contract")
+# The client owns browser qualification and its evolving worker protocols.
+def headless_solve_gate(out, asset_identity, client_root, target_root):
+    try:
+        jit = capture([sys.executable, "-B", str(client_root / "tools/ci/check_wasm_jit_browser.py"),
+             "--web-root", str(out), "--worker-path",
+             "ide/assets/%s/simulation-worker.js" % asset_identity], cwd=client_root)
+    except subprocess.CalledProcessError as error:
+        print(error.stdout or "", end="", flush=True)
+        print(error.stderr or "", end="", file=sys.stderr, flush=True)
+        raise
+    print(jit)
+    evidence_root = target_root / "browser-release-qualification"
+    evidence_root.mkdir(parents=True, exist_ok=True)
+    evidence = tempfile.mkdtemp(prefix="release-", dir=evidence_root)
+    run([sys.executable, "-B", str(client_root / "tools/ci/check_browser_release.py"),
+         "--web-root", str(out), "--output", evidence], cwd=client_root)
+    # Qualification serves virtual fixture pages without altering release bytes.
+    gate_ide_worker(out)
+    report = json.loads((Path(evidence) / "release.json").read_text(encoding="utf-8"))
+    report["jit_qualification"] = {"status": "passed", "output": jit}
+    (out / "browser-qualification.json").write_text(
+        json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    verify_browser_qualification(out)
 
 
-def gate_playground_worker(out):
-    worker = out / "play" / "engine-worker.js"
-    if not worker.exists():
-        fail(str(worker) + " is missing")
-    worker_source = worker.read_text(encoding="utf-8")
-    require_tokens(worker, worker_source, (
-        "summarizeNetlist",
-        "runDcOperatingPoint",
-        "runAcAnalysis",
-        "runTransientAnalysis",
-        'case "summary"',
-        'case "op"',
-        'case "ac"',
-        'case "tran"',
-        "runAcAnalysis(payload.source, payload.frequencies)",
-        "let initPromise = null",
-        "initPromise = init()",
-        'type: "ready"',
-        'type: "result"',
-        'type: "error"',
-    ))
-    print("ok: playground engine worker")
-
-
-# 5. headless solve gate
-def find_chrome():
-    env = os.environ.get("CHROME")
-    if env and (Path(env).exists() or shutil.which(env)):
-        return env
-    for name in ("google-chrome", "chromium-browser", "chromium", "chrome"):
-        found = shutil.which(name)
-        if found:
-            return found
-    for path in (
-        r"C:\Program Files\Google\Chrome\Application\chrome.exe",
-        r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
-        os.path.expandvars(r"%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe"),
-        r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
-    ):
-        if Path(path).exists():
-            return path
-    return None
-
-
-def free_port():
-    with socket.socket() as s:
-        s.bind(("127.0.0.1", 0))
-        return s.getsockname()[1]
-
-
-def validate_playground_dom(dom):
-    if "worker ready" not in dom:
-        m = re.search(r"module failed|init failed[^<]*", dom)
-        if m:
-            print(m.group(0), file=sys.stderr)
-        fail("playground never reached 'worker ready'")
-    if "solved in" not in dom:
-        m = re.search(r"tran error[^<]*", dom)
-        if m:
-            print(m.group(0), file=sys.stderr)
-        fail("playground loaded but the on-load transient did not solve")
-
-
-def validate_ide_dom(dom):
-    if 'id="rspice_canvas"' not in dom:
-        fail("browser IDE route did not expose the RSpice canvas")
-    if '<p class="err">' in dom:
-        m = re.search(r'<p class="err">([^<]*)</p>', dom)
-        if m:
-            print(m.group(1), file=sys.stderr)
-        fail("browser IDE rendered a startup error")
-
-
-def validate_ide_worker_smoke_dom(dom):
-    if "ide worker solved" in dom:
-        return
-    m = re.search(r"ide worker error:[^<]*", dom)
-    if m:
-        print(m.group(0), file=sys.stderr)
-    fail("browser IDE worker loaded but did not complete the smoke solve")
-
-
-def write_ide_worker_smoke_page(out, asset_identity):
-    smoke = out / "ide-worker-smoke.html"
-    smoke.write_text(
-        """<!doctype html>
-<html>
-<body>
-<pre id="ide-worker-smoke">starting</pre>
-<script type="module">
-const status = document.getElementById("ide-worker-smoke");
-const setStatus = (text) => { status.textContent = text; };
-let finished = false;
-let sent = false;
-
-function fail(message) {
-  if (finished) return;
-  finished = true;
-  setStatus(`ide worker error: ${message}`);
-  worker.terminate();
-}
-
-function complete(message) {
-  if (finished) return;
-  finished = true;
-  setStatus(message);
-  worker.terminate();
-}
-
-const worker = new Worker(new URL("./ide/assets/%s/simulation-worker.js", import.meta.url), {
-  type: "module",
-});
-
-const request = {
-  id: 314,
-  request: { Config: "DcOp" },
-  netlist: "* ide worker smoke\\nV1 in 0 1\\nR1 in 0 1k\\n.op\\n.end\\n",
-  source_path: null,
-};
-
-function sendRequest() {
-  if (sent) return;
-  sent = true;
-  setStatus("ide worker request sent");
-  worker.postMessage({ type: "run", id: 314, request });
-}
-
-worker.addEventListener("message", (event) => {
-  const message = event.data || {};
-  if (message.type === "ready") {
-    sendRequest();
-    return;
-  }
-  if (message.type === "result" && message.id === 314) {
-    const response = message.response && message.response.response;
-    const outcome = response && response.outcome;
-    if (outcome && Object.prototype.hasOwnProperty.call(outcome, "Success")) {
-      complete("ide worker solved");
-    } else {
-      fail(JSON.stringify(outcome || message.response || message));
-    }
-    return;
-  }
-  if (message.type === "error") {
-    fail(message.error || message.message || "unknown worker error");
-  }
-});
-
-worker.addEventListener("error", (event) => {
-  fail(event.message || "worker error");
-});
-worker.addEventListener("messageerror", () => {
-  fail("worker messageerror");
-});
-setTimeout(() => {
-  if (!finished) fail("timeout");
-}, 15000);
-</script>
-</body>
-</html>
-""" % asset_identity,
-        encoding="utf-8",
-    )
-    return smoke
-
-
-def chrome_headless_args(chrome, url, width=1280, height=900):
-    return [
-        chrome,
-        "--headless=new",
-        "--no-sandbox",
-        "--enable-unsafe-webgpu",
-        "--ignore-gpu-blocklist",
-        "--enable-features=Vulkan",
-        "--use-vulkan=swiftshader",
-        "--window-size=%d,%d" % (width, height),
-        "--virtual-time-budget=20000",
-        "--dump-dom",
-        url,
+def verify_browser_qualification(out):
+    """Bind a successful client qualification to the exact packaged inputs."""
+    report_path = out / "browser-qualification.json"
+    if not report_path.is_file():
+        raise ValueError("release has no completed browser qualification")
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    if report.get("status") != "passed" or report.get("jit_qualification", {}).get("status") != "passed":
+        raise ValueError("release browser qualification did not pass")
+    build = json.loads((out / "build.json").read_text(encoding="utf-8"))
+    if report.get("build") != build:
+        raise ValueError("browser qualification has a different build identity")
+    expected_images = [
+        {"name": name, "profile": UI_PROFILE, "target": "wasm32-unknown-unknown",
+         "features": list(features)} for name, features in UI_MODULES
     ]
-
-
-def dump_chrome_dom(chrome, url, width=1280, height=900):
-    try:
-        return subprocess.run(
-            chrome_headless_args(chrome, url, width, height),
-            capture_output=True, text=True, timeout=90).stdout
-    except subprocess.TimeoutExpired as e:
-        return e.stdout.decode() if isinstance(e.stdout, bytes) else (e.stdout or "")
-
-
-def headless_solve_gate(out, asset_identity):
-    chrome = find_chrome()
-    if not chrome:
-        fail("no Chrome found for the headless gate "
-             "(set CHROME or pass --skip-headless)")
-
-    port = free_port()
-    smoke_page = write_ide_worker_smoke_page(out, asset_identity)
-    server = subprocess.Popen(
-        [sys.executable, "-m", "http.server", str(port), "--directory", str(out)],
-        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    try:
-        time.sleep(1)
-        # play/index.html runs a transient on load; a healthy bundle yields
-        # the "worker ready" badge and a "solved in" log line in the DOM.
-        play_url = "http://127.0.0.1:%d/play/" % port
-        ide_url = "http://127.0.0.1:%d/ide/" % port
-        viewports = (
-            ("desktop", 1280, 900),
-            ("tablet", 820, 1180),
-            ("phone", 390, 844),
-        )
-        viewport_doms = [
-            (
-                label,
-                dump_chrome_dom(chrome, play_url, width, height),
-                dump_chrome_dom(chrome, ide_url, width, height),
-            )
-            for label, width, height in viewports
-        ]
-        ide_smoke_dom = dump_chrome_dom(
-            chrome, "http://127.0.0.1:%d/ide-worker-smoke.html" % port
-        )
-    finally:
-        server.terminate()
-        try:
-            server.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            server.kill()
-        smoke_page.unlink(missing_ok=True)
-
-    for label, play_dom, ide_dom in viewport_doms:
-        validate_playground_dom(play_dom)
-        print("ok: headless solve (%s viewport) - worker ready, transient completed" % label)
-        validate_ide_dom(ide_dom)
-        print("ok: headless IDE (%s viewport) - route loaded without startup error" % label)
-    validate_ide_worker_smoke_dom(ide_smoke_dom)
-    print("ok: headless IDE worker - request solved")
+    if build.get("browser_images") != expected_images:
+        raise ValueError("release does not declare the required isolated catalog images")
+    observed = {"_headers": hashlib.sha256((out / "_headers").read_bytes()).hexdigest()}
+    for path in sorted([*(out / "ide").rglob("*"), *(out / "play").rglob("*")]):
+        if path.is_symlink():
+            raise ValueError("release qualification input is a symbolic link: %s" % path)
+        if path.is_file():
+            observed[path.relative_to(out).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
+    if not observed or report.get("inputs") != observed:
+        raise ValueError("release inputs differ from the browser-qualified files")
+    return report
 
 
 def validate_site_source(site_source):
@@ -573,8 +366,19 @@ def require_clean_client_checkout(root):
 def executable_asset_identity(asset_root):
     """Digest the exact executable browser bundle with stable framing."""
     digest = hashlib.sha256()
-    digest.update(b"RSpice IDE executable assets v1\0")
-    for name in ("simulation-worker.js", "rspice-ui.js", "rspice-ui_bg.wasm.gz"):
+    digest.update(b"RSpice IDE executable assets v2\0")
+    python = asset_root / "python"
+    if not python.is_dir() or python.is_symlink():
+        fail("browser Python runtime is missing or unsafe")
+    runtime_files = []
+    for path in python.rglob("*"):
+        if path.is_symlink():
+            fail("browser Python runtime contains a symlink: %s" % path)
+        if path.is_file():
+            runtime_files.append(path.relative_to(asset_root).as_posix())
+    if not runtime_files:
+        fail("browser Python runtime is empty")
+    for name in (*IDE_EXECUTABLE_FILES, *sorted(runtime_files)):
         path = asset_root / name
         if not path.is_file() or path.is_symlink():
             fail("browser executable asset is missing or unsafe: %s" % path)
@@ -602,91 +406,47 @@ def stamp_ide_asset_root(ide, asset_identity):
     index.write_text(
         source.replace(
             ASSET_ROOT_PLACEHOLDER,
-            "./assets/" + asset_identity,
+            "/ide/assets/" + asset_identity,
         ),
         encoding="utf-8",
     )
 
 
-def enable_compressed_ide_wasm(ide):
-    """Make the release shell fetch and inflate the Pages-safe WASM asset."""
-    loader = '''
-  async function loadCompressedWasm() {
-    const response = await fetch(executableAsset("rspice-ui_bg.wasm.gz"));
-    if (!response.ok || !response.body) {
-      throw new Error(`Failed to fetch compressed RSpice module (${response.status}).`);
-    }
-    const stream = response.body.pipeThrough(new DecompressionStream("gzip"));
-    return new Response(stream).arrayBuffer();
-  }
-'''
-    index = ide / "index.html"
-    source = index.read_text(encoding="utf-8")
-    marker = "\n  function showStartupError(message) {"
-    if source.count(marker) != 1:
-        fail("IDE shell is missing the compressed-WASM insertion point")
-    source = source.replace(marker, loader + marker)
-    old = '''  const wasmModule = executableAsset("rspice-ui_bg.wasm");
-  import(executableAsset("rspice-ui.js").href)
-    .then(({ default: init }) => init({ module_or_path: wasmModule }))'''
-    new = '''  import(executableAsset("rspice-ui.js").href)
-    .then(async ({ default: init }) =>
-      init({ module_or_path: await loadCompressedWasm() }),
-    )'''
-    if source.count(old) != 1:
-        fail("IDE shell has an unexpected WASM initialization contract")
-    index.write_text(source.replace(old, new), encoding="utf-8")
-
-    worker = ide / "simulation-worker.js"
-    source = worker.read_text(encoding="utf-8")
-    marker = "\nlet initPromise = null;"
-    worker_loader = loader.replace("  async", "async").replace("\n    ", "\n  ")
-    if source.count(marker) != 1:
-        fail("IDE worker is missing the compressed-WASM insertion point")
-    source = source.replace(marker, worker_loader + marker)
-    old = '''  const wasmModule = executableAsset("rspice-ui_bg.wasm");
-  await module.default({ module_or_path: wasmModule });'''
-    new = '''  await module.default({ module_or_path: await loadCompressedWasm() });'''
-    if source.count(old) != 1:
-        fail("IDE worker has an unexpected WASM initialization contract")
-    worker.write_text(source.replace(old, new), encoding="utf-8")
-
-
 def package_ide_executable_assets(ide):
-    """Move fixed-name build outputs behind their immutable bundle digest."""
+    """Bind both client-owned modules and loaders to one immutable asset cohort."""
     staging = ide / ".executable-asset-stage"
     if staging.exists():
         fail("browser executable staging path already exists: %s" % staging)
-    staging.mkdir()
-    raw_wasm = ide / "pkg" / "rspice-ui_bg.wasm"
-    compressed_wasm = ide / "pkg" / "rspice-ui_bg.wasm.gz"
-    with raw_wasm.open("rb") as source, compressed_wasm.open("wb") as destination:
-        with gzip.GzipFile(fileobj=destination, mode="wb", mtime=0) as archive:
-            shutil.copyfileobj(source, archive)
-    raw_wasm.unlink()
-    enable_compressed_ide_wasm(ide)
-    sources = {
-        "simulation-worker.js": ide / "simulation-worker.js",
-        "rspice-ui.js": ide / "pkg" / "rspice-ui.js",
-        "rspice-ui_bg.wasm.gz": compressed_wasm,
-    }
-    for name, source in sources.items():
+    pkg = ide / "pkg"
+    expected_pkg = {name + suffix for name, _ in UI_MODULES
+                    for suffix in (".js", "_bg.wasm")}
+    if not pkg.is_dir() or {entry.name for entry in pkg.iterdir()} != expected_pkg:
+        fail("wasm-bindgen must emit exactly the UI and worker package files")
+    sources = {name: ide / name for name in ("simulation-worker.js", "wasm-loader.js", "automation-worker.js")}
+    sources.update({name: pkg / name for name in expected_pkg})
+    for source in sources.values():
         if not source.is_file() or source.is_symlink():
             fail("browser executable build output is missing or unsafe: %s" % source)
-        shutil.move(str(source), str(staging / name))
 
-    pkg = ide / "pkg"
-    leftovers = list(pkg.iterdir()) if pkg.exists() else []
-    if leftovers:
-        fail("wasm-bindgen emitted unexpected mutable IDE package files")
-    if pkg.exists():
-        pkg.rmdir()
-
+    if not (ide / "python").is_dir() or (ide / "python").is_symlink():
+        fail("browser Python runtime is missing or unsafe")
+    staging.mkdir()
+    for name, source in sources.items():
+        destination = staging / (name + ".gz" if name.endswith(".wasm") else name)
+        if name.endswith(".wasm"):
+            with source.open("rb") as raw, destination.open("wb") as compressed:
+                with gzip.GzipFile(filename="", fileobj=compressed, mode="wb", mtime=0) as archive:
+                    shutil.copyfileobj(raw, archive)
+            source.unlink()
+        else:
+            shutil.move(str(source), str(destination))
+    pkg.rmdir()
+    shutil.move(str(ide / "python"), str(staging / "python"))
     asset_identity = executable_asset_identity(staging)
     destination = ide / "assets" / asset_identity
     destination.parent.mkdir()
     if destination.exists():
-        fail("content-addressed browser asset destination already exists: %s" % destination)
+        fail("content-addressed executable output already exists: %s" % destination)
     staging.rename(destination)
     stamp_ide_asset_root(ide, asset_identity)
     return asset_identity
@@ -701,8 +461,9 @@ def assemble_site_sources(site_root, rspice_root, site_source, out):
     copy_runtime_shell(
         rspice_root / "crates" / "rspice-ui" / "web",
         out / "ide",
-        ("index.html", "simulation-worker.js"),
+        ("index.html", "simulation-worker.js", "wasm-loader.js", "automation-worker.js"),
     )
+    shutil.copytree(rspice_root / "crates/rspice-ui/web/python", out / "ide/python")
     copy_runtime_shell(
         rspice_root / "crates" / "rspice-wasm" / "web",
         out / "play",
@@ -713,7 +474,7 @@ def assemble_site_sources(site_root, rspice_root, site_source, out):
 def main():
     ap = argparse.ArgumentParser(description="Build, verify, and assemble _site/.")
     ap.add_argument("--skip-headless", action="store_true",
-                    help="skip the headless playground solve gate (no local Chrome)")
+                    help="assemble locally without browser qualification; output cannot be published")
     ap.add_argument(
         "--rspice-source",
         required=True,
@@ -738,7 +499,8 @@ def main():
     target_root = Path(os.environ.get("CARGO_TARGET_DIR", root / "target"))
     if not target_root.is_absolute():
         target_root = root / target_root
-    target = target_root / "wasm32-unknown-unknown" / "release"
+    target = target_root / "wasm32-unknown-unknown"
+    ui_target = target / UI_PROFILE
     site_source = Path(args.site_source).resolve()
     validate_site_source(site_source)
     out = validated_output_path(site_root, site_source, args.out)
@@ -747,6 +509,10 @@ def main():
     if not re.fullmatch(r"[0-9a-f]{40}", client_sha):
         fail("client source revision is not a full commit SHA")
     require_clean_client_checkout(root)
+    require_clean_client_checkout(site_root)
+
+    # Fail source contracts before expensive compilation.
+    qualify_client_sources(root)
 
     # 1. toolchain gate
     locked = locked_wasm_bindgen(root)
@@ -756,12 +522,7 @@ def main():
     print("ok: wasm-bindgen CLI %s matches Cargo.lock" % have)
 
     # 2. build
-    print("building rspice-ui (browser IDE, bin target)...")
-    run_cargo_build(
-        ["cargo", "build", "--locked", "-p", "rspice-ui", "--bins",
-         "--target", "wasm32-unknown-unknown", "--release"],
-        root,
-    )
+    build_ui_images(root)
     print("building rspice-wasm (engine playground)...")
     run_cargo_build(
         ["cargo", "build", "--locked", "-p", "rspice-wasm", "--lib",
@@ -772,10 +533,11 @@ def main():
     # 3. assemble
     assemble_site_sources(site_root, root, site_source, out)
 
-    run(["wasm-bindgen", str(target / "rspice-ui.wasm"),
-         "--out-dir", str(out / "ide" / "pkg"),
-         "--out-name", "rspice-ui", "--target", "web", "--no-typescript"])
-    run(["wasm-bindgen", str(target / "rspice_wasm.wasm"),
+    for name, _ in UI_MODULES:
+        run(["wasm-bindgen", str(ui_target / (name + ".wasm")),
+             "--out-dir", str(out / "ide" / "pkg"), "--out-name", name,
+             "--target", "web", "--no-typescript"])
+    run(["wasm-bindgen", str(target / "release" / "rspice_wasm.wasm"),
          "--out-dir", str(out / "play" / "pkg"),
          "--out-name", "rspice_wasm", "--target", "web", "--no-typescript"])
     ide_asset_identity = package_ide_executable_assets(out / "ide")
@@ -791,6 +553,13 @@ def main():
                 "ide_executable_asset_sha256": ide_asset_identity,
                 "built_utc": built_utc,
                 "wasm_bindgen": have,
+                "dependency_lock_sha256": hashlib.sha256((root / "Cargo.lock").read_bytes()).hexdigest(),
+                "rustc": capture(["rustc", "--version", "--verbose"], cwd=root),
+                "cargo": capture(["cargo", "--version"], cwd=root),
+                "browser_images": [
+                    {"name": name, "profile": UI_PROFILE, "target": "wasm32-unknown-unknown",
+                     "features": list(features)} for name, features in UI_MODULES
+                ],
             },
             separators=(",", ":"),
         )
@@ -799,18 +568,24 @@ def main():
     )
 
     # 4. static gates
-    gate_bundle(out, "ide/assets/%s/rspice-ui" % ide_asset_identity, compressed=True)
+    for name, _ in UI_MODULES:
+        gate_bundle(out, "ide/assets/%s/%s" % (ide_asset_identity, name), compressed=True)
     gate_bundle(out, "play/pkg/rspice_wasm")
     if gate_ide_worker(out) != ide_asset_identity:
         fail("IDE shell and executable asset gate disagree on bundle identity")
-    gate_ide_worker_sources(root)
-    gate_playground_worker(out)
 
     # 5. headless solve gate
     if args.skip_headless:
         print("skipped: headless solve gate (--skip-headless)")
     else:
-        headless_solve_gate(out, ide_asset_identity)
+        headless_solve_gate(out, ide_asset_identity, root, target_root)
+
+    require_clean_client_checkout(root)
+    require_clean_client_checkout(site_root)
+    if capture(["git", "-C", str(root), "rev-parse", "HEAD"]) != client_sha:
+        fail("client source revision changed during assembly")
+    if site_source_revision(site_source) != site_sha:
+        fail("site source revision changed during assembly")
 
     print(
         "site assembled at %s (client %s, site %s, IDE assets %s)"

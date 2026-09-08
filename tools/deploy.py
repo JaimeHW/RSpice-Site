@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import gzip
 import hashlib
 import json
 import os
@@ -17,6 +16,8 @@ import time
 import urllib.error
 import urllib.request
 from pathlib import Path
+
+from build_simulator import UI_MODULES, gate_bundle, gate_ide_worker, verify_browser_qualification
 
 
 SITE_ROOT = Path(__file__).resolve().parents[1]
@@ -139,19 +140,18 @@ def write_and_validate_manifest(
     missing = sorted(required - actual)
     if missing:
         raise ValueError("release is missing required files: " + ", ".join(missing))
-    ide_wasm = sorted(artifact.glob("ide/assets/*/rspice-ui_bg.wasm.gz"))
-    if len(ide_wasm) != 1:
-        raise ValueError("release must contain one compressed, content-addressed IDE WASM")
-    if gzip.decompress(ide_wasm[0].read_bytes())[:4] != b"\x00asm":
-        raise ValueError(f"invalid compressed WebAssembly module: {ide_wasm[0]}")
-    play_wasm = artifact / "play/pkg/rspice_wasm_bg.wasm"
-    if play_wasm.read_bytes()[:4] != b"\x00asm":
-        raise ValueError(f"invalid WebAssembly module: {play_wasm}")
+    identity = gate_ide_worker(artifact)
+    for name, _ in UI_MODULES:
+        gate_bundle(artifact, f"ide/assets/{identity}/{name}", compressed=True)
+    gate_bundle(artifact, "play/pkg/rspice_wasm")
     build = json.loads((artifact / "build.json").read_text(encoding="utf-8"))
     if build.get("site_source_sha") != site_sha:
         raise ValueError("build artifact has the wrong site revision")
     if build.get("client_source_sha") != rspice_sha:
         raise ValueError("build artifact has the wrong simulator revision")
+    if build.get("ide_executable_asset_sha256") != identity:
+        raise ValueError("build artifact has the wrong executable asset identity")
+    verify_browser_qualification(artifact)
 
     files = release_files(artifact)
     digest = tree_digest(files)
