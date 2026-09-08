@@ -52,11 +52,25 @@ def git_value(source: Path, *arguments: str) -> str:
 
 def strip_markdown(value: str) -> str:
     value = html.unescape(value.strip())
-    value = re.sub(r"!\[([^]]*)\]\([^)]+\)", r"\1", value)
-    value = re.sub(r"\[([^]]+)\]\([^)]+\)", r"\1", value)
-    value = re.sub(r"<br\s*/?>", " / ", value, flags=re.I)
-    value = re.sub(r"[`*_~]", "", value)
-    value = value.replace("†", "").replace("&rarr;", "→")
+
+    def plain(text: str) -> str:
+        text = re.sub(r"!?\[([^]]*)\]\([^)]+\)", r"\1", text)
+        text = re.sub(r"<br\s*/?>", " / ", text, flags=re.I)
+        text = re.sub(r"(?<!\w)(\*{1,3}|_{1,3}|~~)(?=\S)(.+?)(?<=\S)\1(?!\w)", r"\2", text)
+        return text.replace("†", "")
+
+    # Code punctuation is part of identifiers, wildcard paths and expressions.
+    codes: list[str] = []
+    token = "\0code:"
+    while token in value:
+        token += ":"
+
+    def protect(code: re.Match[str]) -> str:
+        codes.append(code.group(2))
+        return f"{token}{len(codes) - 1}\0"
+
+    value = plain(re.sub(r"(?<!`)(`+)(?!`)(.+?)(?<!`)\1(?!`)", protect, value))
+    value = re.sub(re.escape(token) + r"(\d+)\x00", lambda match: codes[int(match.group(1))], value)
     return " ".join(value.split())
 
 
@@ -331,16 +345,6 @@ def collect_catalog(
     except json.JSONDecodeError as exc:
         raise ValueError(f"invalid benchmark scoreboard JSON: {exc}") from exc
 
-    useful_cli_tables = [
-        table
-        for table in cli_tables
-        if table["rows"]
-        and any(
-            marker in table["context"]
-            for marker in ("Commands", "Configuration File", "Exit Codes")
-        )
-    ]
-
     return {
         "schema_version": 1,
         "source": {
@@ -354,7 +358,7 @@ def collect_catalog(
         "devices": table_records(require_table(root_tables, "Devices")),
         "commands": table_records(require_table(root_tables, "Command line", ["Command", "Purpose"])),
         "workspace": table_records(require_table(root_tables, None, ["Crate", "Purpose"])),
-        "cli_tables": useful_cli_tables,
+        "cli_tables": [table for table in cli_tables if table["rows"]],
         "validation": {
             "nightly": nightly,
             "ngspice_manifest": {

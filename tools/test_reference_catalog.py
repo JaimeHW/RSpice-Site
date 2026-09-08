@@ -6,12 +6,15 @@ from __future__ import annotations
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from reference_catalog import (
+    collect_catalog,
     parse_conformance_log,
     parse_markdown_tables,
     require_table,
     render_reference,
+    strip_markdown,
     parse_nightly_configuration,
     validation_artifact_data,
     workspace_metadata,
@@ -19,6 +22,54 @@ from reference_catalog import (
 
 
 class MarkdownTableTests(unittest.TestCase):
+    def test_reference_preserves_technical_punctuation(self) -> None:
+        self.assertEqual(
+            strip_markdown("**Path** `~/runs/*.raw` and `RSPICE_OUTPUT_DIRECTORY` with `a*b`"),
+            "Path ~/runs/*.raw and RSPICE_OUTPUT_DIRECTORY with a*b",
+        )
+        self.assertEqual(strip_markdown("_value_ RSPICE_CONFIG x * y ~~old~~"),
+                         "value RSPICE_CONFIG x * y old")
+        self.assertEqual(strip_markdown("``a`b_*`` [guide](https://example.test)<br>next &lt; 5"),
+                         "a`b_* guide / next < 5")
+        self.assertEqual(strip_markdown("**[`RSPICE_CONFIG`](guide.html)** and `[x](y)`"),
+                         "RSPICE_CONFIG and [x](y)")
+
+    def test_catalog_preserves_cli_tables_after_sections_are_reorganized(self) -> None:
+        inputs = {
+            "README.md": "\n".join(
+                f"## {heading}\n| {headers} |\n| --- | --- |\n| sample | purpose |"
+                for heading, headers in (("Analyses", "Analysis | Trigger"),
+                                         ("Devices", "Device | Description"),
+                                         ("Command line", "Command | Purpose"),
+                                         ("Repository", "Crate | Purpose"))
+            ),
+            "Cargo.toml": '[workspace.package]\nversion = "1"\nrust-version = "1.94"\n',
+            "crates/rspice-cli/README.md": "\n".join(
+                f"## {heading}\n| Option | Meaning |\n| --- | --- |\n| {value} | documented |"
+                for heading, value in (("How analyses are selected", "--tran"),
+                                       ("Output files", "raw"),
+                                       ("Configuration file", "RSPICE_CONFIG"),
+                                       ("Exit codes", "80"))
+            ),
+            "tests/ngspice/validation-manifest.tsv": "circuit.cir\top\n",
+            "tests/xyce/RSPICE-HARNESS-MANIFEST.tsv": "circuit.cir\ttran\n",
+            ".github/workflows/nightly.yml": '# TOTAL +2 tests\nMAX_FAILING: "0"\n',
+            "benchmarks/scoreboards/scoreboard.json": "{}",
+        }
+        with tempfile.TemporaryDirectory() as temporary:
+            source = Path(temporary)
+            for name, content in inputs.items():
+                path = source / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(content, encoding="utf-8")
+            with mock.patch("reference_catalog.git_value", side_effect=["", "a" * 40, "2026-09-08"]):
+                catalog = collect_catalog(source)
+        self.assertEqual([table["rows"][0][0] for table in catalog["cli_tables"]],
+                         ["--tran", "raw", "RSPICE_CONFIG", "80"])
+        page = render_reference(catalog)
+        for value in ("--tran", "raw", "RSPICE_CONFIG", "80"):
+            self.assertIn(f"<td>{value}</td>", page)
+
     def test_repository_table_identity_survives_heading_rename(self) -> None:
         for heading in ("Workspace", "Repository"):
             tables = parse_markdown_tables(f"## {heading}\n| Crate | Purpose |\n| --- | --- |\n| rspice-ui | IDE |\n")

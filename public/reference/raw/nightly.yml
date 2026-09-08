@@ -8,9 +8,14 @@ on:
   schedule:
     - cron: "0 6 * * *"
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
+
+concurrency:
+  group: nightly-${{ github.ref }}
+  cancel-in-progress: false
 
 env:
   CARGO_TERM_COLOR: always
@@ -23,40 +28,149 @@ jobs:
     name: Conformance & full suite (Linux, release)
     runs-on: ubuntu-latest
     timeout-minutes: 150
+    env:
+      # Keep memory-heavy UI and solver release codegen from competing on the
+      # same hosted runner.
+      CARGO_BUILD_JOBS: "1"
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install Rust toolchain
         run: rustup toolchain install ${{ env.RUST_TOOLCHAIN }} --profile minimal
-      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+      - uses: Swatinem/rust-cache@f0d9c3887740aee45f6153b24b3a6b815192ec16 # v2
         with:
           key: nightly
+      - name: Install independent Verilog reference simulators
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y iverilog verilator
+          iverilog -V
+          verilator --version
       - name: Full test suite (release)
+        # rspice-conformance is excluded by crate, not by test name: the
+        # dedicated ngspice step below runs that suite properly (serial
+        # threads, logged, ratcheted) and running it twice would double the
+        # nightly. This previously read `-- --skip test_ngspice_ --skip
+        # test_full_ngspice`, which depended on test names never changing.
         run: >-
           cargo test --locked --workspace --exclude rspice-python --exclude rspice-wasm
-          --release -- --skip test_ngspice_ --skip test_full_ngspice
-      - name: Core library unit tests (release)
-        run: cargo test --locked -p rspice-core --lib --release
+          --exclude rspice-conformance --release --no-fail-fast
+          --exclude 'rspice-veriloga-model*' --exclude 'rspice-*-catalog-dump'
+      - name: Xyce conformance suite (release)
+        # The workspace run above excludes rspice-conformance wholesale, so
+        # the Xyce corpus needs its own step or it would silently vanish from
+        # nightly.
+        run: >-
+          cargo test --locked -p rspice-conformance --release
+          --test xyce_regression --test y_device_policy --no-fail-fast
+      - name: Conformance suite unit tests (release)
+        # Missing reference tools must fail, rather than silently skipping
+        # the independent comparison as the routine tier intentionally does.
+        env:
+          RSPICE_VERILOG_ORACLES_REQUIRED: "1"
+        run: >-
+          cargo test --locked -p rspice-conformance --lib
+          --test ngspice_oracle_audit --test verilog_oracles --release --no-fail-fast
+          -- --nocapture
+      - name: RNM against analog wall clock (release)
+        # The performance leg of the dual-representation suite: what a
+        # real-number model of a reference block costs against simulating the
+        # block. Here rather than in CI for two reasons. It is a wall-clock
+        # measurement, which flaps on a loaded per-push runner; and it is only
+        # meaningful in release, because the two sides are dominated by
+        # different work — matrix solves on one, a Verilog front end on the
+        # other — that `opt-level = 0` slows by different factors, so a debug
+        # measurement is a different ratio rather than a slower one.
+        #
+        # --nocapture because the table is the deliverable. The assertion is
+        # only that the RNM is the cheaper of the two; P3's 100x exit gate is
+        # printed against the measurement rather than asserted, since a
+        # wall-clock ratio asserted in CI is a test that fails when the runner
+        # is busy.
+        run: >-
+          cargo test --locked -p rspice-conformance --release
+          --test verilog_rnm_performance -- --nocapture
+      - name: Mixed against all-analog wall clock (release)
+        # P4's runtime measurement: what executing a circuit's digital half on
+        # the Verilog-AMS event wheel costs against simulating the same circuit
+        # entirely in the analog domain. Here rather than in CI for exactly the
+        # reasons the step above is, and in release for the same one: the two
+        # sides are dominated by different work and `opt-level = 0` slows them
+        # by different factors.
+        #
+        # Nothing about the ratio is asserted, and that is deliberate. There is
+        # no honest a-priori claim that the interleave is faster on an arbitrary
+        # circuit — it is faster exactly when the digital half would otherwise
+        # cost the matrix more than the interleave costs in trial machinery.
+        # What the step asserts is that both representations still agree, since
+        # a ratio between two answers that differ measures nothing; the table
+        # says which circuits win and by how much.
+        run: >-
+          cargo test --locked -p rspice-conformance --release
+          --test verilog_mixed_performance -- --nocapture
+      - name: GF180MCU device corpus (release)
+        # A released Apache-2.0 foundry PDK: BSIM4 through the vendor's own
+        # subcircuit wrappers and corner libraries, across four temperatures.
+        # Nightly rather than CI because every case re-parses the 1.3 MB model
+        # library, which dominates the runtime.
+        run: >-
+          cargo test --locked -p rspice-conformance --release
+          --test gf180mcu_devices -- --nocapture
+      - name: Oracle-free corpora (release, full depth)
+        # ISCAS85 and the ngspice example decks carry no reference data, so
+        # this gates execution rather than conformance: every deck must load,
+        # build, and either complete or refuse cleanly against its
+        # execution-manifest.tsv.
+        #
+        # EXTENDED=1 is what makes this a nightly step rather than a CI one.
+        # The whole ISCAS85 corpus is marked extended — its smallest circuit
+        # is 160 gates over a 45nm BSIM4 card and its largest is ~89k netlist
+        # lines — so without the flag the simulations are skipped entirely and
+        # only discovery and manifest integrity are checked. The deck budget
+        # is raised to match; the 120 s default is sized for paranoia.
+        env:
+          RSPICE_EXECUTION_EXTENDED: "1"
+          RSPICE_EXECUTION_DECK_TIMEOUT_MS: "900000"
+        run: >-
+          cargo test --locked -p rspice-conformance --release
+          --test execution_corpora -- --nocapture --test-threads 1
+      - name: Corpus panic gate (release, full depth)
+        # Rule 2 of the engineering contract — authored input never panics —
+        # over every vendored deck rather than only the ones a reference suite
+        # has data for. Ingestion, planning, coordinate materialization and
+        # authored-output resolution run in process under `catch_unwind`; the
+        # solve stays with the subprocess-isolated regression runners, which is
+        # where a solver crash is already attributable.
+        #
+        # It is a nightly step for the same reason the corpora above are: the
+        # sweep is thousands of decks and elaborates most of them, which is
+        # minutes rather than seconds. The per-push tier gets the same claim
+        # over a deterministic slice, through `rspice-core`'s `no_panic_corpus`
+        # target. `--nocapture` so the deck and per-corpus counts reach the
+        # log; a gate that silently swept nothing must not look like a pass.
+        run: >-
+          cargo test --locked -p rspice-conformance --release
+          --test panic_gate -- --nocapture
       - name: ngspice conformance report
+        id: ngspice
         # Serial test threads: each deck spawns a case-runner subprocess with
         # a hard per-case timeout; parallel threads oversubscribe the runner
-        # and trip the caps. The command's own exit status is advisory; the
-        # ratchet step below is the gate.
-        continue-on-error: true
+        # and trip the caps. Explicit bash enables pipefail so tee cannot hide
+        # a crashed test process behind a successful aggregate row.
+        shell: bash
         run: >-
-          cargo test --locked -p rspice-core --release --test ngspice_regression
+          cargo test --locked -p rspice-conformance --release --test ngspice_regression
           -- --nocapture --test-threads 1 | tee conformance.log
       - name: Conformance ratchet
         # Accuracy can only move forward: fail the nightly when the full
         # suite reports more failing decks than the recorded watermark.
-        # Never lower the floor. Watermark 2 as measured 2026-06-12: the
-        # two fourbitadder decks (general + transient), a regression
-        # bisected to 5f4f9e41 with a fix in flight; ratchet to 0 when it
-        # lands. The grep anchors on the aggregate row of
+        # Never lower the floor. The strict corpus is green, so any future
+        # failing deck is a release regression. The grep anchors on the
+        # aggregate row of
         # test_full_ngspice_suite_summary and pins the deck count, so a
         # shrinking test universe fails the gate instead of faking
         # progress; bump the count deliberately when decks are added.
         env:
-          MAX_FAILING: "2"
+          MAX_FAILING: "0"
         run: |
           failed=$(grep -E '^TOTAL +113 tests' conformance.log | grep -Eo '[0-9]+ failed' | grep -Eo '[0-9]+' | tail -1)
           if [ -z "$failed" ]; then
@@ -66,11 +180,126 @@ jobs:
           echo "failing decks: $failed (watermark allows <= $MAX_FAILING)"
           [ "$failed" -le "$MAX_FAILING" ]
       - name: Upload conformance log
-        if: always()
+        if: ${{ !cancelled() && steps.ngspice.outcome != 'skipped' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: conformance-log
           path: conformance.log
+          if-no-files-found: error
+
+  veriloga-corpus:
+    name: Verilog-A corpus gates (Linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install Rust toolchain
+        run: rustup toolchain install ${{ env.RUST_TOOLCHAIN }} --profile minimal
+      - uses: Swatinem/rust-cache@f0d9c3887740aee45f6153b24b3a6b815192ec16 # v2
+        with:
+          key: veriloga-corpus
+      - name: Corpus golden gates (43 models)
+        # The four correctness gates: finite evaluation at every probe point,
+        # gmin reaching the devices that read it, stamped Jacobians against a
+        # numerical derivative of the stamped currents, and stamped reactive
+        # blocks against a numerical derivative of the recovered charge.
+        #
+        # Nightly rather than per-commit because the feature compiles all 43
+        # CMC models. Serial threads and a raised stack because the generated
+        # bodies are large enough to overflow the 2 MB the test harness gives a
+        # spawned thread.
+        #
+        # The suite lives in rspice-conformance, not rspice-core: it moved there
+        # with the rest of the validation code. Pointed at the old package this
+        # step fails with "no test target named veriloga_golden", which reads
+        # like a missing file rather than a stale path.
+        env:
+          RUST_MIN_STACK: "67108864"
+        run: >-
+          cargo test --locked --release -p rspice-conformance --features veriloga-builtins
+          --test veriloga_golden -- --test-threads=1
+      - name: Generated model routing selectors
+        # Which `.model` type and LEVEL selects which generated device, and
+        # which selectors must stay on a native evaluator. It rides this job
+        # rather than CI because its assertions name models only the complete
+        # catalog supplies: against the corpus the gates above already build,
+        # it costs one test-binary link. The stack is raised for the same
+        # reason as those gates -- instantiating a generated device touches
+        # bodies larger than a spawned test thread's default stack.
+        env:
+          RUST_MIN_STACK: "67108864"
+        run: >-
+          cargo test --locked --release -p rspice-conformance --features veriloga-builtins
+          --test generated_veriloga_model_routing
+      - name: Replay captured Verilog-A fingerprints (43 models)
+        # Snapshot replay is deliberately separate from the independent
+        # derivative gates above: replay detects behavioral drift, while the
+        # oracle determines whether the captured derivative is mathematically
+        # defensible. Both must pass.
+        env:
+          RUST_MIN_STACK: "67108864"
+        run: >-
+          cargo run --locked --release -p rspice-conformance
+          --features veriloga-builtins --bin rspice-veriloga-golden -- verify
+      - name: Measure 43-model stamp performance
+        id: stamp
+        # Keep model timings and the same-run BSIM4 reference as evidence.
+        # Different model equations and sizes do not have a universal runtime
+        # ratio. Initialization, finite output and real contributions still
+        # have to qualify before a timing can be reported.
+        run: >-
+          cargo run --locked --release -p rspice-bench
+          --features generated-stamp -- generated-stamp
+          --iterations 2000
+          --samples 7
+          --out target/veriloga-stamp-qualification.json
+      - name: Every model's Jacobian against complex step
+        # Phase 7's property gate. `#[ignore]` by default because it compiles
+        # the whole model tree through the front end; this is the run that makes
+        # it mean something.
+        run: >-
+          cargo test --locked --release -p rspice-veriloga --test cfg_derivatives
+          the_whole_corpus_matches_complex_step -- --ignored --nocapture
+      - name: Shipped models execute through the native x64 device route
+        # These probes parse and compile every shipped CMC Verilog-A source,
+        # construct the production VerilogADevice, and reject any interpreter
+        # fallback. They are release-only and ignored by ordinary cargo test.
+        env:
+          RUST_MIN_STACK: "67108864"
+        run: >-
+          cargo test --locked --release -p rspice-veriloga --features native --lib
+          native_x64_shipped_model_devices_run_without_interpreter_fallback
+          -- --ignored --nocapture --test-threads=1
+      - name: Shipped native x64 finite entries match bytecode
+        # Independent backend agreement over every finite current, charge, and
+        # Jacobian entry catches native lowering errors that merely-finite
+        # smoke tests cannot detect.
+        env:
+          RUST_MIN_STACK: "67108864"
+        run: >-
+          cargo test --locked --release -p rspice-veriloga --features native --lib
+          native_x64_shipped_model_finite_entries_match_bytecode_reference
+          -- --ignored --nocapture --test-threads=1
+      - name: Shipped machine code is the code that was last measured
+        # The strongest identity gate the Verilog-A backend has, and until now
+        # the only one nothing ran: `#[ignore]`d so no lane pays for it, and
+        # named by no workflow, so it stood red against a stale baseline for a
+        # day without anyone seeing it. A default `cargo test` prints it as
+        # `ignored` inside a green summary, which is why the marking alone was
+        # never going to be enough. It belongs here, beside its three siblings,
+        # on the run nobody waits for.
+        env:
+          RUST_MIN_STACK: "67108864"
+        run: >-
+          cargo test --locked --release -p rspice-veriloga --features native --lib
+          shipped_model_machine_code_census_digest
+          -- --ignored --nocapture --test-threads=1
+      - name: Upload Verilog-A stamp qualification
+        if: ${{ !cancelled() && steps.stamp.outcome != 'skipped' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: veriloga-stamp-qualification
+          path: target/veriloga-stamp-qualification.json
           if-no-files-found: error
 
   release-build:
@@ -86,14 +315,14 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install Rust toolchain
         run: rustup toolchain install ${{ env.RUST_TOOLCHAIN }} --profile minimal
-      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+      - uses: Swatinem/rust-cache@f0d9c3887740aee45f6153b24b3a6b815192ec16 # v2
         with:
           key: nightly-release-${{ matrix.os }}
       - name: Build shipped binaries
-        run: cargo build --locked --release -p rspice-ui -p rspice-cli
+        run: cargo build --locked --release -p rspice-ui -p rspice-cli --features rspice-ui/generated-veriloga-catalog
       - name: Stage release artifacts
         shell: bash
         run: |
@@ -112,6 +341,6 @@ jobs:
           path: release-artifacts
           if-no-files-found: error
       - name: Generate artifact attestation
-        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763 # v4
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
         with:
           subject-path: release-artifacts/*

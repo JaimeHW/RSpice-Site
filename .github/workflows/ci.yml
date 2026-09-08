@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   build:
-    name: Validate and build static site
+    name: Validate static source
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -42,6 +42,10 @@ jobs:
             /README.md
             /Cargo.toml
             /crates/rspice-cli/README.md
+            /crates/rspice-ui/web/index.html
+            /crates/rspice-ui/web/simulation-worker.js
+            /crates/rspice-ui/web/wasm-loader.js
+            /crates/rspice-ui/web/automation-worker.js
             /tests/ngspice/validation-manifest.tsv
             /tests/xyce/RSPICE-HARNESS-MANIFEST.tsv
             /.github/workflows/nightly.yml
@@ -52,6 +56,8 @@ jobs:
         with:
           python-version: "3.14"
       - name: Test site tooling
+        env:
+          RSPICE_TEST_SOURCE: ${{ github.workspace }}/rspice-source
         run: python -m unittest discover -s tools -p "test_*.py"
       - name: Verify public Workbench snapshot
         shell: bash
