@@ -33,7 +33,7 @@ class DeploymentTests(unittest.TestCase):
                       "features": list(features)} for name, features in build_simulator.UI_MODULES]}
         (root / "build.json").write_text(json.dumps(build), encoding="utf-8")
         # A synthetic receipt exercises validation, not browser execution.
-        receipt = {"status": "passed", "jit_qualification": {"status": "passed"}, "build": build,
+        receipt = {"schema_version": 2, "status": "passed", "jit_qualification": {"status": "passed"}, "build": build,
                    "inputs": {path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
                               for folder in (root / "ide", root / "play")
                               for path in folder.rglob("*") if path.is_file()}}
@@ -65,7 +65,7 @@ class DeploymentTests(unittest.TestCase):
                         deploy.write_and_validate_manifest(root, "b" * 40, "a" * 40)
 
     def test_qualification_rejects_skipped_failed_changed_and_wrong_feature_builds(self):
-        for change in ("missing", "failed", "jit-failed", "play-changed", "headers-changed", "build-changed", "features"):
+        for change in ("missing", "legacy", "unknown-schema", "failed", "jit-failed", "play-changed", "headers-changed", "build-changed", "features"):
             with self.subTest(change=change), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)
                 self.make_release(root)
@@ -73,6 +73,10 @@ class DeploymentTests(unittest.TestCase):
                 receipt = json.loads(path.read_text())
                 if change == "missing":
                     path.unlink()
+                elif change == "legacy":
+                    receipt.pop("schema_version")
+                elif change == "unknown-schema":
+                    receipt["schema_version"] = 3
                 elif change == "failed":
                     receipt["status"] = "failed"
                 elif change == "jit-failed":
