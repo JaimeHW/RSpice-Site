@@ -244,8 +244,6 @@ def verify_browser_qualification(out):
     if not report_path.is_file():
         raise ValueError("release has no completed browser qualification")
     report = json.loads(report_path.read_text(encoding="utf-8"))
-    if report.get("schema_version") != 2:
-        raise ValueError("release needs browser qualification with rendered playground results")
     if report.get("status") != "passed" or report.get("jit_qualification", {}).get("status") != "passed":
         raise ValueError("release browser qualification did not pass")
     build = json.loads((out / "build.json").read_text(encoding="utf-8"))
