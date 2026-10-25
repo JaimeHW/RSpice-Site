@@ -28,9 +28,9 @@ with the simulator source automatically whenever that directory is present in a
 clean checkout; until then, CI validates and deploys the vendor snapshot instead
 of depending on a local-only path.
 
-It does **not** own the browser simulator source. The `/ide/` and `/play/`
-runtimes are built from an immutable revision of an explicitly selected RSpice
-repository by `tools/deploy.py`. The local publisher overlays those generated WebAssembly
+It does **not** own the browser simulator source. The `/ide/` runtime is
+built from an immutable revision of an explicitly selected RSpice repository by
+`tools/deploy.py`. The local publisher overlays those generated WebAssembly
 artifacts, records both source revisions, runs browser smoke tests, and pushes
 the verified static tree to this repository's `production` branch.
 
@@ -77,8 +77,8 @@ python tools/check_site.py --root public
 
 On Windows, `py` can be used in place of `python`. Validation covers every HTML
 file recursively, local links and fragments, responsive/SEO metadata,
-accessibility basics, URL safety, deployment metadata, and the `/ide/`,
-`/play/`, and `/workbench/` overlay boundaries.
+accessibility basics, URL safety, deployment metadata, and the `/ide/` and
+`/workbench/` overlay boundaries.
 
 Build a clean deployable copy in `dist/`. The builder uses the sibling
 `../RSpice` Workbench source when it is present and otherwise uses the reviewed
@@ -156,20 +156,20 @@ py -3 tools\deploy.py C:\path\to\RSpice
 The simulator repository is a required positional argument; deployment never
 guesses which checkout to compile. The command resolves both remote `main`
 heads, creates clean temporary
-worktrees, builds the site, the separate UI/simulation-worker images, and the
-engine playground locally. Both UI images include the generated device catalog;
+worktrees, and builds the site and the separate UI/simulation-worker images
+locally. Both UI images include the generated device catalog;
 only the worker image enables `browser-worker`. Assembly preserves client-owned
 JavaScript and packages both compressed modules, the loader, and the Python
 runtime in one content-addressed `/ide/assets/<hash>/` directory.
 
 Client-owned Chrome gates check JIT solver execution, actual UI startup at desktop,
-portrait and compact viewport sizes, playground transient solves, and Python
-breakpoint/evaluate/step behavior under the packaged security headers. Set
+portrait and compact viewport sizes, and Python breakpoint/evaluate/step
+behavior under the packaged security headers. Set
 `CHROME` and `CHROMEDRIVER` when those
 programs are not discoverable automatically. These viewport checks do not qualify
 physical tablet/touch input or the full engineering workflow. Browser evidence is
 retained under the Cargo target directory. A `browser-qualification.json` receipt
-binds the successful checks to every packaged IDE/playground file and `_headers`. Publication
+binds the successful checks to every packaged IDE file and `_headers`. Publication
 rejects absent/failed qualification, changed inputs, or missing runtime assets;
 `--skip-headless` assembly output is for local development only.
 
