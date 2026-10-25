@@ -129,8 +129,6 @@ def write_and_validate_manifest(
         "build.json",
         "workbench/index.html",
         "ide/index.html",
-        "play/index.html",
-        "play/pkg/rspice_wasm_bg.wasm",
     }
     actual = {
         path.relative_to(artifact).as_posix()
@@ -143,7 +141,6 @@ def write_and_validate_manifest(
     identity = gate_ide_worker(artifact)
     for name, _ in UI_MODULES:
         gate_bundle(artifact, f"ide/assets/{identity}/{name}", compressed=True)
-    gate_bundle(artifact, "play/pkg/rspice_wasm")
     build = json.loads((artifact / "build.json").read_text(encoding="utf-8"))
     if build.get("site_source_sha") != site_sha:
         raise ValueError("build artifact has the wrong site revision")

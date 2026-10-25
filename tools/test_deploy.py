@@ -19,13 +19,10 @@ class DeploymentTests(unittest.TestCase):
     def make_release(self, root):
         assembly_fixtures.BuildSiteGateTests.make_ide_build_outputs(root / "ide")
         identity = build_simulator.package_ide_executable_assets(root / "ide")
-        for name in ("index.html", "404.html", "_headers", "workbench/index.html", "play/index.html"):
+        for name in ("index.html", "404.html", "_headers", "workbench/index.html"):
             path = root / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text("fixture", encoding="utf-8")
-        (root / "play/pkg").mkdir()
-        (root / "play/pkg/rspice_wasm.js").write_text("export { initSync, __wbg_init as default };", encoding="utf-8")
-        (root / "play/pkg/rspice_wasm_bg.wasm").write_bytes(b"\x00asm\x01\x00\x00\x00")
         build = {"client_source_sha": "a" * 40, "site_source_sha": "b" * 40,
                  "ide_executable_asset_sha256": identity,
                  "browser_images": [
@@ -35,8 +32,7 @@ class DeploymentTests(unittest.TestCase):
         # A synthetic receipt exercises validation, not browser execution.
         receipt = {"schema_version": 2, "status": "passed", "jit_qualification": {"status": "passed"}, "build": build,
                    "inputs": {path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
-                              for folder in (root / "ide", root / "play")
-                              for path in folder.rglob("*") if path.is_file()}}
+                              for path in (root / "ide").rglob("*") if path.is_file()}}
         receipt["inputs"]["_headers"] = hashlib.sha256((root / "_headers").read_bytes()).hexdigest()
         (root / "browser-qualification.json").write_text(json.dumps(receipt), encoding="utf-8")
         return identity
@@ -65,7 +61,7 @@ class DeploymentTests(unittest.TestCase):
                         deploy.write_and_validate_manifest(root, "b" * 40, "a" * 40)
 
     def test_qualification_rejects_skipped_failed_changed_and_wrong_feature_builds(self):
-        for change in ("missing", "legacy", "unknown-schema", "failed", "jit-failed", "play-changed", "headers-changed", "build-changed", "features"):
+        for change in ("missing", "legacy", "unknown-schema", "failed", "jit-failed", "ide-changed", "headers-changed", "build-changed", "features"):
             with self.subTest(change=change), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)
                 self.make_release(root)
@@ -81,8 +77,8 @@ class DeploymentTests(unittest.TestCase):
                     receipt["status"] = "failed"
                 elif change == "jit-failed":
                     receipt["jit_qualification"]["status"] = "failed"
-                elif change == "play-changed":
-                    (root / "play/index.html").write_text("changed", encoding="utf-8")
+                elif change == "ide-changed":
+                    (root / "ide/index.html").write_text("changed", encoding="utf-8")
                 elif change == "headers-changed":
                     (root / "_headers").write_text("changed", encoding="utf-8")
                 else:

@@ -158,10 +158,8 @@ class BuildSiteGateTests(unittest.TestCase):
             site = root / "site-source" / "public"
             out = root / "_site-test"
             ui = root / "crates" / "rspice-ui" / "web"
-            play = root / "crates" / "rspice-wasm" / "web"
             self.make_site_source(site)
             ui.mkdir(parents=True)
-            play.mkdir(parents=True)
 
             (site / "index.html").write_text("marketing", encoding="utf-8")
             (site / "assets" / "site.css").write_text("body{}", encoding="utf-8")
@@ -172,17 +170,12 @@ class BuildSiteGateTests(unittest.TestCase):
             (ui / "python").mkdir()
             (ui / "python/runtime.wasm").write_bytes(b"python fixture")
             (ui / "README.md").write_text("do not deploy", encoding="utf-8")
-            (play / "index.html").write_text("play", encoding="utf-8")
-            (play / "engine-worker.js").write_text("play worker", encoding="utf-8")
-            (play / ".gitignore").write_text("pkg", encoding="utf-8")
 
             build_site.assemble_site_sources(root, root, site, out)
 
             self.assertEqual((out / "index.html").read_text(encoding="utf-8"), "marketing")
             self.assertEqual((out / "ide" / "index.html").read_text(encoding="utf-8"), "ide")
-            self.assertEqual((out / "play" / "index.html").read_text(encoding="utf-8"), "play")
             self.assertFalse((out / "ide" / "README.md").exists())
-            self.assertFalse((out / "play" / ".gitignore").exists())
             self.assertEqual((out / "ide/python/runtime.wasm").read_bytes(), b"python fixture")
 
 
@@ -375,9 +368,9 @@ class BuildSiteGateTests(unittest.TestCase):
     def test_client_source_qualification_propagates_failure(self) -> None:
         with mock.patch.object(build_site, "run") as run:
             build_site.qualify_client_sources(ROOT)
-            self.assertEqual(len(run.call_args_list), 3)
+            self.assertEqual(len(run.call_args_list), 2)
             self.assertEqual([Path(call.args[0][-1]).name for call in run.call_args_list],
-                             ["test_ide_worker.py", "test_automation_runtime_assets.py", "test_wasm_playground.py"])
+                             ["test_ide_worker.py", "test_automation_runtime_assets.py"])
         with mock.patch.object(build_site, "run", side_effect=subprocess.CalledProcessError(1, ["python"])):
             with self.assertRaises(subprocess.CalledProcessError):
                 build_site.qualify_client_sources(ROOT)

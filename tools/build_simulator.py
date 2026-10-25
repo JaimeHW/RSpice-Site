@@ -14,12 +14,12 @@ overlays its browser runtimes on an already-built RSpice-Site tree.
 Stages:
   1. toolchain gate    - wasm-bindgen CLI must match Cargo.lock
   2. build             - separate UI and simulation-worker images with the
-                         generated device catalog, plus the engine playground
+                         generated device catalog
   3. assemble          - RSpice-Site/dist + client-owned browser shells,
                          generated wasm packages, and build.json
   4. static gates      - \0asm magic + wasm-bindgen export signature
-  5. headless gate     - client-owned JIT, production UI startup, playground
-                         solve, and Python debugger checks in Chrome
+  5. headless gate     - client-owned JIT, production UI startup, and Python
+                         debugger checks in Chrome
 
 Any failed gate exits non-zero; tools/deploy.py owns publication.
 Pure stdlib, no third-party deps - runs the same on the Ubuntu CI runner
@@ -88,7 +88,7 @@ def build_ui_images(root):
 
 
 def qualify_client_sources(root):
-    for name in ("test_ide_worker.py", "test_automation_runtime_assets.py", "test_wasm_playground.py"):
+    for name in ("test_ide_worker.py", "test_automation_runtime_assets.py"):
         run([sys.executable, "-B", str(root / "tools/ci" / name)], cwd=root)
 
 
@@ -258,7 +258,7 @@ def verify_browser_qualification(out):
     if build.get("browser_images") != expected_images:
         raise ValueError("release does not declare the required isolated catalog images")
     observed = {"_headers": hashlib.sha256((out / "_headers").read_bytes()).hexdigest()}
-    for path in sorted([*(out / "ide").rglob("*"), *(out / "play").rglob("*")]):
+    for path in sorted((out / "ide").rglob("*")):
         if path.is_symlink():
             raise ValueError("release qualification input is a symbolic link: %s" % path)
         if path.is_file():
@@ -277,12 +277,8 @@ def validate_site_source(site_source):
             fail("site source is missing required file: %s" % (site_source / required))
     if not (site_source / "assets").is_dir():
         fail("site source is missing required directory: %s" % (site_source / "assets"))
-    for reserved in ("ide", "play"):
-        if (site_source / reserved).exists():
-            fail(
-                "site source must not provide the client-owned runtime route '%s/'"
-                % reserved
-            )
+    if (site_source / "ide").exists():
+        fail("site source must not provide the client-owned runtime route 'ide/'")
     for path in site_source.rglob("*"):
         if path.is_symlink():
             fail("site source must not contain symlinks: %s" % path)
@@ -466,11 +462,6 @@ def assemble_site_sources(site_root, rspice_root, site_source, out):
         ("index.html", "simulation-worker.js", "wasm-loader.js", "automation-worker.js"),
     )
     shutil.copytree(rspice_root / "crates/rspice-ui/web/python", out / "ide/python")
-    copy_runtime_shell(
-        rspice_root / "crates" / "rspice-wasm" / "web",
-        out / "play",
-        ("index.html", "engine-worker.js"),
-    )
 
 
 def main():
@@ -525,12 +516,6 @@ def main():
 
     # 2. build
     build_ui_images(root)
-    print("building rspice-wasm (engine playground)...")
-    run_cargo_build(
-        ["cargo", "build", "--locked", "-p", "rspice-wasm", "--lib",
-         "--target", "wasm32-unknown-unknown", "--release"],
-        root,
-    )
 
     # 3. assemble
     assemble_site_sources(site_root, root, site_source, out)
@@ -539,9 +524,6 @@ def main():
         run(["wasm-bindgen", str(ui_target / (name + ".wasm")),
              "--out-dir", str(out / "ide" / "pkg"), "--out-name", name,
              "--target", "web", "--no-typescript"])
-    run(["wasm-bindgen", str(target / "release" / "rspice_wasm.wasm"),
-         "--out-dir", str(out / "play" / "pkg"),
-         "--out-name", "rspice_wasm", "--target", "web", "--no-typescript"])
     ide_asset_identity = package_ide_executable_assets(out / "ide")
 
     built_utc = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -572,7 +554,6 @@ def main():
     # 4. static gates
     for name, _ in UI_MODULES:
         gate_bundle(out, "ide/assets/%s/%s" % (ide_asset_identity, name), compressed=True)
-    gate_bundle(out, "play/pkg/rspice_wasm")
     if gate_ide_worker(out) != ide_asset_identity:
         fail("IDE shell and executable asset gate disagree on bundle identity")
 
