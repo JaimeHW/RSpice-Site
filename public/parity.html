@@ -91,8 +91,8 @@
           <h2>Run tests against the exact source revision.</h2>
           <p>Representative validation commands are documented in the source repository. Run them from the exact checkout and retain the output with the build/toolchain context when evaluating a change.</p>
           <figure class="technical-code"><figcaption><span>shell / representative source targets</span><span>exact target names may evolve with source</span></figcaption><pre><code>cargo test --release -p rspice-core
-cargo test --release -p rspice-core --test ngspice_regression
-cargo test --release -p rspice-core --test xyce_regression</code></pre></figure>
+cargo test --release -p rspice-conformance --test ngspice_regression
+cargo test --release -p rspice-conformance --test xyce_regression</code></pre></figure>
           <p class="technical-note">The source repository defines current target names, feature flags, fixtures, platform requirements, tolerance policy, and CI wiring.</p>
           <div class="technical-actions"><a class="button button--hot" href="validation.html">Open generated status</a><a class="button button--quiet" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Inspect validation source <span aria-hidden="true">&nearr;</span></a><a class="button button--quiet" href="docs.html#validation">Technical scope</a></div>
         </section>
