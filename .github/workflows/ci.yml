@@ -42,10 +42,10 @@ jobs:
             /README.md
             /Cargo.toml
             /crates/rspice-cli/README.md
-            /crates/rspice-ui/web/index.html
-            /crates/rspice-ui/web/simulation-worker.js
-            /crates/rspice-ui/web/wasm-loader.js
-            /crates/rspice-ui/web/automation-worker.js
+            /crates/rspice-app/web/index.html
+            /crates/rspice-app/web/simulation-worker.js
+            /crates/rspice-app/web/wasm-loader.js
+            /crates/rspice-app/web/automation-worker.js
             /tests/ngspice/validation-manifest.tsv
             /tests/xyce/RSPICE-HARNESS-MANIFEST.tsv
             /mockups/rspice-workbench-host/public/rspice/**
