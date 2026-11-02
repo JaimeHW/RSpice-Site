@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#071015">
   <meta name="color-scheme" content="dark">
-  <title>Technical scope &mdash; RSpice</title>
-  <meta name="description" content="Technical scope and source-build notes for RSpice: the Rust analog, mixed-signal, and RF circuit simulator in active development.">
+  <title>Documentation &mdash; RSpice</title>
+  <meta name="description" content="Task guides for the RSpice circuit simulator application, with the engine's analysis map, its interfaces and the commands that build RSpice from source.">
   <link rel="canonical" href="https://rspice.app/docs">
   <link rel="icon" href="assets/brand/rspice.ico" sizes="any">
   <link rel="apple-touch-icon" href="assets/brand/icon-256.png">
@@ -14,11 +14,11 @@
   <link rel="stylesheet" href="assets/technical.css">
   <link rel="stylesheet" href="assets/interior-refined.css">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Technical scope &mdash; RSpice">
-  <meta property="og:description" content="Engine, analysis, interface, build, and validation scope for RSpice.">
+  <meta property="og:title" content="Documentation &mdash; RSpice">
+  <meta property="og:description" content="Guides to the RSpice application, the analysis map, interfaces, source builds and validation.">
   <meta property="og:image" content="https://rspice.app/assets/og.png">
 </head>
-<body class="technical-page">
+<body class="technical-page docs-page">
   <a class="skip-link" href="#main">Skip to main content</a>
 
   <header class="topbar" data-topbar>
@@ -36,86 +36,105 @@
     <header class="technical-hero">
       <div class="page-frame technical-hero__grid">
         <div>
-          <p class="eyebrow">RSPICE / TECHNICAL SCOPE</p>
-          <h1>Engine, analyses, interfaces, and build commands.</h1>
-          <p class="technical-hero__lede">The current source contains the Rust simulation engine, desktop application, CLI, Python bindings, WebAssembly bindings, model libraries, and validation harnesses. Availability differs by analysis and target.</p>
+          <p class="eyebrow">RSPICE / DOCS</p>
+          <h1>Documentation.</h1>
+          <p class="technical-hero__lede">Short guides to the RSpice application, one task at a time, written from its source at revision <a href="https://github.com/JaimeHW/RSpice/commit/c72435a76cc052467c67148f11af52402106423d" target="_blank" rel="noopener"><code>c72435a76cc0</code></a> (2026-11-01). Below them: what the engine covers, its interfaces, and how to build RSpice from source.</p>
         </div>
-        <dl class="technical-hero__ledger" aria-label="Technical documentation status">
-          <div><dt>ENGINE</dt><dd>MNA / Newton / adaptive transient</dd></div>
-          <div><dt>HOSTS</dt><dd>Native / CLI / Python / WASM</dd></div>
-          <div><dt>BROWSER</dt><dd>Summaries / DC / AC / TRAN</dd></div>
-          <div><dt>AUTHORITY</dt><dd>Source README and test output</dd></div>
+        <dl class="technical-hero__ledger" aria-label="Where RSpice runs">
+          <div><dt>DESKTOP</dt><dd>Windows, macOS and Linux application</dd></div>
+          <div><dt>BROWSER</dt><dd>The same application, experimental, WebGPU</dd></div>
+          <div><dt>COMMAND LINE</dt><dd><code>rspice</code> for scripted runs and CI</dd></div>
+          <div><dt>INSTALLERS</dt><dd>Not published yet: build from source</dd></div>
         </dl>
       </div>
     </header>
 
     <div class="page-frame technical-layout">
-      <aside class="technical-index" aria-label="Technical documentation sections">
+      <aside class="technical-index" aria-label="Documentation sections">
         <p>ON THIS PAGE</p>
-        <a href="#boundary">Runtime boundary</a><a href="#build">Build from source</a><a href="#analyses">Analysis map</a><a href="#interfaces">Interfaces</a><a href="#validation">Validation</a>
+        <a href="#guides">Guides</a><a href="#boundary">Runtime boundary</a><a href="#build">Build from source</a><a href="#analyses">Analysis map</a><a href="#interfaces">Interfaces</a><a href="#validation">Validation</a>
       </aside>
 
       <article class="technical-document">
-        <section class="technical-section" id="boundary">
-          <p class="technical-number">01 / RUNTIME BOUNDARY</p>
-          <h2>Desktop, CLI, Python, and WASM use the same simulation core.</h2>
-          <p><code>rspice-core</code> elaborates SPICE-compatible netlists, evaluates devices, assembles modified-nodal-analysis systems, and dispatches analyses. Native builds can use configured parallel and SIMD paths; the browser build is single-threaded and exposes a smaller command set.</p>
-          <div class="technical-grid technical-grid--three">
-            <article><span>DESKTOP</span><h3>egui / wgpu</h3><p>The native application provides schematic capture, waveform inspection, analysis views, and local file-system access.</p></article>
-            <article><span>AUTOMATION</span><h3>CLI / Python</h3><p>The CLI runs decks, converts formats, compares references, and writes reports. Python returns DC, transient, and AC data for numerical analysis.</p></article>
-            <article><span>BROWSER</span><h3>WebAssembly</h3><p>The JavaScript binding exposes netlist summaries plus DC operating-point, AC, and transient result snapshots.</p></article>
+        <section class="technical-section" id="guides">
+          <p class="technical-number">01 / GUIDES</p>
+          <h2>Start from the task.</h2>
+          <p>Each guide names menus and commands exactly as the application labels them. A command with a key shows it; <a href="docs/keyboard-shortcuts.html">Keyboard shortcuts</a> lists them all, and the command palette, <kbd>Ctrl+K</kbd>, finds any command by name.</p>
+          <div class="technical-grid">
+            <article><span>01 / START</span><h3><a href="docs/getting-started.html">Getting started</a></h3><p>Build or open RSpice, create a project or open an example, and run your first simulation.</p></article>
+            <article><span>02 / DESIGN</span><h3><a href="docs/schematic-entry.html">Schematic entry</a></h3><p>Place parts, wire them, build hierarchy and symbols, and check the design.</p></article>
+            <article><span>03 / SIMULATE</span><h3><a href="docs/simulation-setup.html">Simulation setup</a></h3><p>Add analyses, review sources, outputs, sweeps and solver options, then run.</p></article>
+            <article><span>04 / RESULTS</span><h3><a href="docs/results.html">Results</a></h3><p>Read waveforms and the other result views, measure, compare runs and export data.</p></article>
+            <article><span>05 / VERIFY</span><h3><a href="docs/verification.html">Verification</a></h3><p>Monte Carlo yield, process corners, tuning, optimization, safe operating area and regression.</p></article>
+            <article><span>06 / MODELS</span><h3><a href="docs/models-and-pdks.html">Models and PDKs</a></h3><p>Point RSpice at model libraries, browse and edit models, and choose corner sections.</p></article>
+            <article><span>07 / VERILOG-A</span><h3><a href="docs/verilog-a.html">Verilog-A</a></h3><p>Create or import a Verilog-A module as a cell view, compile it and place it.</p></article>
+            <article><span>08 / NETLISTS</span><h3><a href="docs/netlists-and-scripts.html">Netlists and scripts</a></h3><p>Open or write SPICE decks, export netlists, run Python workflows and use the command line.</p></article>
+            <article><span>09 / PROBLEMS</span><h3><a href="docs/troubleshooting.html">Troubleshooting</a></h3><p>Refused runs, the Problems list, recovery, safe mode and support bundles.</p></article>
+            <article><span>10 / KEYS</span><h3><a href="docs/keyboard-shortcuts.html">Keyboard shortcuts</a></h3><p>Every default key, menu by menu, generated from the application's command registry.</p></article>
           </div>
-          <div class="technical-callout"><strong>WORKBENCH</strong><span>The home page embeds the current 1440 × 900 Workbench HTML mockup in a non-interactive auto-fit frame. The experimental WASM lab is a separate route.</span></div>
+        </section>
+
+        <section class="technical-section" id="boundary">
+          <p class="technical-number">02 / RUNTIME BOUNDARY</p>
+          <h2>One engine behind the command line, the desktop and the browser.</h2>
+          <p><code>rspice-core</code> parses SPICE netlists, evaluates devices, assembles modified-nodal-analysis systems and runs the analyses. The command line and the desktop and browser application run the same <code>rspice-core</code> code, so a result does not depend on how the run was launched. Where a deck needs physics RSpice does not have, it stops with an error naming the parameter or model level responsible rather than approximating.</p>
+          <div class="technical-grid technical-grid--three">
+            <article><span>DESKTOP</span><h3>egui / wgpu</h3><p>The native application: eight workspaces covering projects, schematic and symbol design, simulation setup, results, verification, models, netlists and scripts, and stimulus definitions.</p></article>
+            <article><span>BROWSER</span><h3>WebAssembly</h3><p>The same application in a browser tab, with simulations in a worker off the page's main thread. Experimental: it needs WebGPU, and phones and tablets are not a qualified target.</p></article>
+            <article><span>AUTOMATION</span><h3>Command line</h3><p><code>rspice</code> runs decks and studies, checks and inspects them, converts result files and compares them with golden results. Its exit status is the verification contract.</p></article>
+          </div>
         </section>
 
         <section class="technical-section" id="build">
-          <p class="technical-number">02 / SOURCE BUILD</p>
-          <h2>Build the CLI or desktop application from the checked-out revision.</h2>
-          <p>Signed installers are not published. The commands below build the current CLI and desktop packages with the installed Rust toolchain.</p>
-          <figure class="technical-code"><figcaption><span>shell / native CLI</span><span>source evaluation</span></figcaption><pre><code>git clone https://github.com/JaimeHW/RSpice.git
+          <p class="technical-number">03 / SOURCE BUILD</p>
+          <h2>Build the command line or the application from a checkout.</h2>
+          <p>Signed installers are not published yet. The toolchain is pinned to Rust 1.94 by the repository's <code>rust-toolchain.toml</code>, which rustup picks up on its own.</p>
+          <figure class="technical-code"><figcaption><span>shell / command line</span><span>source build</span></figcaption><pre><code>git clone https://github.com/JaimeHW/RSpice.git
 cd RSpice
 cargo build --release -p rspice-cli
 target/release/rspice --help</code></pre></figure>
-          <figure class="technical-code"><figcaption><span>shell / desktop GUI</span><span>native development path</span></figcaption><pre><code>cd RSpice
-cargo run --release -p rspice-ui</code></pre></figure>
-          <p class="technical-note">Optional model-generation paths and platform dependencies vary by target. Use the repository README and CI configuration for the checked-out revision.</p>
+          <figure class="technical-code"><figcaption><span>shell / desktop application</span><span>source build</span></figcaption><pre><code>cd RSpice
+cargo run --release -p rspice-app</code></pre></figure>
+          <p class="technical-note">Add <code>--features generated-veriloga-catalog</code> to compile in the 43 compact models generated from their Verilog-A sources. At the workspace root a plain <code>cargo build</code> builds the command line and the application; use <code>-p &lt;package&gt;</code> for a tool or <code>--workspace</code> for everything. Use the repository README and CI configuration for the checked-out revision.</p>
           <div class="technical-actions"><a class="button button--hot" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Inspect source <span aria-hidden="true">&nearr;</span></a><a class="button button--quiet" href="reference.html">Search generated reference</a><a class="button button--quiet" href="download.html">Build notes</a></div>
         </section>
 
         <section class="technical-section" id="analyses">
-          <p class="technical-number">03 / ANALYSIS MAP</p>
-          <h2>Implemented analyses and interface-specific entry points.</h2>
-          <p>The native engine contains the core paths below. Statistical, periodic, and RF entry points currently span deck cards, CLI flags, and IDE controls rather than one uniform interface.</p>
-          <div class="technical-table-wrap"><table class="technical-table"><thead><tr><th>FAMILY</th><th>DOCUMENTED COMMANDS / PATHS</th><th>ENGINEERING NOTE</th></tr></thead><tbody>
-            <tr><td>Operating point &amp; sweeps</td><td><code>.OP .DC .STEP .TEMP .TF .SENS</code></td><td>Includes two-source DC sweeps, temperature and parameter families, transfer functions, and sensitivity.</td></tr>
-            <tr><td>Transient &amp; spectral</td><td><code>.TRAN .FOUR THD IMD</code></td><td>LTE-controlled adaptive timestepping, checkpoint/resume segmentation, Fourier output, and selected distortion metrics.</td></tr>
-            <tr><td>Linear frequency domain</td><td><code>.AC .NOISE .PZ</code></td><td>Complex small-signal sweeps, input/output-referred noise, and pole-zero extraction.</td></tr>
-            <tr><td>Measurement &amp; comparison</td><td><code>.MEAS GOAL TOL compare</code></td><td>Measurement gating over TRAN, DC, AC, and NOISE plus CLI golden-reference comparison.</td></tr>
-            <tr><td>Statistical &amp; corners</td><td><code>.mc --monte-carlo --corners</code></td><td>Seeded operating-point parameter variation and process-corner campaigns through selected deck, CLI, and IDE paths.</td></tr>
-            <tr><td>Periodic &amp; RF</td><td><code>PSS HB .stb --sparam</code></td><td>Shooting PSS, harmonic balance, stability, and two-port S-parameters with interface-specific exposure.</td></tr>
-            <tr><td>Partial kernels</td><td><code>PAC PNOISE PXF PSTB ENV .DISTO</code></td><td>Conversion-matrix, monodromy, envelope, and multirate mathematics lack complete circuit extraction; <code>.DISTO</code> currently maps to AC.</td></tr>
+          <p class="technical-number">04 / ANALYSIS MAP</p>
+          <h2>The analyses a deck or <code>rspice run</code> can request.</h2>
+          <p>The application offers the same families from Simulate &rsaquo; Add analysis&hellip;; <a href="docs/simulation-setup.html#analyses">Simulation setup</a> lists them by the names it uses.</p>
+          <div class="technical-table-wrap"><table class="technical-table"><thead><tr><th>FAMILY</th><th>REQUESTED BY</th><th>NOTE</th></tr></thead><tbody>
+            <tr><td>Operating point &amp; sweeps</td><td><code>.OP .DC .TEMP .STEP .TF .SENS .DCMATCH</code></td><td>Nested two-source DC sweeps, temperature and parameter run axes (a parameter, a device or a <code>DATA=</code> table), transfer function, DC and AC sensitivity, and DC mismatch.</td></tr>
+            <tr><td>Transient &amp; spectral</td><td><code>.TRAN .FOUR .FFT</code></td><td>Adaptive timestep with breakpoint handling, <code>TRNOISE</code> transient noise, and <code>--checkpoint</code>/<code>--resume</code> segmentation. Fourier, THD and FFT spectra post-process a transient.</td></tr>
+            <tr><td>Small-signal frequency domain</td><td><code>.AC .NOISE .PZ .DISTO</code></td><td>Including <code>.AC DATA=</code> and <code>.NOISE DATA=</code> tables; pole-zero; third-order Volterra distortion with harmonic and two-tone intermodulation.</td></tr>
+            <tr><td>Statistical &amp; corners</td><td><code>.MC --monte-carlo --corners</code></td><td>Monte Carlo over operating-point voltages or named <code>.MEAS</code> results per trial (gaussian, uniform or worst case); corners rerun the deck's analyses once per corner from <code>--corner-lib</code>.</td></tr>
+            <tr><td>RF steady state</td><td><code>.HB .PSS .QPSS .ENVELOPE .SP .STB</code></td><td>Harmonic balance; shooting PSS, driven or autonomous; quasi-periodic steady state; envelope over a preceding <code>.HB</code>; S-parameters with Touchstone export; loop-gain stability.</td></tr>
+            <tr><td>Periodic small-signal</td><td><code>.PAC .PXF .PNOISE .PSTB .QPAC .QPXF .QPNOISE</code></td><td>Linearized around the preceding <code>.PSS</code> or <code>.HB</code>, or a <code>.QPSS</code> for the quasi-periodic set; phase noise by Floquet projection; Floquet multipliers for stability.</td></tr>
+            <tr><td>Configured studies</td><td><code>rspice study</code></td><td>Periodic S-parameters, HB S-parameters, HB noise, safe operating area and optimization run as configured studies, from <code>rspice study</code> or the application.</td></tr>
+            <tr><td>Measurement</td><td><code>.MEAS GOAL TOL</code></td><td>Measurements over TRAN, DC, AC and NOISE; <code>GOAL</code>/<code>TOL</code> sets the exit status.</td></tr>
           </tbody></table></div>
-          <div class="technical-callout"><strong>PARTIAL</strong><span>PAC, PNoise, PXF, PSTB, envelope, and multirate kernels are not complete input-to-result analyses. <code>.DISTO</code> does not yet use a dedicated Volterra engine.</span></div>
+          <div class="technical-callout"><strong>MATURITY</strong><span>Validation depth varies by analysis: a <code>.TRAN</code> on a BSIM4 deck rests on far more evidence than a periodic-stability run. The application marks envelope, quasi-periodic steady state and its small-signal analyses, large-signal and periodic S-parameters, harmonic-balance noise, transient noise and DC mismatch as preview engines whose results are not for sign-off.</span></div>
         </section>
 
         <section class="technical-section" id="interfaces">
-          <p class="technical-number">04 / INTERFACES</p>
+          <p class="technical-number">05 / INTERFACES</p>
           <h2>Interface scope.</h2>
           <ul class="technical-list">
-            <li><span><strong>CLI</strong> executes requested analyses, validates and inspects decks, converts result formats, compares golden references, and emits machine-readable summaries and reports for scripted work.</span></li>
-            <li><span><strong>Python</strong> exposes simulation results for programmatic analysis, including transient and AC data returned to Python-oriented numerical workflows.</span></li>
-            <li><span><strong>WebAssembly</strong> runs client-side and single-threaded. It exposes netlist summaries and DC, AC, and transient results; it does not provide managed jobs, accounts, or collaboration.</span></li>
-            <li><span><strong>Desktop</strong> is the native graphical route. The current egui application and the Workbench redesign are separate implementations.</span></li>
+            <li><span><strong>Command line</strong>: <code>rspice run</code>, <code>study</code>, <code>check</code>, <code>info</code>, <code>models</code>, <code>compare</code>, <code>convert</code>, <code>health</code>, <code>capabilities</code>, <code>compile-va</code> and <code>completions</code>. Runs write SPICE raw, ASCII raw, CSV, TSV, JSON, HDF5 or VCD, and can emit JUnit or TAP reports and a versioned JSON run summary. The full manual is <code>crates/rspice-cli/README.md</code> in the source.</span></li>
+            <li><span><strong>Desktop application</strong>: <code>rspice-app</code>, built with egui and wgpu, with local file access. The guides above describe it.</span></li>
+            <li><span><strong>Browser</strong>: the same application compiled to WebAssembly. It is experimental, needs a WebGPU-capable browser, and keeps projects in the browser's storage.</span></li>
+            <li><span><strong>Python</strong>: Tools &rsaquo; Scripts runs Python workflows inside the application, on a Python runtime RSpice manages rather than a system interpreter. The current source has no separate Python or JavaScript binding package.</span></li>
+            <li><span><strong>Verilog-AMS</strong>: one compiler for <code>.va</code> and <code>.vams</code> sources. In the application a module is a cell view; <code>rspice compile-va</code> compiles one on its own.</span></li>
           </ul>
         </section>
 
         <section class="technical-section" id="validation">
-          <p class="technical-number">05 / VALIDATION DISCIPLINE</p>
+          <p class="technical-number">06 / VALIDATION DISCIPLINE</p>
           <h2>Validation targets in the source tree.</h2>
-          <p>The workspace contains unit and integration tests, oracle replay for history-coupled device behavior, and corpus harnesses for ngspice and Xyce decks. Corpus runs record unsupported cases and use watchdog-supervised processes.</p>
+          <p>The workspace contains unit tests per crate, integration suites, oracle-replay fixtures for history-coupled device behavior, and corpus harnesses: ngspice and Xyce alongside GF180MCU, ISCAS85, mixed-signal and paranoia suites. Each ngspice deck runs in a watchdog-supervised process and is compared row by row with ngspice output; the Xyce harness reports unsupported Xyce contracts instead of omitting the deck.</p>
           <figure class="technical-code"><figcaption><span>shell / representative validation targets</span><span>run against the checked-out revision</span></figcaption><pre><code>cargo test --release -p rspice-core
-cargo test --release -p rspice-core --test ngspice_regression
-cargo test --release -p rspice-core --test xyce_regression</code></pre></figure>
+cargo test --release -p rspice-conformance --test ngspice_regression
+cargo test --release -p rspice-conformance --test xyce_regression</code></pre></figure>
           <p>The <a href="parity.html">validation methodology</a> describes comparison inputs, failure states, and tolerance requirements. The <a href="validation.html">generated validation page</a> publishes source-controlled gate configuration, corpus inventories, benchmark context, and any exact-revision CI artifact available to the site build.</p>
         </section>
       </article>
