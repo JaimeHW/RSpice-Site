@@ -4,11 +4,13 @@
 from __future__ import annotations
 
 import argparse
+import json
 import posixpath
 import re
 import sys
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
+from datetime import date
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Callable
@@ -21,6 +23,20 @@ SITE_ORIGIN = "https://rspice.app"
 CLIENT_RUNTIME_ROUTES = {"ide"}
 EMBEDDED_APP_ROUTES = {"workbench"}
 RESERVED_ROUTES = CLIENT_RUNTIME_ROUTES | EMBEDDED_APP_ROUTES
+# The manifest the desktop application's Check for updates reads. Its shape is
+# a contract with the application: the keys below, each a string.
+RELEASE_MANIFEST = "releases/latest.json"
+RELEASE_MANIFEST_KEYS = ("version", "date", "download_url", "notes_url")
+RELEASE_MANIFEST_HOST = "rspice.app"
+RELEASE_HEADERS_RULE = "/releases/*"
+# Semantic Versioning 2.0.0, as the specification writes it.
+SEMVER_PATTERN = re.compile(
+    r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
+    r"(?:-((?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*)"
+    r"(?:\.(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*))*))?"
+    r"(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?"
+)
+ISO_DATE_PATTERN = re.compile(r"\d{4}-\d{2}-\d{2}")
 VOID_ELEMENTS = {
     "area",
     "base",
@@ -969,6 +985,95 @@ class SiteValidator:
             self.validate_sitemap(required[1])
         if required[2].is_file():
             self.validate_headers(required[2])
+        self.validate_release_manifest(self.root / RELEASE_MANIFEST)
+
+    def validate_release_manifest(self, path: Path) -> None:
+        """Check the manifest the application's update check reads."""
+        if not path.is_file():
+            self.error(path, "missing required release manifest")
+            return
+        try:
+            manifest = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            self.error(path, f"release manifest is not UTF-8 JSON: {exc}")
+            return
+        if not isinstance(manifest, dict):
+            self.error(path, "release manifest must be a JSON object")
+            return
+        values: dict[str, str] = {}
+        for key in RELEASE_MANIFEST_KEYS:
+            value = manifest.get(key)
+            if not isinstance(value, str) or not value:
+                self.error(path, f"release manifest needs a non-empty string '{key}'")
+            else:
+                values[key] = value
+
+        version = values.get("version")
+        if version is not None and not SEMVER_PATTERN.fullmatch(version):
+            self.error(path, f"release manifest version is not SemVer: {version!r}")
+
+        date_text = values.get("date")
+        if date_text is not None:
+            valid_date = bool(ISO_DATE_PATTERN.fullmatch(date_text))
+            if valid_date:
+                try:
+                    date.fromisoformat(date_text)
+                except ValueError:
+                    valid_date = False
+            if not valid_date:
+                self.error(
+                    path, f"release manifest date is not ISO 8601 YYYY-MM-DD: {date_text!r}"
+                )
+
+        for key in ("download_url", "notes_url"):
+            url = values.get(key)
+            if url is None:
+                continue
+            target = self.release_manifest_target(path, key, url)
+            if target is None:
+                continue
+            page, fragment = target
+            if key == "download_url":
+                if fragment:
+                    self.error(path, f"release manifest {key} must not carry a fragment")
+                continue
+            if version is not None and fragment != f"v{version}":
+                self.error(
+                    path,
+                    f"release manifest notes_url must point at '#v{version}', not {fragment!r}",
+                )
+            elif fragment not in page.parser.ids:
+                self.error(path, f"release notes fragment '#{fragment}' is missing from {url!r}")
+
+    def release_manifest_target(
+        self, path: Path, key: str, url: str
+    ) -> tuple[Page, str] | None:
+        """The page and fragment a manifest URL names, or None after reporting why not."""
+        try:
+            parsed = urlsplit(url)
+        except ValueError as exc:
+            self.error(path, f"release manifest {key} is not a URL: {exc}")
+            return None
+        if (
+            parsed.scheme != "https"
+            or parsed.netloc != RELEASE_MANIFEST_HOST
+            or parsed.query
+        ):
+            self.error(
+                path,
+                f"release manifest {key} must be an https URL on {RELEASE_MANIFEST_HOST} "
+                f"without a query: {url!r}",
+            )
+            return None
+        route = unquote(parsed.path).strip("/")
+        if not route or route.endswith(".html"):
+            self.error(path, f"release manifest {key} must name a clean page route: {url!r}")
+            return None
+        page = self.pages.get((self.root / f"{route}.html").resolve())
+        if page is None:
+            self.error(path, f"release manifest {key} names no page in the site: {url!r}")
+            return None
+        return page, unquote(parsed.fragment)
 
     def validate_robots(self, path: Path) -> None:
         source = path.read_text(encoding="utf-8")
@@ -1064,6 +1169,30 @@ class SiteValidator:
         for token in csp_tokens:
             if token.lower() not in source.lower():
                 self.error(path, f"Content-Security-Policy must include {token!r}")
+        release_headers = header_rules(lines).get(RELEASE_HEADERS_RULE, [])
+        if "cache-control: no-cache" not in (
+            " ".join(header.split()).lower() for header in release_headers
+        ):
+            self.error(
+                path,
+                f"{RELEASE_HEADERS_RULE} must be served with Cache-Control: no-cache "
+                "so a release reaches the update check at once",
+            )
+
+
+def header_rules(lines: list[str]) -> dict[str, list[str]]:
+    """The header lines of each Cloudflare _headers rule, by its URL pattern."""
+    rules: dict[str, list[str]] = {}
+    current: list[str] | None = None
+    for line in lines:
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        if line[0].isspace():
+            if current is not None:
+                current.append(line.strip())
+        else:
+            current = rules.setdefault(line.strip(), [])
+    return rules
 
 
 def validate_site(root: Path) -> ValidationResult:
