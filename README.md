@@ -168,8 +168,9 @@ py -3 tools\deploy.py C:\path\to\RSpice
 
 The simulator repository is a required positional argument; deployment never
 guesses which checkout to compile. The command resolves both remote `main`
-heads, creates clean temporary
-worktrees, and builds the site and the separate UI/simulation-worker images
+heads, checks the site out into a clean temporary worktree and the simulator
+into a fixed `<repository>-deploy-source` worktree beside it (kept between
+runs so Cargo reuses the crates a new commit did not change), and builds the site and the separate UI/simulation-worker images
 locally. Both UI images include the generated device catalog;
 only the worker image enables `browser-worker`. Assembly preserves client-owned
 JavaScript and packages both compressed modules, the loader, and the Python

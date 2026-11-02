@@ -68,6 +68,30 @@ def add_worktree(repository: Path, destination: Path, sha: str) -> None:
     )
 
 
+def simulator_checkout(repository: Path) -> Path:
+    """The fixed checkout the simulator is built from, beside its repository.
+
+    Cargo keys workspace crates by their path, so a checkout in a fresh
+    temporary directory rebuilt every RSpice crate on every deployment. A
+    checkout that stays put keeps the shared target's crates valid, and moving
+    it to a new commit touches only the files that commit changed.
+    """
+    return repository.parent / f"{repository.name}-deploy-source"
+
+
+def checkout_simulator(repository: Path, destination: Path, sha: str) -> None:
+    if not (destination / ".git").is_file():
+        if destination.exists():
+            raise ValueError(f"simulator checkout is not a worktree: {destination}")
+        add_worktree(repository, destination, sha)
+        return
+    run(["git", "checkout", "--quiet", "--force", "--detach", sha], cwd=destination)
+    run(["git", "clean", "--quiet", "-ffdx"], cwd=destination)
+    head = capture(["git", "rev-parse", "HEAD"], cwd=destination)
+    if head != sha:
+        raise ValueError(f"simulator checkout is at {head}, not {sha}")
+
+
 def remove_worktree(repository: Path, destination: Path) -> None:
     if destination.exists():
         run(
@@ -325,12 +349,12 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="rspice-deploy-") as temporary:
         temporary_root = Path(temporary)
         site_worktree = temporary_root / "site"
-        rspice_worktree = temporary_root / "rspice"
+        rspice_worktree = simulator_checkout(rspice_repository)
         publisher = temporary_root / "publisher"
         publisher.mkdir()
         try:
             add_worktree(SITE_ROOT, site_worktree, site_sha)
-            add_worktree(rspice_repository, rspice_worktree, rspice_sha)
+            checkout_simulator(rspice_repository, rspice_worktree, rspice_sha)
             artifact = build_release(
                 site_worktree,
                 rspice_worktree,
@@ -343,7 +367,6 @@ def main() -> int:
             else:
                 publish_branch(artifact, publisher, remote, site_sha, rspice_sha)
         finally:
-            remove_worktree(rspice_repository, rspice_worktree)
             remove_worktree(SITE_ROOT, site_worktree)
 
     if not args.build_only and not args.skip_verify:

@@ -111,5 +111,41 @@ class DeploymentTests(unittest.TestCase):
             self.assertFalse((root / "old").exists())
 
 
+    def test_the_simulator_checkout_stays_put_and_moves_to_each_commit(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            repository = root / "RSpice"
+            repository.mkdir()
+
+            def git(*arguments, cwd=repository):
+                return deploy.capture(["git", *arguments], cwd=cwd)
+
+            git("init", "--quiet")
+            git("config", "user.email", "fixture@example.com")
+            git("config", "user.name", "Fixture")
+            (repository / "a.txt").write_text("one", encoding="utf-8")
+            git("add", "a.txt")
+            git("commit", "--quiet", "-m", "one")
+            first = git("rev-parse", "HEAD")
+            (repository / "a.txt").write_text("two", encoding="utf-8")
+            git("commit", "--quiet", "-am", "two")
+            second = git("rev-parse", "HEAD")
+
+            checkout = deploy.simulator_checkout(repository)
+            self.assertEqual(checkout, root / "RSpice-deploy-source")
+            with contextlib.redirect_stdout(io.StringIO()):
+                deploy.checkout_simulator(repository, checkout, first)
+                self.assertEqual((checkout / "a.txt").read_text(encoding="utf-8"), "one")
+                (checkout / "stray.txt").write_text("left by a build", encoding="utf-8")
+                deploy.checkout_simulator(repository, checkout, second)
+            self.assertEqual(git("rev-parse", "HEAD", cwd=checkout), second)
+            self.assertEqual((checkout / "a.txt").read_text(encoding="utf-8"), "two")
+            self.assertFalse((checkout / "stray.txt").exists())
+
+            (root / "occupied").mkdir()
+            with self.assertRaises(ValueError):
+                deploy.checkout_simulator(repository, root / "occupied", second)
+
+
 if __name__ == "__main__":
     unittest.main()
