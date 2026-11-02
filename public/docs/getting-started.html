@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071015">
+  <meta name="color-scheme" content="dark">
+  <title>Getting started &mdash; RSpice</title>
+  <meta name="description" content="Run RSpice from source or in the browser, create a project or open an example, and run a first simulation.">
+  <link rel="canonical" href="https://rspice.app/docs/getting-started">
+  <link rel="icon" href="../assets/brand/rspice.ico" sizes="any">
+  <link rel="apple-touch-icon" href="../assets/brand/icon-256.png">
+  <link rel="stylesheet" href="../assets/field.css">
+  <link rel="stylesheet" href="../assets/technical.css">
+  <link rel="stylesheet" href="../assets/interior-refined.css">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Getting started &mdash; RSpice">
+  <meta property="og:description" content="Run RSpice, make a project or open an example, and run a first simulation.">
+  <meta property="og:image" content="https://rspice.app/assets/og.png">
+</head>
+<body class="technical-page docs-page">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="topbar" data-topbar>
+    <div class="topbar__inner">
+      <a class="identity" href="../index.html" aria-label="RSpice home"><img src="../assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a>
+      <button class="nav-trigger" type="button" aria-controls="site-nav" aria-expanded="false" data-nav-trigger><span class="visually-hidden">Open navigation</span><span aria-hidden="true"></span><span aria-hidden="true"></span></button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary navigation" data-site-nav>
+        <a href="../index.html#engine">Engine</a><a href="../index.html#analyses">Analyses</a><a href="../index.html#truth">Status</a><a href="../reference.html">Reference</a><a href="../validation.html">Validation</a><a href="../docs.html" aria-current="page">Docs</a>
+      </nav>
+      <div class="topbar__actions"><a class="source-link" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a><a class="launch-link" href="../ide/">Open WASM lab <span class="launch-link__tag">experimental</span></a></div>
+    </div>
+  </header>
+
+  <main id="main">
+    <header class="technical-hero">
+      <div class="page-frame technical-hero__grid">
+        <div>
+          <p class="eyebrow"><a href="../docs.html">RSPICE / DOCS</a> / GETTING STARTED</p>
+          <h1>Getting started.</h1>
+          <p class="technical-hero__lede">Run RSpice, make a project or open an example circuit, and run a first simulation.</p>
+        </div>
+        <dl class="technical-hero__ledger" aria-label="Getting started at a glance">
+          <div><dt>DESKTOP</dt><dd>Built from source; no installer yet</dd></div>
+          <div><dt>BROWSER</dt><dd>Experimental; needs WebGPU</dd></div>
+          <div><dt>FIRST CIRCUIT</dt><dd>Help &rsaquo; Examples&hellip;</dd></div>
+          <div><dt>FIND A COMMAND</dt><dd>Command palette, <kbd>Ctrl+K</kbd></dd></div>
+        </dl>
+      </div>
+    </header>
+
+    <div class="page-frame technical-layout">
+      <aside class="technical-index" aria-label="Getting started sections">
+        <p>ON THIS PAGE</p>
+        <a href="#run">Run RSpice</a><a href="#start">The start screen</a><a href="#project">Create a project</a><a href="#example">Open an example</a><a href="#workspaces">Workspaces</a><a href="#first-run">A first run</a>
+      </aside>
+
+      <article class="technical-document">
+        <section class="technical-section" id="run">
+          <p class="technical-number">01 / RUN RSPICE</p>
+          <h2>Build the desktop application, or open the browser build.</h2>
+          <p>Signed installers are not published yet, so the desktop application is built from source. With Rust installed (the repository pins the version it needs), from a checkout:</p>
+          <figure class="technical-code"><figcaption><span>shell / desktop application</span><span>Windows, macOS, Linux</span></figcaption><pre><code>git clone https://github.com/JaimeHW/RSpice.git
+cd RSpice
+cargo run --release -p rspice-app</code></pre></figure>
+          <p>The docs index has the <a href="../docs.html#build">command-line build</a> too. The browser build is the same application compiled to WebAssembly. It is experimental and needs a browser with WebGPU. A browser keeps some keys for itself, so RSpice uses others there: Run is <kbd>Ctrl+Enter</kbd> rather than <kbd>F5</kbd>, and Save is <kbd>Ctrl+Alt+S</kbd> rather than <kbd>Ctrl+S</kbd>. <a href="keyboard-shortcuts.html">Keyboard shortcuts</a> lists both sets.</p>
+        </section>
+
+        <section class="technical-section" id="start">
+          <p class="technical-number">02 / THE START SCREEN</p>
+          <h2>With no project open.</h2>
+          <p>RSpice opens on a screen headed <strong>No project open</strong>, with four ways in. The same commands are in the File menu.</p>
+          <div class="technical-table-wrap"><table class="technical-table"><thead><tr><th scope="col">ACTION</th><th scope="col">WHAT IT OPENS</th></tr></thead><tbody>
+            <tr><td>New project</td><td>A new project with a blank top cell. You name the project, its design library and the top cell.</td></tr>
+            <tr><td>Open project&hellip;</td><td>A saved project, a <code>.rspiceproj</code> file. In the browser the file is imported.</td></tr>
+            <tr><td>Open SPICE deck&hellip;</td><td>A SPICE deck as a netlist project, which has no schematic. See <a href="netlists-and-scripts.html">Netlists and scripts</a>.</td></tr>
+            <tr><td>Open schematic&hellip;</td><td>A single schematic cell view, a <code>.rsch</code> file.</td></tr>
+          </tbody></table></div>
+          <p>Under them, <strong>Recent projects</strong> lists the projects opened on this device, most recent first, with Pinned and Shared filters and a search box. If an earlier session was interrupted, an <strong>Interrupted session</strong> card offers its recovery checkpoints for review; <a href="troubleshooting.html#recovery">Troubleshooting</a> explains them.</p>
+        </section>
+
+        <section class="technical-section" id="project">
+          <p class="technical-number">03 / CREATE A PROJECT</p>
+          <h2>A project holds the design, its plans and its results.</h2>
+          <ol class="technical-list technical-list--steps">
+            <li><span>Choose <strong>File &rsaquo; New project&hellip;</strong> (<kbd>Ctrl+Shift+N</kbd>). The <strong>Create RSpice project</strong> dialog asks for a <strong>Project name</strong>.</span></li>
+            <li><span><strong>Library</strong> follows the name until you edit it, and <strong>Top cell</strong> starts as <code>top</code>. The top cell gets a <code>schematic</code> view, and the project gets a simulation plan and a drawing sheet.</span></li>
+            <li><span>Choose <strong>Create project</strong>. Nothing is written to disk until you save.</span></li>
+            <li><span>Choose <strong>File &rsaquo; Save</strong> (<kbd>Ctrl+S</kbd>). On the desktop, a project never saved before asks where its <code>.rspiceproj</code> file goes; in the browser it is kept in the browser's storage.</span></li>
+          </ol>
+          <p>If a project with unsaved changes is open, New project asks about those changes first.</p>
+        </section>
+
+        <section class="technical-section" id="example">
+          <p class="technical-number">04 / OPEN AN EXAMPLE</p>
+          <h2>Six ready-drawn circuits.</h2>
+          <p><strong>Help &rsaquo; Examples&hellip;</strong> lists six demonstration circuits. Opening one replaces the session with a new project named after the circuit, draws it as the top cell, then asks where to save it: a file you choose on the desktop, the browser's storage on the web.</p>
+          <div class="technical-table-wrap"><table class="technical-table"><thead><tr><th scope="col">EXAMPLE</th><th scope="col">CIRCUIT</th></tr></thead><tbody>
+            <tr><td>RC Lowpass Filter</td><td>R1 1k into C1 159n: a first-order low-pass with its corner at 1 kHz.</td></tr>
+            <tr><td>Voltage Divider</td><td>Two 10k resistors halving a 5 V supply.</td></tr>
+            <tr><td>Common Emitter Amplifier</td><td>An NPN stage on 12 V with base bias, collector load and emitter degeneration.</td></tr>
+            <tr><td>CMOS Inverter</td><td>A PMOS and NMOS pair on 3.3 V, switched by a pulse input.</td></tr>
+            <tr><td>Differential Pair</td><td>Two NPN transistors sharing a 1 mA tail: an op-amp input stage.</td></tr>
+            <tr><td>Opamp Inverting Amplifier</td><td>A gain of &minus;10 from 10k over 1k around a high-gain op-amp.</td></tr>
+          </tbody></table></div>
+        </section>
+
+        <section class="technical-section" id="workspaces">
+          <p class="technical-number">05 / WORKSPACES</p>
+          <h2>Eight workspaces, one project.</h2>
+          <p>Each workspace is one kind of work on the open project. Switch with <strong>Window &rsaquo; Workspace</strong> or the keys below, which are the same on the desktop and in the browser.</p>
+          <div class="technical-table-wrap"><table class="technical-table shortcut-table"><thead><tr><th scope="col">WORKSPACE</th><th scope="col">KEY</th><th scope="col">FOR</th></tr></thead><tbody>
+            <tr><td>Project</td><td><kbd>Alt+1</kbd></td><td>The project overview, its libraries and cells, configurations, dependencies and recovery.</td></tr>
+            <tr><td>Design</td><td><kbd>Alt+2</kbd></td><td>Schematics, symbols and Verilog-A views: <a href="schematic-entry.html">Schematic entry</a>.</td></tr>
+            <tr><td>Simulate</td><td><kbd>Alt+3</kbd></td><td>The simulation plan and its setup pages: <a href="simulation-setup.html">Simulation setup</a>.</td></tr>
+            <tr><td>Results</td><td><kbd>Alt+4</kbd></td><td>Retained runs and their views: <a href="results.html">Results</a>.</td></tr>
+            <tr><td>Verify</td><td><kbd>Alt+5</kbd></td><td>Yield, corners, tuning, optimization, safe operating area and regression: <a href="verification.html">Verification</a>.</td></tr>
+            <tr><td>Models</td><td><kbd>Alt+6</kbd></td><td>Model libraries and PDKs: <a href="models-and-pdks.html">Models and PDKs</a>.</td></tr>
+            <tr><td>Netlist and script editor</td><td><kbd>Alt+7</kbd></td><td>SPICE decks and Python workflows: <a href="netlists-and-scripts.html">Netlists and scripts</a>.</td></tr>
+            <tr><td>Stimulus library</td><td><kbd>Alt+8</kbd></td><td>Reusable source definitions: <a href="simulation-setup.html#stimulus">Simulation setup</a>.</td></tr>
+          </tbody></table></div>
+        </section>
+
+        <section class="technical-section" id="first-run">
+          <p class="technical-number">06 / A FIRST RUN</p>
+          <h2>Check, run, read.</h2>
+          <ol class="technical-list technical-list--steps">
+            <li><span>Open an example, or draw a circuit in the Design workspace.</span></li>
+            <li><span>Open the Simulate workspace (<kbd>Alt+3</kbd>). Its <strong>Analyses</strong> page lists the plan's analyses; <strong>Simulate &rsaquo; Add analysis&hellip;</strong> adds one, such as <strong>Transient</strong> for waveforms over time.</span></li>
+            <li><span>Choose <strong>Simulate &rsaquo; Run</strong> (<kbd>F5</kbd>; <kbd>Ctrl+Enter</kbd> in the browser). The plan is checked before any solving starts, and a plan that cannot run is refused with the reason. <strong>Simulate &rsaquo; Stop</strong> (<kbd>Shift+F5</kbd>; <kbd>Ctrl+Shift+Enter</kbd> in the browser) ends a run.</span></li>
+            <li><span>Open the Results workspace (<kbd>Alt+4</kbd>) to read the run's waveforms and values.</span></li>
+          </ol>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="page-frame footer__grid">
+      <div class="footer__identity"><a class="identity" href="../index.html"><img src="../assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a><p>Rust circuit simulator with desktop, CLI, Python, and WebAssembly interfaces.</p></div>
+      <div><h2>Technical</h2><a href="../reference.html">Generated reference</a><a href="../validation.html">Validation status</a><a href="../parity.html">Methodology</a><a href="../docs.html">Scope and builds</a></div>
+      <div><h2>Project</h2><a href="../changelog.html">Development record</a><a href="../download.html">Build from source</a><a href="../early-access.html">Early access</a><a href="../privacy.html">Privacy</a></div>
+      <div><h2>Contact</h2><a href="mailto:hello@rspice.app">General</a><a href="mailto:sales@rspice.app">Commercial</a><a href="https://github.com/JaimeHW/RSpice-Site/security" target="_blank" rel="noopener">Security</a></div>
+    </div>
+    <div class="page-frame footer__base"><span>&copy; <span data-year>2026</span> RSpice</span><span>SOURCE BUILD / HOSTED SERVICES NOT ACTIVE</span><span>IBM Plex under SIL OFL</span></div>
+  </footer>
+  <script src="../assets/field.js" defer></script>
+</body>
+</html>

@@ -251,6 +251,15 @@
   line-height: 1;
 }
 
+.technical-list--steps { counter-reset: step; }
+.technical-list--steps li { counter-increment: step; }
+.technical-list--steps li::before {
+  content: counter(step, decimal-leading-zero);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  line-height: 1.9;
+}
+
 .technical-table-wrap {
   margin-top: 24px;
   overflow-x: auto;
