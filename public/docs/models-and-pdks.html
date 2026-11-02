@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071015">
+  <meta name="color-scheme" content="dark">
+  <title>Models and PDKs &mdash; RSpice</title>
+  <meta name="description" content="Where RSpice finds device models, how to point it at model libraries, bind a model to an instance, edit a model, attach a technology and choose corner sections.">
+  <link rel="canonical" href="https://rspice.app/docs/models-and-pdks">
+  <link rel="icon" href="../assets/brand/rspice.ico" sizes="any">
+  <link rel="apple-touch-icon" href="../assets/brand/icon-256.png">
+  <link rel="stylesheet" href="../assets/field.css">
+  <link rel="stylesheet" href="../assets/technical.css">
+  <link rel="stylesheet" href="../assets/interior-refined.css">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Models and PDKs &mdash; RSpice">
+  <meta property="og:description" content="Model library paths, the Models workspace, model binding and editing, and technology attachment in RSpice.">
+  <meta property="og:image" content="https://rspice.app/assets/og.png">
+</head>
+<body class="technical-page docs-page">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="topbar" data-topbar>
+    <div class="topbar__inner">
+      <a class="identity" href="../index.html" aria-label="RSpice home"><img src="../assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a>
+      <button class="nav-trigger" type="button" aria-controls="site-nav" aria-expanded="false" data-nav-trigger><span class="visually-hidden">Open navigation</span><span aria-hidden="true"></span><span aria-hidden="true"></span></button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary navigation" data-site-nav>
+        <a href="../index.html#engine">Engine</a><a href="../index.html#analyses">Analyses</a><a href="../index.html#truth">Status</a><a href="../reference.html">Reference</a><a href="../validation.html">Validation</a><a href="../docs.html" aria-current="page">Docs</a>
+      </nav>
+      <div class="topbar__actions"><a class="source-link" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a><a class="launch-link" href="../ide/">Open WASM lab <span class="launch-link__tag">experimental</span></a></div>
+    </div>
+  </header>
+
+  <main id="main">
+    <header class="technical-hero">
+      <div class="page-frame technical-hero__grid">
+        <div>
+          <p class="eyebrow"><a href="../docs.html">RSPICE / DOCS</a> / MODELS AND PDKS</p>
+          <h1>Models and PDKs.</h1>
+          <p class="technical-hero__lede">Point RSpice at the model libraries a design needs, choose the model each instance runs with, edit a project copy of a model, and attach a technology to the project.</p>
+        </div>
+        <dl class="technical-hero__ledger" aria-label="Models and PDKs at a glance">
+          <div><dt>WORKSPACE</dt><dd>Models, <kbd>Alt+6</kbd></dd></div>
+          <div><dt>LIBRARY PATHS</dt><dd>Tools &rsaquo; PDK and model paths&hellip;</dd></div>
+          <div><dt>PER INSTANCE</dt><dd>Tools &rsaquo; Model browser&hellip;</dd></div>
+          <div><dt>PER RUN</dt><dd>Simulate &rsaquo; Setup &rsaquo; Models &amp; sections</dd></div>
+        </dl>
+      </div>
+    </header>
+
+    <div class="page-frame technical-layout">
+      <aside class="technical-index" aria-label="Models and PDKs sections">
+        <p>ON THIS PAGE</p>
+        <a href="#sources">Where models come from</a><a href="#paths">Model library paths</a><a href="#workspace">The Models workspace</a><a href="#bind">Choose an instance's model</a><a href="#edit">Edit a model</a><a href="#technology">Technology and corners</a><a href="#cli">Command line</a>
+      </aside>
+
+      <article class="technical-document">
+        <section class="technical-section" id="sources">
+          <p class="technical-number">01 / WHERE MODELS COME FROM</p>
+          <h2>Built-in devices, the foundation library, and your own files.</h2>
+          <ul class="technical-list">
+            <li><span><strong>Built-in device models</strong>: the classic SPICE elements and native compact models such as BSIM3, BSIM4, BSIM-SOI, VBIC and EKV, selected by a <code>.model</code> card's type and <code>LEVEL</code>. A MOSFET level RSpice does not list is refused rather than approximated.</span></li>
+            <li><span><strong>Generated Verilog-A models</strong>: 43 compact models generated from their Verilog-A sources, in builds made with the <code>generated-veriloga-catalog</code> feature. See <a href="verilog-a.html">Verilog-A</a>.</span></li>
+            <li><span><strong>The foundation library</strong>: a small, generic SPICE model library that every product build ships.</span></li>
+            <li><span><strong>Your model files</strong>: libraries on disk that RSpice scans, and model sources a project imports. A deck reaches them with <code>.INCLUDE</code>, <code>.LIB</code> and <code>.MODEL</code>.</span></li>
+          </ul>
+        </section>
+
+        <section class="technical-section" id="paths">
+          <p class="technical-number">02 / MODEL LIBRARY PATHS</p>
+          <h2>Tell RSpice where the model files are.</h2>
+          <p><strong>Tools &rsaquo; PDK and model paths&hellip;</strong> opens <strong>Model library paths</strong>:</p>
+          <ul class="technical-list">
+            <li><span><strong>Sources</strong> lists the library paths. Each can be included in or excluded from scans and edited in place; add one by typing a path or with <strong>Browse&hellip;</strong>, or bring one in with <strong>Import bundle&hellip;</strong>.</span></li>
+            <li><span><strong>Environment</strong> holds variables to use inside those paths.</span></li>
+            <li><span>The selected source's model files are listed with their type and sections, with a filter and an option to scan subdirectories.</span></li>
+            <li><span><strong>Rescan</strong> reads the sources again; <strong>Save</strong> keeps the changes.</span></li>
+          </ul>
+          <p><strong>Tools &rsaquo; Rescan model libraries</strong> rescans without opening the dialog.</p>
+        </section>
+
+        <section class="technical-section" id="workspace">
+          <p class="technical-number">03 / THE MODELS WORKSPACE</p>
+          <h2>Six pages over the loaded libraries.</h2>
+          <p>The Models workspace (<kbd>Alt+6</kbd>, or <strong>Tools &rsaquo; Library manager</strong>) has six pages:</p>
+          <div class="technical-table-wrap"><table class="technical-table"><thead><tr><th scope="col">PAGE</th><th scope="col">SHOWS</th></tr></thead><tbody>
+            <tr><td>Library manager</td><td>The loaded models, with which schematic instances use each and which instances name a model nothing provides, and the signed model packs this machine and project hold.</td></tr>
+            <tr><td>Symbols &amp; CDF</td><td>Project and technology symbols with their pins and device forms; pin order is netlist order. Create or import a symbol here, or open the form designer.</td></tr>
+            <tr><td>Corners &amp; sections</td><td>The corner bindings from a sectioned model library, or from a section map imported from a SPICE source whose <code>.lib</code> sections define it.</td></tr>
+            <tr><td>Bins &amp; geometry</td><td>Binned model cards, whose L, W and NFIN bounds the simulator evaluates from the imported source.</td></tr>
+            <tr><td>Include graph</td><td>The model sources' include graph, with a manifest export and a way to resolve sources that have drifted.</td></tr>
+            <tr><td>Model qualification</td><td>Which model families a release may be signed against, and on what evidence, per analysis domain.</td></tr>
+          </tbody></table></div>
+        </section>
+
+        <section class="technical-section" id="bind">
+          <p class="technical-number">04 / CHOOSE AN INSTANCE'S MODEL</p>
+          <h2>Tools &rsaquo; Model browser&hellip;</h2>
+          <p>Select an instance on the schematic and open the model browser. It lists every model a loaded library offers that the instance can take, under its library, with the card's level and key values on each row. A model the instance cannot take is not listed. A model whose name another library also uses stays listed but cannot be chosen, with the reason when you point at it.</p>
+        </section>
+
+        <section class="technical-section" id="edit">
+          <p class="technical-number">05 / EDIT A MODEL</p>
+          <h2>Edit a project-owned copy.</h2>
+          <ol class="technical-list technical-list--steps">
+            <li><span>Select a library model and choose <strong>Tools &rsaquo; Create editable project copy</strong>. The copy belongs to the project; the library is not changed.</span></li>
+            <li><span><strong>Tools &rsaquo; Edit model&hellip;</strong> opens the device-model editor on the project's definition. Its toolbar saves a model revision, validates the model, runs its qualification tests and compares it with a release.</span></li>
+          </ol>
+          <p><strong>Tools &rsaquo; Measurement correlation&hellip;</strong> compares a model with measured reference datasets kept in the project, plotting residuals at the measured points.</p>
+        </section>
+
+        <section class="technical-section" id="technology">
+          <p class="technical-number">06 / TECHNOLOGY AND CORNERS</p>
+          <h2>Bind the project to a technology, then pick a corner per run.</h2>
+          <p>The Project workspace's <strong>Dependencies</strong> page shows the project's <strong>Technology &amp; simulator binding</strong>: the technology, its model library, the root source and the source files it pins. <strong>Attach model technology&hellip;</strong> changes it. The project is saved before the binding changes, so an abandoned or failed change leaves a recoverable project, and a technology that would break pinned model sources is shown with the sources it would break. <strong>Model paths&hellip;</strong> on the same page opens Model library paths.</p>
+          <p>For a run, <strong>Simulate &rsaquo; Setup &rsaquo; Models &amp; sections</strong> shows which corner section each loaded library will use and whether its source is pinned well enough to reproduce. Process corners across several sections are set up in the run set; see <a href="verification.html#corners">Verification</a>.</p>
+        </section>
+
+        <section class="technical-section" id="cli">
+          <p class="technical-number">07 / COMMAND LINE</p>
+          <h2>Model packs from <code>rspice</code>.</h2>
+          <p><code>rspice models</code> lists the shipped SPICE model packs and looks up parts in them.</p>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="page-frame footer__grid">
+      <div class="footer__identity"><a class="identity" href="../index.html"><img src="../assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a><p>Rust circuit simulator with desktop, CLI, Python, and WebAssembly interfaces.</p></div>
+      <div><h2>Technical</h2><a href="../reference.html">Generated reference</a><a href="../validation.html">Validation status</a><a href="../parity.html">Methodology</a><a href="../docs.html">Scope and builds</a></div>
+      <div><h2>Project</h2><a href="../changelog.html">Development record</a><a href="../download.html">Build from source</a><a href="../early-access.html">Early access</a><a href="../privacy.html">Privacy</a></div>
+      <div><h2>Contact</h2><a href="mailto:hello@rspice.app">General</a><a href="mailto:sales@rspice.app">Commercial</a><a href="https://github.com/JaimeHW/RSpice-Site/security" target="_blank" rel="noopener">Security</a></div>
+    </div>
+    <div class="page-frame footer__base"><span>&copy; <span data-year>2026</span> RSpice</span><span>SOURCE BUILD / HOSTED SERVICES NOT ACTIVE</span><span>IBM Plex under SIL OFL</span></div>
+  </footer>
+  <script src="../assets/field.js" defer></script>
+</body>
+</html>
