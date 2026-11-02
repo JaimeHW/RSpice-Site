@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071015">
+  <meta name="color-scheme" content="dark">
+  <title>Verilog-A &mdash; RSpice</title>
+  <meta name="description" content="Create or import a Verilog-A module as an RSpice cell view, set how it compiles, compile it and place it, and reach the generated compact models from a deck.">
+  <link rel="canonical" href="https://rspice.app/docs/verilog-a">
+  <link rel="icon" href="../assets/brand/rspice.ico" sizes="any">
+  <link rel="apple-touch-icon" href="../assets/brand/icon-256.png">
+  <link rel="stylesheet" href="../assets/field.css">
+  <link rel="stylesheet" href="../assets/technical.css">
+  <link rel="stylesheet" href="../assets/interior-refined.css">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Verilog-A &mdash; RSpice">
+  <meta property="og:description" content="Verilog-A modules as cell views in RSpice: create, import, build settings, compile and place.">
+  <meta property="og:image" content="https://rspice.app/assets/og.png">
+</head>
+<body class="technical-page docs-page">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="topbar" data-topbar>
+    <div class="topbar__inner">
+      <a class="identity" href="../index.html" aria-label="RSpice home"><img src="../assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a>
+      <button class="nav-trigger" type="button" aria-controls="site-nav" aria-expanded="false" data-nav-trigger><span class="visually-hidden">Open navigation</span><span aria-hidden="true"></span><span aria-hidden="true"></span></button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary navigation" data-site-nav>
+        <a href="../index.html#engine">Engine</a><a href="../index.html#analyses">Analyses</a><a href="../index.html#truth">Status</a><a href="../reference.html">Reference</a><a href="../validation.html">Validation</a><a href="../docs.html" aria-current="page">Docs</a>
+      </nav>
+      <div class="topbar__actions"><a class="source-link" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a><a class="launch-link" href="../ide/">Open WASM lab <span class="launch-link__tag">experimental</span></a></div>
+    </div>
+  </header>
+
+  <main id="main">
+    <header class="technical-hero">
+      <div class="page-frame technical-hero__grid">
+        <div>
+          <p class="eyebrow"><a href="../docs.html">RSPICE / DOCS</a> / VERILOG-A</p>
+          <h1>Verilog-A.</h1>
+          <p class="technical-hero__lede">In RSpice a Verilog-A module is a view of a cell, beside its schematic and symbol. Create one or import a file, compile it in the Design workspace, and place it like any other cell.</p>
+        </div>
+        <dl class="technical-hero__ledger" aria-label="Verilog-A at a glance">
+          <div><dt>NEW</dt><dd>File &rsaquo; New Verilog-A device&hellip;</dd></div>
+          <div><dt>IMPORT</dt><dd>File &rsaquo; Import &rsaquo; Verilog-A&hellip;</dd></div>
+          <div><dt>COMPILE</dt><dd>Design &rsaquo; Compile Verilog-A</dd></div>
+          <div><dt>LANGUAGE</dt><dd>Verilog-AMS, LRM 2.4; <code>.va</code> and <code>.vams</code></dd></div>
+        </dl>
+      </div>
+    </header>
+
+    <div class="page-frame technical-layout">
+      <aside class="technical-index" aria-label="Verilog-A sections">
+        <p>ON THIS PAGE</p>
+        <a href="#create">Create a device</a><a href="#import">Import a file</a><a href="#edit">Edit and compile</a><a href="#build">Build settings</a><a href="#place">Place it</a><a href="#generated">Generated models</a><a href="#cli">Command line</a>
+      </aside>
+
+      <article class="technical-document">
+        <section class="technical-section" id="create">
+          <p class="technical-number">01 / CREATE A DEVICE</p>
+          <h2>A new cell with a starter module and a symbol.</h2>
+          <ol class="technical-list technical-list--steps">
+            <li><span>Choose <strong>File &rsaquo; New Verilog-A device&hellip;</strong>.</span></li>
+            <li><span>Pick the <strong>Library</strong> and type a <strong>Cell name</strong> (letters, digits and underscores).</span></li>
+            <li><span>List the <strong>Ports</strong>, for example <code>inp:in inn:in out:out vdd vss</code>. A direction after the colon is <code>in</code>, <code>out</code> or <code>inout</code>, and a bus is written like <code>d[7:0]</code>.</span></li>
+            <li><span>Choose <strong>Create</strong>. The cell gets a <code>veriloga</code> view holding a starter module, and a symbol generated from the module's ports.</span></li>
+          </ol>
+          <p>To add a Verilog-A view to an existing cell instead, use <strong>File &rsaquo; New cell view&hellip;</strong> and choose the Verilog-A view type.</p>
+        </section>
+
+        <section class="technical-section" id="import">
+          <p class="technical-number">02 / IMPORT A FILE</p>
+          <h2>One cell per top module.</h2>
+          <p><strong>File &rsaquo; Import &rsaquo; Verilog-A&hellip;</strong> reads a source file. Each top module the file declares becomes a cell with a <code>veriloga</code> view that owns a copy of the file. Choose the library, review what the import creates, and choose <strong>Create cells</strong>.</p>
+        </section>
+
+        <section class="technical-section" id="edit">
+          <p class="technical-number">03 / EDIT AND COMPILE</p>
+          <h2>The source editor in the Design workspace.</h2>
+          <p>A Verilog-A view opens in the Design workspace as a source editor, and the inspector shows the module's facts: its ports, its symbol, and, once compiled, the parameters an instance takes with their type, default, range and units.</p>
+          <ul class="technical-list">
+            <li><span><strong>Design &rsaquo; Compile Verilog-A</strong> compiles the view. The status reads Compiling&hellip;, then the errors and advisories found, or Compile failed; after an edit it reads Edited since the last compile. Diagnostics beyond the first few are listed in <strong>View &rsaquo; Problems</strong>.</span></li>
+            <li><span>When the module's ports differ from the cell's schematic or symbol, the editor says so, and <strong>Update symbol</strong> brings the symbol's pins in line.</span></li>
+            <li><span><strong>Replace source from file</strong> swaps one file of the view's source for a file from disk. The dialog says whether the text it replaces can be restored from the source's revision history.</span></li>
+          </ul>
+        </section>
+
+        <section class="technical-section" id="build">
+          <p class="technical-number">04 / BUILD SETTINGS</p>
+          <h2>Design &rsaquo; Build settings&hellip;</h2>
+          <p>How the open Verilog-A view compiles. <strong>Save</strong> keeps the settings; <strong>Save &amp; compile</strong> also compiles.</p>
+          <div class="technical-table-wrap"><table class="technical-table"><thead><tr><th scope="col">SETTING</th><th scope="col">CHOICES</th></tr></thead><tbody>
+            <tr><td>Entry module</td><td>Which top module the view compiles; offered only when the source declares more than one.</td></tr>
+            <tr><td>Targets</td><td>Generated Rust; Native x86-64 JIT.</td></tr>
+            <tr><td>If a target fails</td><td>Use the interpreter, or Fail the compile.</td></tr>
+            <tr><td>Include paths</td><td>Relative paths inside the source, such as <code>include/models</code>.</td></tr>
+            <tr><td>Defines and undefines</td><td>Preprocessor symbols, written <code>NAME</code> or <code>NAME=value</code>.</td></tr>
+            <tr><td>Checks</td><td>Units and ranges, Convergence, Discontinuities, Hidden state, Portability.</td></tr>
+          </tbody></table></div>
+        </section>
+
+        <section class="technical-section" id="place">
+          <p class="technical-number">05 / PLACE IT</p>
+          <h2>Use the module on a schematic.</h2>
+          <p>Once compiled, the editor reports that the cell is ready to place and offers <strong>Place in</strong> the open schematic. The cell can also be placed from <strong>Design &rsaquo; Place &rsaquo; Instance&hellip;</strong> (<kbd>Shift+I</kbd>) like any other cell.</p>
+        </section>
+
+        <section class="technical-section" id="generated">
+          <p class="technical-number">06 / GENERATED MODELS</p>
+          <h2>43 compact models, compiled ahead of time.</h2>
+          <p>Compact-model families with redistributable Verilog-A sources, such as BSIM-CMG, PSP104, HICUM and MEXTRAM, are generated to Rust and compiled into builds made with the <code>generated-veriloga-catalog</code> feature. A deck reaches one by its model name on an <code>X</code> line, or through an ordinary element whose <code>.model</code> card names the model's type or a <code>LEVEL</code> routed to it. Reaching a model proves it is wired in, not that it is numerically qualified; see <a href="../validation.html">validation</a> for what has been compared.</p>
+          <p>Beyond the analog subset, RSpice compiles the digital and real-number parts of Verilog-AMS too, so digital and <code>wreal</code> modules simulate alongside the analog solve, with connect modules inserted where a deck node joins analog and discrete ports.</p>
+        </section>
+
+        <section class="technical-section" id="cli">
+          <p class="technical-number">07 / COMMAND LINE</p>
+          <h2>Compile a module on its own.</h2>
+          <p><code>rspice compile-va</code> compiles an external Verilog-A model without the application. The source repository's <code>models/veriloga/</code> holds examples.</p>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="page-frame footer__grid">
+      <div class="footer__identity"><a class="identity" href="../index.html"><img src="../assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a><p>Rust circuit simulator with desktop, CLI, Python, and WebAssembly interfaces.</p></div>
+      <div><h2>Technical</h2><a href="../reference.html">Generated reference</a><a href="../validation.html">Validation status</a><a href="../parity.html">Methodology</a><a href="../docs.html">Scope and builds</a></div>
+      <div><h2>Project</h2><a href="../changelog.html">Development record</a><a href="../download.html">Build from source</a><a href="../early-access.html">Early access</a><a href="../privacy.html">Privacy</a></div>
+      <div><h2>Contact</h2><a href="mailto:hello@rspice.app">General</a><a href="mailto:sales@rspice.app">Commercial</a><a href="https://github.com/JaimeHW/RSpice-Site/security" target="_blank" rel="noopener">Security</a></div>
+    </div>
+    <div class="page-frame footer__base"><span>&copy; <span data-year>2026</span> RSpice</span><span>SOURCE BUILD / HOSTED SERVICES NOT ACTIVE</span><span>IBM Plex under SIL OFL</span></div>
+  </footer>
+  <script src="../assets/field.js" defer></script>
+</body>
+</html>
