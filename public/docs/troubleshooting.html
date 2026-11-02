@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071015">
+  <meta name="color-scheme" content="dark">
+  <title>Troubleshooting &mdash; RSpice</title>
+  <meta name="description" content="What to do when an RSpice run is refused or does not converge, how to recover interrupted work, start in safe mode, reset the layout, and report a problem.">
+  <link rel="canonical" href="https://rspice.app/docs/troubleshooting">
+  <link rel="icon" href="../assets/brand/rspice.ico" sizes="any">
+  <link rel="apple-touch-icon" href="../assets/brand/icon-256.png">
+  <link rel="stylesheet" href="../assets/field.css">
+  <link rel="stylesheet" href="../assets/technical.css">
+  <link rel="stylesheet" href="../assets/interior-refined.css">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Troubleshooting &mdash; RSpice">
+  <meta property="og:description" content="Refused runs, convergence, recovery, safe mode, layout and problem reports in RSpice.">
+  <meta property="og:image" content="https://rspice.app/assets/og.png">
+</head>
+<body class="technical-page docs-page">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="topbar" data-topbar>
+    <div class="topbar__inner">
+      <a class="identity" href="../index.html" aria-label="RSpice home"><img src="../assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a>
+      <button class="nav-trigger" type="button" aria-controls="site-nav" aria-expanded="false" data-nav-trigger><span class="visually-hidden">Open navigation</span><span aria-hidden="true"></span><span aria-hidden="true"></span></button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary navigation" data-site-nav>
+        <a href="../index.html#engine">Engine</a><a href="../index.html#analyses">Analyses</a><a href="../index.html#truth">Status</a><a href="../reference.html">Reference</a><a href="../validation.html">Validation</a><a href="../docs.html" aria-current="page">Docs</a>
+      </nav>
+      <div class="topbar__actions"><a class="source-link" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a><a class="launch-link" href="../ide/">Open WASM lab <span class="launch-link__tag">experimental</span></a></div>
+    </div>
+  </header>
+
+  <main id="main">
+    <header class="technical-hero">
+      <div class="page-frame technical-hero__grid">
+        <div>
+          <p class="eyebrow"><a href="../docs.html">RSPICE / DOCS</a> / TROUBLESHOOTING</p>
+          <h1>Troubleshooting.</h1>
+          <p class="technical-hero__lede">Where to look when a run is refused or does not converge, how to get interrupted work back, and what to send when something is wrong with RSpice itself.</p>
+        </div>
+        <dl class="technical-hero__ledger" aria-label="Troubleshooting at a glance">
+          <div><dt>WHAT IS WRONG NOW</dt><dd>View &rsaquo; Problems</dd></div>
+          <div><dt>WHAT HAPPENED</dt><dd>View &rsaquo; Console, <kbd>Ctrl+J</kbd></dd></div>
+          <div><dt>RECOVERY</dt><dd>File &rsaquo; Open recent &rsaquo; All projects&hellip;</dd></div>
+          <div><dt>REPORT</dt><dd>Help &rsaquo; Report a problem&hellip;</dd></div>
+        </dl>
+      </div>
+    </header>
+
+    <div class="page-frame technical-layout">
+      <aside class="technical-index" aria-label="Troubleshooting sections">
+        <p>ON THIS PAGE</p>
+        <a href="#problems">Problems and Console</a><a href="#refused">A refused run</a><a href="#convergence">Convergence</a><a href="#recovery">Recover interrupted work</a><a href="#safe-mode">Safe mode</a><a href="#layout">Lost panels and windows</a><a href="#browser">The browser build</a><a href="#report">Report a problem</a>
+      </aside>
+
+      <article class="technical-document">
+        <section class="technical-section" id="problems">
+          <p class="technical-number">01 / PROBLEMS AND CONSOLE</p>
+          <h2>Two lists, two questions.</h2>
+          <p><strong>View &rsaquo; Problems</strong> lists the conditions that stand against the design now: check findings, run refusals, compile errors. A finding leaves the list when the design stops causing it; one whose inputs have changed since it was found is shown faint as stale rather than dropped. A finding that knows where it is takes you there when you click it.</p>
+          <p><strong>View &rsaquo; Console</strong> (<kbd>Ctrl+J</kbd>; <kbd>Ctrl+Alt+J</kbd> in the browser) is the session's record of what happened, in order, and keeps entries after they stop being true.</p>
+        </section>
+
+        <section class="technical-section" id="refused">
+          <p class="technical-number">02 / A REFUSED RUN</p>
+          <h2>Refused before any solving, with the reason.</h2>
+          <p>Every run is checked first, and the engine builds every deck it would run before solving any of them. Whatever it refuses blocks the run, and the reason, naming the analysis, the instance and what is wrong, is listed in Problems. <strong>Simulate &rsaquo; Check and netlist</strong> runs the same checks without starting a run.</p>
+          <ul class="technical-list">
+            <li><span>A deck that needs physics RSpice does not have stops with an error naming the parameter or model level responsible; RSpice does not approximate around it.</span></li>
+            <li><span>An output expression that names a node the design does not have is flagged on <strong>Simulate &rsaquo; Setup &rsaquo; Outputs &amp; expressions</strong>.</span></li>
+            <li><span>A specification whose measurement no analysis produces is flagged on <strong>Requirements &amp; specifications</strong>.</span></li>
+            <li><span>Design problems found by <strong>Design &rsaquo; Check cellview</strong> (<kbd>Ctrl+E</kbd>) or <strong>Check design</strong> are listed with the rest; see <a href="schematic-entry.html#check">Schematic entry</a>.</span></li>
+          </ul>
+        </section>
+
+        <section class="technical-section" id="convergence">
+          <p class="technical-number">03 / CONVERGENCE</p>
+          <h2>When the solve does not converge.</h2>
+          <p>The engine's Newton solver has four aids for hard circuits: gmin stepping, source stepping, pseudo-transient continuation and arc-length continuation. <strong>Simulate &rsaquo; Setup &rsaquo; Simulator options</strong> sets what counts as converged, how the solve recovers when it does not, how many iterations each stage gets, how time advances, and how the matrix is factored. Its values reach the engine through the deck's <code>.OPTIONS</code> block.</p>
+        </section>
+
+        <section class="technical-section" id="recovery">
+          <p class="technical-number">04 / RECOVER INTERRUPTED WORK</p>
+          <h2>Checkpoints, compared before anything is replaced.</h2>
+          <p>If a session ends with work unsaved, the start screen shows an <strong>Interrupted session</strong> card; choose <strong>Review&hellip;</strong>. The same checkpoints are on the <strong>Recovery</strong> page of the project launcher (<strong>File &rsaquo; Open recent &rsaquo; All projects&hellip;</strong>, <kbd>Ctrl+Shift+O</kbd>), and the Project workspace has a Recovery page for the open project.</p>
+          <ul class="technical-list">
+            <li><span>Each checkpoint states where it came from, when it was captured and what it does not include.</span></li>
+            <li><span><strong>Open recovery comparison</strong> opens a comparison copy; recovery never overwrites the saved project. A checkpoint that fails its integrity check cannot be opened this way.</span></li>
+            <li><span><strong>Discard selected checkpoint&hellip;</strong> deletes only that checkpoint; the saved source is not modified.</span></li>
+          </ul>
+        </section>
+
+        <section class="technical-section" id="safe-mode">
+          <p class="technical-number">05 / SAFE MODE</p>
+          <h2>Start with less, to find what is wrong.</h2>
+          <p>The project launcher's <strong>Safe mode</strong> page turns features off for this launch of RSpice only. Choose any of:</p>
+          <div class="technical-table-wrap"><table class="technical-table"><thead><tr><th scope="col">OPTION</th><th scope="col">EFFECT</th></tr></thead><tbody>
+            <tr><td>Disable third-party extensions</td><td>Built-in signed components remain available.</td></tr>
+            <tr><td>Do not reopen prior documents</td><td>Start in the empty workbench with project files closed.</td></tr>
+            <tr><td>Reset dock and monitor geometry</td><td>Recover panels and windows to the primary display.</td></tr>
+            <tr><td>Open project read-only</td><td>Prevent working-document writes while you diagnose content.</td></tr>
+            <tr><td>Disable GPU acceleration</td><td>Listed, but this build cannot switch to a software renderer after start-up, so it cannot be chosen.</td></tr>
+          </tbody></table></div>
+          <p>Then choose <strong>Start RSpice in safe mode</strong>. Safe mode lasts until RSpice restarts; the session from before it is kept for the next normal launch.</p>
+        </section>
+
+        <section class="technical-section" id="layout">
+          <p class="technical-number">06 / LOST PANELS AND WINDOWS</p>
+          <h2>Put the workbench back.</h2>
+          <p><strong>Window &rsaquo; Layout &rsaquo; Reset layout</strong> returns the side docks to their default widths and collapses the console. <strong>View &rsaquo; Focus mode</strong> (<kbd>Ctrl+Shift+F</kbd>) hides the console and the side docks; the same key brings them back. On the desktop, <strong>Window &rsaquo; Recover off-screen windows&hellip;</strong> brings the application windows you select back onto the screen, and <strong>Merge all windows&hellip;</strong> gathers detached windows back into one.</p>
+        </section>
+
+        <section class="technical-section" id="browser">
+          <p class="technical-number">07 / THE BROWSER BUILD</p>
+          <h2>Experimental, and it needs WebGPU.</h2>
+          <p>The browser build draws with WebGPU, so it needs a browser that supports it. Phones and tablets are not a qualified target. Some keys differ from the desktop because the browser keeps them: <a href="keyboard-shortcuts.html">Keyboard shortcuts</a> lists both. Projects saved in the browser are kept in that browser's storage.</p>
+        </section>
+
+        <section class="technical-section" id="report">
+          <p class="technical-number">08 / REPORT A PROBLEM</p>
+          <h2>Help &rsaquo; Report a problem&hellip;</h2>
+          <p>The dialog shows what support needs to reproduce a problem: the RSpice version, the platform, the graphics adapter, the file the session log is written to, and the address to write to, <a href="mailto:hello@rspice.app">hello@rspice.app</a>.</p>
+          <ol class="technical-list technical-list--steps">
+            <li><span>Choose whether to include the session log. Your home folder is removed from it.</span></li>
+            <li><span>Tick <strong>I reviewed what the bundle contains</strong>, then <strong>Create support bundle&hellip;</strong> and choose where to save it.</span></li>
+            <li><span>Send the bundle with a description of what happened.</span></li>
+          </ol>
+          <p>A support bundle is made only when you create one, and it is saved where you choose: you send it yourself. Project content, models, results, credentials, license keys and recovery checkpoints are excluded. <strong>Help &rsaquo; About RSpice</strong> has <strong>Copy diagnostics</strong>, which copies the version and platform details to the clipboard. Report a security issue through the <a href="https://github.com/JaimeHW/RSpice-Site/security" target="_blank" rel="noopener">security policy</a> instead.</p>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="page-frame footer__grid">
+      <div class="footer__identity"><a class="identity" href="../index.html"><img src="../assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a><p>Rust circuit simulator with desktop, CLI, Python, and WebAssembly interfaces.</p></div>
+      <div><h2>Technical</h2><a href="../reference.html">Generated reference</a><a href="../validation.html">Validation status</a><a href="../parity.html">Methodology</a><a href="../docs.html">Scope and builds</a></div>
+      <div><h2>Project</h2><a href="../changelog.html">Development record</a><a href="../download.html">Build from source</a><a href="../early-access.html">Early access</a><a href="../privacy.html">Privacy</a></div>
+      <div><h2>Contact</h2><a href="mailto:hello@rspice.app">General</a><a href="mailto:sales@rspice.app">Commercial</a><a href="https://github.com/JaimeHW/RSpice-Site/security" target="_blank" rel="noopener">Security</a></div>
+    </div>
+    <div class="page-frame footer__base"><span>&copy; <span data-year>2026</span> RSpice</span><span>SOURCE BUILD / HOSTED SERVICES NOT ACTIVE</span><span>IBM Plex under SIL OFL</span></div>
+  </footer>
+  <script src="../assets/field.js" defer></script>
+</body>
+</html>
