@@ -17,7 +17,6 @@ from reference_catalog import (
     require_table,
     render_reference,
     strip_markdown,
-    parse_nightly_configuration,
     validation_artifact_data,
     workspace_metadata,
 )
@@ -55,8 +54,6 @@ class MarkdownTableTests(unittest.TestCase):
             ),
             "tests/ngspice/validation-manifest.tsv": "circuit.cir\top\n",
             "tests/xyce/RSPICE-HARNESS-MANIFEST.tsv": "circuit.cir\ttran\n",
-            ".github/workflows/nightly.yml": '# TOTAL +2 tests\nMAX_FAILING: "0"\n',
-            "benchmarks/scoreboards/scoreboard.json": "{}",
         }
         with tempfile.TemporaryDirectory() as temporary:
             source = Path(temporary)
@@ -143,12 +140,7 @@ class ValidationParserTests(unittest.TestCase):
                     self.assertEqual((root / "output/reference/raw" / name).read_bytes(),
                                      b"first\nsecond\n")
 
-    def test_parses_nightly_gate_and_conformance_aggregate(self) -> None:
-        workflow = 'RUST_TOOLCHAIN: "1.94.0"\nMAX_FAILING: "2"\n# TOTAL +113 tests\n'
-        self.assertEqual(
-            parse_nightly_configuration(workflow),
-            {"configured_total": 113, "max_failing": 2, "rust_toolchain": "1.94.0"},
-        )
+    def test_parses_conformance_aggregate(self) -> None:
         self.assertEqual(
             parse_conformance_log("detail\nTOTAL 113 tests: 112 passed, 1 failed\n"),
             {

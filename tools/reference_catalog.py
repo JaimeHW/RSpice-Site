@@ -23,8 +23,6 @@ MAX_CI_ARTIFACT_BYTES = 25 * 1024 * 1024
 SOURCE_ARTIFACTS = {
     Path("tests/ngspice/validation-manifest.tsv"): "ngspice-validation-manifest.tsv",
     Path("tests/xyce/RSPICE-HARNESS-MANIFEST.tsv"): "xyce-harness-manifest.tsv",
-    Path(".github/workflows/nightly.yml"): "nightly.yml",
-    Path("benchmarks/scoreboards/scoreboard.json"): "benchmark-scoreboard.json",
 }
 
 
@@ -185,19 +183,6 @@ def parse_tsv(path: Path) -> list[dict[str, str]]:
     return rows
 
 
-def parse_nightly_configuration(text: str) -> dict[str, Any]:
-    total_match = re.search(r"TOTAL \+(\d+) tests", text)
-    failing_match = re.search(r'MAX_FAILING:\s*"(\d+)"', text)
-    toolchain_match = re.search(r'RUST_TOOLCHAIN:\s*"([^"]+)"', text)
-    if not total_match or not failing_match:
-        raise ValueError("nightly workflow is missing the conformance total or failure watermark")
-    return {
-        "configured_total": int(total_match.group(1)),
-        "max_failing": int(failing_match.group(1)),
-        "rust_toolchain": toolchain_match.group(1) if toolchain_match else None,
-    }
-
-
 def parse_conformance_log(text: str) -> dict[str, Any]:
     aggregate = next(
         (line.strip() for line in text.splitlines() if re.match(r"^TOTAL\s+\d+\s+tests", line)),
@@ -309,8 +294,6 @@ def collect_catalog(
         Path("crates/rspice-cli/README.md"),
         Path("tests/ngspice/validation-manifest.tsv"),
         Path("tests/xyce/RSPICE-HARNESS-MANIFEST.tsv"),
-        Path(".github/workflows/nightly.yml"),
-        Path("benchmarks/scoreboards/scoreboard.json"),
     ]
     required = [source / relative for relative in required_relative]
     missing = [path for path in required if not path.is_file()]
@@ -339,11 +322,6 @@ def collect_catalog(
     workspace = workspace_metadata(read_utf8(source / "Cargo.toml"))
     ngspice_manifest = parse_tsv(source / "tests/ngspice/validation-manifest.tsv")
     xyce_manifest = parse_tsv(source / "tests/xyce/RSPICE-HARNESS-MANIFEST.tsv")
-    nightly = parse_nightly_configuration(read_utf8(source / ".github/workflows/nightly.yml"))
-    try:
-        benchmarks = json.loads(read_utf8(source / "benchmarks/scoreboards/scoreboard.json"))
-    except json.JSONDecodeError as exc:
-        raise ValueError(f"invalid benchmark scoreboard JSON: {exc}") from exc
 
     return {
         "schema_version": 1,
@@ -360,7 +338,6 @@ def collect_catalog(
         "workspace": table_records(require_table(root_tables, None, ["Crate", "Purpose"])),
         "cli_tables": [table for table in cli_tables if table["rows"]],
         "validation": {
-            "nightly": nightly,
             "ngspice_manifest": {
                 "entries": len(ngspice_manifest),
                 "modes": dict(sorted(Counter(row["mode"] for row in ngspice_manifest).items())),
@@ -371,7 +348,6 @@ def collect_catalog(
             },
             "ci": validation_artifact_data(validation_artifacts, revision, validation_run_url),
         },
-        "benchmarks": benchmarks,
     }
 
 
@@ -381,13 +357,6 @@ def escape(value: Any) -> str:
 
 def search_text(*values: Any) -> str:
     return " ".join(str(value) for value in values).lower()
-
-
-def format_decimal(value: Any, places: int = 3) -> str:
-    try:
-        return f"{float(value):.{places}f}"
-    except (TypeError, ValueError):
-        return ""
 
 
 def common_head(title: str, description: str, canonical_path: str, extra: str = "") -> str:
@@ -533,13 +502,12 @@ def render_reference(catalog: dict[str, Any]) -> str:
 def render_validation(catalog: dict[str, Any], copied_ci_files: list[dict[str, Any]]) -> str:
     source = catalog["source"]
     validation = catalog["validation"]
-    nightly = validation["nightly"]
     ci = validation["ci"]
     revision_url = f"{source['repository']}/commit/{source['revision']}"
 
     if not ci["available"]:
         ci_label = "NOT IMPORTED"
-        ci_copy = "No matching nightly artifact was supplied to this build. The page below reports source-controlled manifests and gate configuration, not a current pass result."
+        ci_copy = "No matching nightly artifact was supplied to this build. The page below reports source-controlled manifests, not a current pass result."
     elif ci["revision_match"] is False:
         ci_label = "REVISION MISMATCH"
         ci_copy = "Validation artifacts were present but identify a different source revision, so they are published only as raw files and not treated as results for this catalog."
@@ -558,10 +526,6 @@ def render_validation(catalog: dict[str, Any], copied_ci_files: list[dict[str, A
         f"<tr><td>{escape(mode)}</td><td>{count}</td></tr>"
         for mode, count in validation["ngspice_manifest"]["modes"].items()
     )
-    benchmark_rows = "".join(
-        f"<tr><td>{escape(result.get('deck'))}</td><td>{format_decimal(result.get('rspice_ms', {}).get('median'))}</td><td>{format_decimal(result.get('ngspice_ms', {}).get('median'))}</td><td>{format_decimal(result.get('speedup_median'))}</td></tr>"
-        for result in catalog.get("benchmarks", {}).get("results", [])
-    )
     artifact_links = "".join(
         f'<li><a href="{escape(item["href"])}">{escape(item["label"])}</a><span>{escape(item["bytes"])} bytes</span></li>'
         for item in copied_ci_files
@@ -572,18 +536,17 @@ def render_validation(catalog: dict[str, Any], copied_ci_files: list[dict[str, A
         else ""
     )
 
-    description = "Revision-pinned RSpice validation configuration, manifest inventory, imported CI results, raw artifacts, and benchmark context."
+    description = "Revision-pinned RSpice manifest inventory, imported CI results, and raw artifacts."
     return f"""{common_head('Validation status', description, 'validation')}
 <body class="technical-page validation-page">
   {common_navigation('validation')}
   <main id="main">
-    <header class="technical-hero"><div class="page-frame technical-hero__grid"><div><p class="eyebrow">RSPICE / REVISION-PINNED VALIDATION</p><h1>Configured gates, imported CI results, and raw validation files.</h1><p class="technical-hero__lede">Every count on this page is tied to source commit <a href="{escape(revision_url)}" target="_blank" rel="noopener"><code>{escape(source['short_revision'])}</code></a>. Missing CI data stays missing instead of being replaced with an unversioned percentage.</p></div><dl class="technical-hero__ledger"><div><dt>SOURCE REVISION</dt><dd>{escape(source['short_revision'])}</dd></div><div><dt>NGSPICE GATE</dt><dd>{nightly['configured_total']} decks / ≤ {nightly['max_failing']} failing</dd></div><div><dt>XYCE CONTRACTS</dt><dd>{validation['xyce_manifest']['entries']} manifest entries</dd></div><div><dt>CI ARTIFACT</dt><dd>{ci_label}</dd></div></dl></div></header>
+    <header class="technical-hero"><div class="page-frame technical-hero__grid"><div><p class="eyebrow">RSPICE / REVISION-PINNED VALIDATION</p><h1>Corpus manifests, imported CI results, and raw validation files.</h1><p class="technical-hero__lede">Every count on this page is tied to source commit <a href="{escape(revision_url)}" target="_blank" rel="noopener"><code>{escape(source['short_revision'])}</code></a>. Missing CI data stays missing instead of being replaced with an unversioned percentage.</p></div><dl class="technical-hero__ledger"><div><dt>SOURCE REVISION</dt><dd>{escape(source['short_revision'])}</dd></div><div><dt>NGSPICE MANIFEST</dt><dd>{validation['ngspice_manifest']['entries']} classified entries</dd></div><div><dt>XYCE CONTRACTS</dt><dd>{validation['xyce_manifest']['entries']} manifest entries</dd></div><div><dt>CI ARTIFACT</dt><dd>{ci_label}</dd></div></dl></div></header>
     <div class="page-frame validation-layout">
       <section class="validation-status"><div><p class="technical-number">IMPORTED RUN STATUS</p><h2>{ci_label}</h2><p>{ci_copy}</p></div><div class="technical-actions">{run_link}<a class="button button--quiet" href="reference/catalog.json">Catalog JSON</a></div></section>
-      <section class="reference-section"><header><div><p class="technical-number">01 / SOURCE-CONTROLLED GATES</p><h2>Nightly and corpus configuration</h2></div></header><div class="technical-grid technical-grid--three"><article><span>NGSPICE</span><h3>{nightly['configured_total']} aggregate decks</h3><p>The nightly ratchet allows no more than {nightly['max_failing']} failing decks and fails if the aggregate row or pinned deck count disappears.</p></article><article><span>NGSPICE MANIFEST</span><h3>{validation['ngspice_manifest']['entries']} classified entries</h3><p>Modes distinguish numeric comparison, smoke execution, locked grids, engineering measures, and expected unsupported or unsolvable cases.</p></article><article><span>XYCE MANIFEST</span><h3>{validation['xyce_manifest']['entries']} retained contracts</h3><p>Wrapper-dependent Xyce decks stay listed until their upstream runner behavior is implemented.</p></article></div></section>
+      <section class="reference-section"><header><div><p class="technical-number">01 / SOURCE-CONTROLLED MANIFESTS</p><h2>Corpus configuration</h2></div></header><div class="technical-grid"><article><span>NGSPICE MANIFEST</span><h3>{validation['ngspice_manifest']['entries']} classified entries</h3><p>Modes distinguish numeric comparison, smoke execution, locked grids, engineering measures, and expected unsupported or unsolvable cases.</p></article><article><span>XYCE MANIFEST</span><h3>{validation['xyce_manifest']['entries']} retained contracts</h3><p>Wrapper-dependent Xyce decks stay listed until their upstream runner behavior is implemented.</p></article></div></section>
       <section class="reference-section"><header><div><p class="technical-number">02 / NGSPICE MANIFEST</p><h2>Classification counts</h2></div></header><div class="technical-table-wrap"><table class="technical-table"><thead><tr><th>MODE</th><th>ENTRIES</th></tr></thead><tbody>{mode_rows}</tbody></table></div></section>
-      <section class="reference-section"><header><div><p class="technical-number">03 / IMPORTED ARTIFACTS</p><h2>Machine-readable and raw files</h2></div></header><ul class="artifact-list">{artifact_links}</ul><div class="reference-downloads"><a href="reference/raw/ngspice-validation-manifest.tsv">ngspice manifest</a><a href="reference/raw/xyce-harness-manifest.tsv">Xyce manifest</a><a href="reference/raw/nightly.yml">nightly workflow</a><a href="reference/catalog.json">full catalog JSON</a></div></section>
-      <section class="reference-section"><header><div><p class="technical-number">04 / SOURCE-CONTROLLED BENCHMARK</p><h2>Published scoreboard context</h2></div><p class="reference-section__lede">These timings come from the source-controlled scoreboard, not the imported CI run. Host, executable paths, repeat count, and methodology remain in the raw JSON.</p></header><div class="technical-table-wrap"><table class="technical-table"><thead><tr><th>DECK</th><th>RSPICE MEDIAN MS</th><th>NGSPICE MEDIAN MS</th><th>NGSPICE / RSPICE</th></tr></thead><tbody>{benchmark_rows}</tbody></table></div><div class="reference-downloads"><a href="reference/raw/benchmark-scoreboard.json">Download scoreboard JSON</a><a href="parity.html">Read validation methodology</a></div></section>
+      <section class="reference-section"><header><div><p class="technical-number">03 / IMPORTED ARTIFACTS</p><h2>Machine-readable and raw files</h2></div></header><ul class="artifact-list">{artifact_links}</ul><div class="reference-downloads"><a href="reference/raw/ngspice-validation-manifest.tsv">ngspice manifest</a><a href="reference/raw/xyce-harness-manifest.tsv">Xyce manifest</a><a href="reference/catalog.json">full catalog JSON</a></div></section>
     </div>
   </main>
   {common_footer()}

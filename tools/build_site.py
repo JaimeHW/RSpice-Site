@@ -24,8 +24,6 @@ RSPICE_CATALOG_FILES = (
     "crates/rspice-cli/README.md",
     "tests/ngspice/validation-manifest.tsv",
     "tests/xyce/RSPICE-HARNESS-MANIFEST.tsv",
-    ".github/workflows/nightly.yml",
-    "benchmarks/scoreboards/scoreboard.json",
 )
 WORKBENCH_ASSET_REWRITES = {
     "../../assets/brand/logo.svg": "../assets/brand/logo.svg",

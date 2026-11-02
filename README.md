@@ -40,10 +40,10 @@ were built from a different simulator revision.
 
 The `/reference` and `/validation` pages are generated from an exact RSpice Git
 checkout. `tools/reference_catalog.py` reads the source README tables, CLI
-reference, workspace metadata, ngspice and Xyce manifests, nightly gate, and
-benchmark scoreboard; it writes the searchable page, a machine-readable catalog,
-and copies the source-controlled raw inputs under `public/reference/`. Refresh
-the checked-in snapshot and its CI pin together from a clean RSpice checkout:
+reference, workspace metadata, and ngspice and Xyce manifests; it writes the
+searchable page, a machine-readable catalog, and copies the source-controlled
+raw inputs under `public/reference/`. Refresh the checked-in snapshot and its
+CI pin together from a clean RSpice checkout:
 
 ```shell
 python tools/sync_reference.py --rspice-source ../RSpice

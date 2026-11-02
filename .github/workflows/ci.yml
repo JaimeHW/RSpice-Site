@@ -48,8 +48,6 @@ jobs:
             /crates/rspice-ui/web/automation-worker.js
             /tests/ngspice/validation-manifest.tsv
             /tests/xyce/RSPICE-HARNESS-MANIFEST.tsv
-            /.github/workflows/nightly.yml
-            /benchmarks/scoreboards/scoreboard.json
             /mockups/rspice-workbench-host/public/rspice/**
             /mockups/rspice-workbench-host/public/crates/rspice-ui/assets/fonts/**
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
@@ -87,7 +85,7 @@ jobs:
           source_sha=$(git -C rspice-source rev-parse HEAD)
           matching=$(gh run list --repo JaimeHW/RSpice --workflow nightly.yml --branch main --status completed --limit 50 --json databaseId,headSha,url,conclusion | jq -c --arg sha "$source_sha" 'map(select(.headSha == $sha)) | first // empty')
           if [ -z "$matching" ]; then
-            echo "No completed Nightly run exactly matches $source_sha; publishing configured gates without a pass result."
+            echo "No completed Nightly run exactly matches $source_sha; publishing manifests without a pass result."
             exit 0
           fi
           run_id=$(jq -r '.databaseId' <<< "$matching")

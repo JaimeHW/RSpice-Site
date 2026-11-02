@@ -93,7 +93,7 @@
         <dl class="hero-dossier" aria-label="Generated source inventory">
           <div><dt>SOURCE REVISION</dt><dd><a href="reference.html"><span data-catalog-field="source.short_revision">c216a0922ae3</span></a></dd></div>
           <div><dt>WORKSPACE</dt><dd>v<span data-catalog-field="source.version">0.1.0</span> / Rust <span data-catalog-field="source.rust_version">1.94</span></dd></div>
-          <div><dt>NIGHTLY GATE</dt><dd><span data-catalog-field="validation.nightly.configured_total">113</span> ngspice decks configured</dd></div>
+          <div><dt>NGSPICE MANIFEST</dt><dd><span data-catalog-field="validation.ngspice_manifest.entries">49</span> classified entries</dd></div>
           <div><dt>RETAINED CORPUS</dt><dd><span data-catalog-field="validation.xyce_manifest.entries">2123</span> Xyce contracts</dd></div>
           <div><dt>HOSTED STATE</dt><dd>Identity / sync / compute not active</dd></div>
         </dl>
@@ -361,14 +361,13 @@ EXIT   0</span></code></pre>
         <header class="section-title section-title--split dossier-heading">
           <div>
             <p class="eyebrow">08 / VALIDATION EVIDENCE</p>
-            <h2 id="evidence-title">Configured gates, retained corpora, and raw files stay separate from pass claims.</h2>
+            <h2 id="evidence-title">Retained corpora and raw files stay separate from pass claims.</h2>
           </div>
-          <p>The public validation page is regenerated from the exact RSpice source commit. A CI conclusion is shown only when the downloaded artifact names that same commit; otherwise the site reports configuration and inventories without inventing a pass percentage.</p>
+          <p>The public validation page is regenerated from the exact RSpice source commit. A CI conclusion is shown only when the downloaded artifact names that same commit; otherwise the site reports source-controlled inventories without inventing a pass percentage.</p>
         </header>
 
         <div class="evidence-ledger">
           <article><span>SOURCE</span><strong data-catalog-field="source.short_revision">c216a0922ae3</strong><p>Commit used for the generated reference and validation inventory.</p></article>
-          <article><span>NIGHTLY RATCHET</span><strong><span data-catalog-field="validation.nightly.configured_total">113</span> decks</strong><p>Configured aggregate; no more than <span data-catalog-field="validation.nightly.max_failing">2</span> failing decks.</p></article>
           <article><span>NGSPICE MANIFEST</span><strong><span data-catalog-field="validation.ngspice_manifest.entries">49</span> entries</strong><p>Numeric, smoke, locked-grid, measure, scripted, and expected-unsolvable modes.</p></article>
           <article><span>XYCE MANIFEST</span><strong><span data-catalog-field="validation.xyce_manifest.entries">2123</span> contracts</strong><p>Retained deck and wrapper requirements, not a claim of successful execution.</p></article>
         </div>
@@ -378,7 +377,6 @@ EXIT   0</span></code></pre>
           <article><span>02</span><h3>Oracle replay</h3><p>Retained inputs and outputs for history-coupled devices and numerical state transitions.</p></article>
           <article><span>03</span><h3>ngspice corpus</h3><p>Deck-by-deck execution with probe-aware floors, relative tolerance, watchdogs, and explicit aggregate output.</p></article>
           <article><span>04</span><h3>Xyce contracts</h3><p>Runtime decks plus retained wrapper requirements that remain visible until the harness implements them.</p></article>
-          <article><span>05</span><h3>Benchmark context</h3><p>Source-controlled host, executable paths, repeats, deck names, medians, and raw scoreboard JSON.</p></article>
         </div>
         <div class="evidence-actions"><a class="button button--hot" href="validation.html">Open revision-pinned validation</a><a class="button button--quiet" href="reference/catalog.json">Inspect catalog JSON</a><a class="button button--quiet" href="parity.html">Read comparison methodology</a></div>
       </div>
@@ -403,7 +401,7 @@ EXIT   0</span></code></pre>
           <article role="row"><span class="truth-pill truth-pill--ready" role="cell">SOURCE BUILD</span><h3 role="cell">Verilog-A toolchain</h3><p role="cell">Parser, semantic IR, bytecode VM, x64-first JIT, standalone compilation, and generated-Rust built-in paths are present behind their applicable features.</p><a role="cell" href="reference.html">Inspect compiler surface <span aria-hidden="true">&nearr;</span></a></article>
           <article role="row"><span class="truth-pill truth-pill--test" role="cell">EXPERIMENTAL</span><h3 role="cell">WebAssembly &amp; browser IDE</h3><p role="cell">The desktop application compiled to WebAssembly. It needs a WebGPU-capable browser; phones and tablets are not a qualified target.</p><a role="cell" href="ide/">Open WASM lab <span aria-hidden="true">↗</span></a></article>
           <article role="row"><span class="truth-pill truth-pill--concept" role="cell">MOCKUP</span><h3 role="cell">New Workbench UI</h3><p role="cell">The embedded desktop, tablet, and phone layouts are HTML design mockups, not the current egui application.</p><a role="cell" href="#product">Inspect mockup <span aria-hidden="true">↗</span></a></article>
-          <article role="row"><span class="truth-pill truth-pill--test" role="cell">GENERATED</span><h3 role="cell">Reference &amp; validation status</h3><p role="cell">The catalog, gate configuration, manifest counts, benchmark context, and raw files are generated from the source commit named on each page.</p><a role="cell" href="validation.html">Open generated status <span aria-hidden="true">&nearr;</span></a></article>
+          <article role="row"><span class="truth-pill truth-pill--test" role="cell">GENERATED</span><h3 role="cell">Reference &amp; validation status</h3><p role="cell">The catalog, manifest counts, and raw files are generated from the source commit named on each page.</p><a role="cell" href="validation.html">Open generated status <span aria-hidden="true">&nearr;</span></a></article>
           <article role="row"><span class="truth-pill truth-pill--future" role="cell">ROADMAP</span><h3 role="cell">Accounts, sync, cloud &amp; sharing</h3><p role="cell">Live collaboration, cloud saves, managed simulation, and published circuit URLs are planned services; they are not live.</p><a role="cell" href="#roadmap">View hosted plan <span aria-hidden="true">↗</span></a></article>
         </div>
         </div>
