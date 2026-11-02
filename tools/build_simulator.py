@@ -47,8 +47,14 @@ IMMUTABLE_ASSET_ID_RE = re.compile(r"[0-9a-f]{64}")
 UI_PROFILE = "web-release"
 UI_MODULES = (
     ("rspice-ui", ("generated-veriloga-catalog",)),
-    ("rspice-ui-worker", ("browser-worker", "generated-veriloga-catalog")),
+    ("rspice-ui-worker", ("generated-veriloga-catalog",)),
 )
+# Cargo package and binary behind each module, as RSpice's browser CI job builds them.
+UI_MODULE_SOURCES = {
+    "rspice-ui": ("rspice-app", "rspice-app"),
+    "rspice-ui-worker": ("rspice-worker", "rspice-worker"),
+}
+WEB_ROOT = Path("crates", "rspice-app", "web")
 IDE_EXECUTABLE_FILES = (
     "simulation-worker.js", "wasm-loader.js", "automation-worker.js",
     "rspice-ui.js", "rspice-ui_bg.wasm.gz",
@@ -80,9 +86,10 @@ def run_cargo_build(cmd, root):
 def build_ui_images(root):
     for name, features in UI_MODULES:
         print("building %s..." % name)
-        # Separate invocations keep the worker feature out of the interactive image.
+        # Separate packages keep the worker runtime out of the interactive image.
+        package, binary = UI_MODULE_SOURCES[name]
         run_cargo_build(
-            ["cargo", "build", "--locked", "-p", "rspice-ui", "--bin", name,
+            ["cargo", "build", "--locked", "-p", package, "--bin", binary,
              "--features", ",".join(features), "--target", "wasm32-unknown-unknown",
              "--profile", UI_PROFILE], root)
 
@@ -455,11 +462,11 @@ def assemble_site_sources(site_root, rspice_root, site_source, out):
         shutil.rmtree(out)
     shutil.copytree(site_source, out)
     copy_runtime_shell(
-        rspice_root / "crates" / "rspice-ui" / "web",
+        rspice_root / WEB_ROOT,
         out / "ide",
         ("index.html", "simulation-worker.js", "wasm-loader.js", "automation-worker.js"),
     )
-    shutil.copytree(rspice_root / "crates/rspice-ui/web/python", out / "ide/python")
+    shutil.copytree(rspice_root / WEB_ROOT / "python", out / "ide/python")
 
 
 def main():
@@ -519,7 +526,7 @@ def main():
     assemble_site_sources(site_root, root, site_source, out)
 
     for name, _ in UI_MODULES:
-        run(["wasm-bindgen", str(ui_target / (name + ".wasm")),
+        run(["wasm-bindgen", str(ui_target / (UI_MODULE_SOURCES[name][1] + ".wasm")),
              "--out-dir", str(out / "ide" / "pkg"), "--out-name", name,
              "--target", "web", "--no-typescript"])
     ide_asset_identity = package_ide_executable_assets(out / "ide")

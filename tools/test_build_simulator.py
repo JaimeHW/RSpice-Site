@@ -50,12 +50,9 @@ class BuildSiteGateTests(unittest.TestCase):
     def make_ide_build_outputs(ide: Path) -> None:
         pkg = ide / "pkg"
         pkg.mkdir(parents=True)
-        shutil.copy2(
-            RSPICE_ROOT / "crates" / "rspice-ui" / "web" / "index.html",
-            ide / "index.html",
-        )
+        shutil.copy2(RSPICE_ROOT / build_site.WEB_ROOT / "index.html", ide / "index.html")
         for name in ("simulation-worker.js", "wasm-loader.js", "automation-worker.js"):
-            shutil.copy2(RSPICE_ROOT / "crates/rspice-ui/web" / name, ide / name)
+            shutil.copy2(RSPICE_ROOT / build_site.WEB_ROOT / name, ide / name)
         for name, _ in build_site.UI_MODULES:
             (pkg / (name + ".js")).write_text(
                 "export { initSync, __wbg_init as default };\n", encoding="utf-8")
@@ -157,7 +154,7 @@ class BuildSiteGateTests(unittest.TestCase):
             root = Path(tmp)
             site = root / "site-source" / "public"
             out = root / "_site-test"
-            ui = root / "crates" / "rspice-ui" / "web"
+            ui = root / "crates" / "rspice-app" / "web"
             self.make_site_source(site)
             ui.mkdir(parents=True)
 
@@ -375,19 +372,18 @@ class BuildSiteGateTests(unittest.TestCase):
             with self.assertRaises(subprocess.CalledProcessError):
                 build_site.qualify_client_sources(ROOT)
 
-    def test_catalog_images_build_separately_with_worker_feature_isolation(self) -> None:
+    def test_catalog_images_build_from_separate_ui_and_worker_packages(self) -> None:
         with mock.patch.object(build_site, "run_cargo_build") as build:
             build_site.build_ui_images(ROOT)
         commands = [call.args[0] for call in build.call_args_list]
-        self.assertEqual([cmd[cmd.index("--bin") + 1] for cmd in commands],
-                         ["rspice-ui", "rspice-ui-worker"])
+        self.assertEqual([cmd[cmd.index("-p") + 1] for cmd in commands], ["rspice-app", "rspice-worker"])
+        self.assertEqual([cmd[cmd.index("--bin") + 1] for cmd in commands], ["rspice-app", "rspice-worker"])
         for command in commands:
             self.assertIn("--locked", command)
             self.assertNotIn("--bins", command)
             self.assertEqual(command[command.index("--profile") + 1], "web-release")
-            self.assertIn("generated-veriloga-catalog", command[command.index("--features") + 1].split(","))
-        self.assertNotIn("browser-worker", commands[0][commands[0].index("--features") + 1].split(","))
-        self.assertIn("browser-worker", commands[1][commands[1].index("--features") + 1].split(","))
+            self.assertEqual(command[command.index("--features") + 1], "generated-veriloga-catalog")
+            self.assertEqual(command[command.index("--target") + 1], "wasm32-unknown-unknown")
 
 
 if __name__ == "__main__":
