@@ -32,14 +32,14 @@
       <div class="page-frame">
         <p class="eyebrow">PRIVACY / CURRENT SERVICE STATUS</p>
         <h1>The public website does not upload local circuit files.</h1>
-        <p>This notice covers the static RSpice website and information sent voluntarily by email. Accounts, hosted projects, collaboration, managed compute, billing, and publishing are not active.</p>
+        <p>This notice covers the static RSpice website, the desktop application’s update check, and information sent voluntarily by email. Accounts, hosted projects, collaboration, managed compute, billing, and publishing are not active.</p>
       </div>
     </header>
 
     <div class="page-frame legal-layout">
       <aside class="legal-index" aria-label="Privacy notice sections">
         <p>ON THIS PAGE</p>
-        <a href="#today">Today</a><a href="#local">Local work</a><a href="#future">Before connected services</a><a href="#contact">Contact</a>
+        <a href="#today">Today</a><a href="#local">Local work</a><a href="#update-check">Update check</a><a href="#future">Before connected services</a><a href="#contact">Contact</a>
       </aside>
       <article class="legal-copy">
         <section id="today">
@@ -57,18 +57,27 @@
           <p>Do not email confidential circuit or model files unless an appropriate protected channel has been established. Keep independent copies of critical work and evaluate development software against your own engineering requirements.</p>
         </section>
 
+        <section id="update-check">
+          <p class="legal-number">03 / UPDATE CHECK</p>
+          <h2>What Check for updates sends.</h2>
+          <div class="legal-callout"><strong>Only when you choose Check for updates.</strong><span>The desktop application never checks on its own, at start-up or in the background.</span></div>
+          <p>When you choose Check for updates, the desktop application makes one HTTPS GET request for <code>https://rspice.app/releases/latest.json</code>. The request carries the User-Agent <code>RSpice/&lt;version&gt;</code>, where <code>&lt;version&gt;</code> is the version you are running, and no cookies, identifiers, or body.</p>
+          <p>The response is the public release manifest: the latest version number, its date, and links to the download page and the release notes. Like any request to this website, the request reaches the hosting infrastructure with the ordinary technical request data described above.</p>
+          <p>The browser version of RSpice never checks for updates.</p>
+        </section>
+
         <section id="future">
-          <p class="legal-number">03 / BEFORE CONNECTED SERVICES</p>
+          <p class="legal-number">04 / BEFORE CONNECTED SERVICES</p>
           <h2>Connected services require a separate privacy notice before launch.</h2>
           <p>RSpice intends to offer identity, project synchronization, live review, managed simulation, and publishable result pages. Those services are not available yet, and this page is not a substitute for their production privacy notice, terms, security architecture, retention schedule, or data-processing agreement.</p>
           <p>Before a connected service launches, RSpice will publish service-specific documentation that describes live data flows, access controls, hosting and subprocessors, retention and deletion, payment handling, sharing visibility, security reporting, and applicable user rights. That material requires appropriate legal review for the jurisdictions in which the service is offered.</p>
         </section>
 
         <section id="contact">
-          <p class="legal-number">04 / CONTACT</p>
+          <p class="legal-number">05 / CONTACT</p>
           <h2>Contact and effective date.</h2>
           <p>For a website privacy question, contact <a href="mailto:privacy@rspice.app">privacy@rspice.app</a>. For a suspected security issue, use the repository’s <a href="https://github.com/JaimeHW/RSpice-Site/security" target="_blank" rel="noopener">private security reporting channel</a>.</p>
-          <p>This service-status notice is effective July 10, 2026 and will be replaced or expanded before RSpice activates accounts, payments, cloud storage, collaboration, managed compute, or publishing.</p>
+          <p>This service-status notice is effective July 10, 2026; the update check section was added November 1, 2026. It will be replaced or expanded before RSpice activates accounts, payments, cloud storage, collaboration, managed compute, or publishing.</p>
         </section>
       </article>
     </div>
