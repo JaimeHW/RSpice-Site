@@ -53,6 +53,19 @@ The sync command writes `RSPICE_SOURCE_REVISION`, `public/reference.html`,
 `public/validation.html`, and `public/reference/` from one inspected commit, so
 the snapshot cannot accidentally be paired with a different manual SHA.
 
+The `/docs/keyboard-shortcuts` page is generated from the RSpice command
+registry: the menus, the command vocabulary, the shell's key table and the
+commands each feature declares, read at one Git revision. The page records that
+revision, and a tooling test regenerates it from the same revision when the
+checkout holds it. Name the revision explicitly when refreshing it:
+
+```shell
+python tools/keyboard_shortcuts.py --rspice-source ../RSpice --revision origin/main
+```
+
+The generator stops, naming the file and line, on any source construct, menu
+context or key it cannot read, rather than writing a page without it.
+
 `RSPICE_SOURCE_REVISION` makes website validation reproducible instead of coupling an
 unchanged site commit to the simulator repository's mutable `main`. CI checks
 out that exact revision, repeats reference generation, and fails when the pin
