@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071015">
+  <meta name="color-scheme" content="dark">
+  <title>Schematic entry &mdash; RSpice</title>
+  <meta name="description" content="Place parts, draw wires and net labels, build hierarchy and symbols, manage sheets and check an RSpice schematic.">
+  <link rel="canonical" href="https://rspice.app/docs/schematic-entry">
+  <link rel="icon" href="../assets/brand/rspice.ico" sizes="any">
+  <link rel="apple-touch-icon" href="../assets/brand/icon-256.png">
+  <link rel="stylesheet" href="../assets/field.css">
+  <link rel="stylesheet" href="../assets/technical.css">
+  <link rel="stylesheet" href="../assets/interior-refined.css">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Schematic entry &mdash; RSpice">
+  <meta property="og:description" content="Placing parts, wiring, hierarchy, symbols, sheets and design checks in RSpice.">
+  <meta property="og:image" content="https://rspice.app/assets/og.png">
+</head>
+<body class="technical-page docs-page">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="topbar" data-topbar>
+    <div class="topbar__inner">
+      <a class="identity" href="../index.html" aria-label="RSpice home"><img src="../assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a>
+      <button class="nav-trigger" type="button" aria-controls="site-nav" aria-expanded="false" data-nav-trigger><span class="visually-hidden">Open navigation</span><span aria-hidden="true"></span><span aria-hidden="true"></span></button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary navigation" data-site-nav>
+        <a href="../index.html#engine">Engine</a><a href="../index.html#analyses">Analyses</a><a href="../index.html#truth">Status</a><a href="../reference.html">Reference</a><a href="../validation.html">Validation</a><a href="../docs.html" aria-current="page">Docs</a>
+      </nav>
+      <div class="topbar__actions"><a class="source-link" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a><a class="launch-link" href="../ide/">Open WASM lab <span class="launch-link__tag">experimental</span></a></div>
+    </div>
+  </header>
+
+  <main id="main">
+    <header class="technical-hero">
+      <div class="page-frame technical-hero__grid">
+        <div>
+          <p class="eyebrow"><a href="../docs.html">RSPICE / DOCS</a> / SCHEMATIC ENTRY</p>
+          <h1>Schematic entry.</h1>
+          <p class="technical-hero__lede">Draw a circuit in the Design workspace: place parts, wire them, name nets, build hierarchy and symbols, and check the result before you simulate it.</p>
+        </div>
+        <dl class="technical-hero__ledger" aria-label="Schematic entry at a glance">
+          <div><dt>WORKSPACE</dt><dd>Design, <kbd>Alt+2</kbd></dd></div>
+          <div><dt>PARTS</dt><dd>Component shelf or Design &rsaquo; Place</dd></div>
+          <div><dt>CHECK</dt><dd>Design &rsaquo; Check cellview, <kbd>Ctrl+E</kbd></dd></div>
+          <div><dt>CANCEL</dt><dd><kbd>Escape</kbd> ends the active tool</dd></div>
+        </dl>
+      </div>
+    </header>
+
+    <div class="page-frame technical-layout">
+      <aside class="technical-index" aria-label="Schematic entry sections">
+        <p>ON THIS PAGE</p>
+        <a href="#workspace">The Design workspace</a><a href="#place">Place parts</a><a href="#wire">Wires and nets</a><a href="#edit">Edit and arrange</a><a href="#view">Zoom and grid</a><a href="#hierarchy">Hierarchy and symbols</a><a href="#sheets">Sheets</a><a href="#check">Check the design</a><a href="#output">Print and export</a>
+      </aside>
+
+      <article class="technical-document">
+        <section class="technical-section" id="workspace">
+          <p class="technical-number">01 / THE DESIGN WORKSPACE</p>
+          <h2>The drawing, the navigator and the shelf.</h2>
+          <p>The Design workspace (<kbd>Alt+2</kbd>) shows the open cell view: a schematic, a symbol, or a Verilog-A source. Its side panel has two tabs: <strong>Navigator</strong>, for the design in front of you, and <strong>Component shelf</strong>, for the parts you can add to it.</p>
+          <p>Single-letter keys such as <kbd>W</kbd> or <kbd>R</kbd> act while the drawing has keyboard focus, and not while you type in a field. <strong>Preferences &rsaquo; Shortcuts</strong> can require Alt with them, turn them off, or change any key. The keys below are the same on the desktop and in the browser unless the text says otherwise.</p>
+        </section>
+
+        <section class="technical-section" id="place">
+          <p class="technical-number">02 / PLACE PARTS</p>
+          <h2>From the shelf or the Place menu.</h2>
+          <p>In the <strong>Component shelf</strong>, click a part to arm it, or drag it onto the sheet. The built-in parts are grouped as Passives, Sources, Analog, and Mixed signal / XSPICE. <strong>Design &rsaquo; Place</strong> arms the common parts and drawing objects by key, and <strong>Place &rsaquo; Instance&hellip;</strong> (<kbd>Shift+I</kbd>) places a cell from a library.</p>
+          <div class="technical-table-wrap"><table class="technical-table shortcut-table"><thead><tr><th scope="col">PLACE</th><th scope="col">KEY</th><th scope="col">PLACE</th><th scope="col">KEY</th></tr></thead><tbody>
+            <tr><td>Resistor</td><td><kbd>R</kbd></td><td>Voltage source</td><td><kbd>V</kbd></td></tr>
+            <tr><td>Capacitor</td><td><kbd>C</kbd></td><td>Current source</td><td><kbd>I</kbd></td></tr>
+            <tr><td>Inductor</td><td><kbd>L</kbd></td><td>Ground</td><td><kbd>Shift+G</kbd></td></tr>
+            <tr><td>Diode</td><td><kbd>D</kbd></td><td>Instance&hellip;</td><td><kbd>Shift+I</kbd></td></tr>
+            <tr><td>Text or note&hellip;</td><td><kbd>Shift+T</kbd></td><td>Documentation shape&hellip;</td><td><span class="shortcut-none">&mdash;</span></td></tr>
+          </tbody></table></div>
+          <p><strong>Edit &rsaquo; Paste</strong> (<kbd>Ctrl+V</kbd>) and <strong>Edit &rsaquo; Duplicate</strong> (<kbd>Ctrl+D</kbd>) float the copy under the pointer until you click to place it: <kbd>R</kbd> rotates it, <kbd>M</kbd> mirrors it and <kbd>Escape</kbd> lets it go. <strong>Edit &rsaquo; Repeat last command</strong> (<kbd>.</kbd>) runs the last placement or editing command again, as it last ran.</p>
+        </section>
+
+        <section class="technical-section" id="wire">
+          <p class="technical-number">03 / WIRES AND NETS</p>
+          <h2>Connect, name and inspect nets.</h2>
+          <div class="technical-table-wrap"><table class="technical-table shortcut-table"><thead><tr><th scope="col">DESIGN &rsaquo; PLACE</th><th scope="col">KEY</th><th scope="col">USE</th></tr></thead><tbody>
+            <tr><td>Wire</td><td><kbd>W</kbd></td><td>Draw a wire between terminals.</td></tr>
+            <tr><td>Net label</td><td><kbd>N</kbd></td><td>Name a net; wires carrying the same name are connected.</td></tr>
+            <tr><td>Junction</td><td><kbd>J</kbd></td><td>Mark a connection where wires cross.</td></tr>
+            <tr><td>Bus</td><td><kbd>B</kbd></td><td>Draw a bus.</td></tr>
+            <tr><td>Bus tap</td><td><kbd>T</kbd></td><td>Take one member off a bus.</td></tr>
+            <tr><td>Off-sheet connector</td><td><span class="shortcut-none">&mdash;</span></td><td>Carry a net to another sheet.</td></tr>
+            <tr><td>Pins&hellip;</td><td><kbd>Shift+P</kbd></td><td>Place the cell's interface pins.</td></tr>
+          </tbody></table></div>
+          <p><strong>Design &rsaquo; Highlight net</strong> lights the net the selection is on. <strong>Design &rsaquo; Connectivity and buses&hellip;</strong> reviews connectivity, typed buses and global nets, and <strong>Design &rsaquo; Arrange &rsaquo; Join collinear wires</strong> merges wires that run on one line into one wire each.</p>
+        </section>
+
+        <section class="technical-section" id="edit">
+          <p class="technical-number">04 / EDIT AND ARRANGE</p>
+          <h2>Select, change and line up.</h2>
+          <ul class="technical-list">
+            <li><span><strong>Move</strong> (<kbd>M</kbd>) moves the selection; <strong>Stretch</strong> (<kbd>S</kbd>) moves a selected wire segment, or a shape's control point, and the wires joined to it follow.</span></li>
+            <li><span><strong>Properties&hellip;</strong> (<kbd>Q</kbd>) edits the selected object's values; <strong>Rename&hellip;</strong> (<kbd>F2</kbd>) renames it.</span></li>
+            <li><span><strong>Design &rsaquo; Arrange</strong>: Rotate clockwise (<kbd>Ctrl+R</kbd>), Rotate counter-clockwise (<kbd>Ctrl+Shift+R</kbd>), Mirror about vertical axis (<kbd>Ctrl+M</kbd>), Mirror about horizontal axis (<kbd>Ctrl+Shift+M</kbd>), the Align and Distribute commands, and Snap selection to grid.</span></li>
+            <li><span><strong>Edit &rsaquo; Select</strong> selects every Instance, Wire, Net label, Pin, Text or Shape on the active sheet. <strong>Edit &rsaquo; Find&hellip;</strong> (<kbd>Ctrl+F</kbd>) searches the design; <strong>Find and replace&hellip;</strong> (<kbd>Ctrl+H</kbd>) has that key on the desktop only.</span></li>
+            <li><span><strong>Replace instance&hellip;</strong>, <strong>Create array&hellip;</strong> and <strong>Bulk edit&hellip;</strong> in the Edit menu change many objects in one step. <strong>Design &rsaquo; Annotate reference designators&hellip;</strong> assigns reference designators, and <strong>Design &rsaquo; Object table&hellip;</strong> (<kbd>Ctrl+Shift+T</kbd>, desktop) lists objects in a table.</span></li>
+          </ul>
+        </section>
+
+        <section class="technical-section" id="view">
+          <p class="technical-number">05 / ZOOM AND GRID</p>
+          <h2>Move around the sheet.</h2>
+          <div class="technical-table-wrap"><table class="technical-table shortcut-table"><thead><tr><th scope="col">VIEW</th><th scope="col">KEY</th><th scope="col">VIEW</th><th scope="col">KEY</th></tr></thead><tbody>
+            <tr><td>Zoom in</td><td><kbd>+</kbd></td><td>Zoom out</td><td><kbd>&minus;</kbd></td></tr>
+            <tr><td>Fit drawing sheet</td><td><kbd>F</kbd></td><td>Fit content</td><td><kbd>Shift+F</kbd></td></tr>
+            <tr><td>Zoom box</td><td><kbd>Z</kbd></td><td>Zoom previous</td><td><kbd>Shift+W</kbd></td></tr>
+            <tr><td>Zoom 100%</td><td><kbd>Ctrl+0</kbd> desktop</td><td>Zoom to selection</td><td><span class="shortcut-none">&mdash;</span></td></tr>
+          </tbody></table></div>
+          <p><strong>View &rsaquo; Grid</strong> shows the grid as Dots, Lines or Off; <strong>Grid, snap and routing&hellip;</strong> sets the grid pitch, what the pointer snaps to, and how wires route.</p>
+        </section>
+
+        <section class="technical-section" id="hierarchy">
+          <p class="technical-number">06 / HIERARCHY AND SYMBOLS</p>
+          <h2>Cells inside cells.</h2>
+          <ul class="technical-list">
+            <li><span><strong>Design &rsaquo; Descend</strong> (<kbd>Shift+E</kbd>) opens the selected instance's cell, following your edit-in-place preference. <strong>Descend with options&hellip;</strong> (<kbd>H</kbd>) lets you choose the edit mode: edit in place, open an isolated cell view, open a read-only reference, or edit its symbol in place. <strong>Return to parent</strong> (<kbd>Shift+H</kbd>) goes back up.</span></li>
+            <li><span><strong>Create symbol from schematic&hellip;</strong> makes a symbol for the open schematic's cell from its pins, so the cell can be placed as an instance elsewhere.</span></li>
+            <li><span><strong>Create hierarchy&hellip;</strong> turns the selection into a new child cell with a generated symbol.</span></li>
+            <li><span><strong>Edit symbol in place</strong> edits the selected instance's symbol where it stands on its parent schematic; in the symbol view, <strong>Return to parent schematic</strong> (<kbd>Enter</kbd>) goes back.</span></li>
+            <li><span>In a symbol view the Place menu holds drawing tools instead: Pin (<kbd>P</kbd>), Line (<kbd>L</kbd>), Rectangle (<kbd>R</kbd>), Circle (<kbd>C</kbd>), Arc (<kbd>A</kbd>), Polygon (<kbd>G</kbd>) and Text (<kbd>T</kbd>). <strong>Validate and save symbol</strong> checks the symbol's pins against the cell's interface and saves it.</span></li>
+          </ul>
+        </section>
+
+        <section class="technical-section" id="sheets">
+          <p class="technical-number">07 / SHEETS</p>
+          <h2>Multi-sheet schematics.</h2>
+          <p><strong>Design &rsaquo; Sheet</strong> moves between sheets with <strong>Previous sheet</strong> (<kbd>PageUp</kbd>) and <strong>Next sheet</strong> (<kbd>PageDown</kbd>), adds one with <strong>New sheet</strong>, and removes one with <strong>Delete&hellip;</strong>. <strong>Sheet properties</strong> (<kbd>Ctrl+Alt+Shift+P</kbd>) shows the open sheet's properties in the inspector; <strong>Sheet formats&hellip;</strong> and <strong>Sheet defaults&hellip;</strong> manage the formats and the defaults new sheets take.</p>
+        </section>
+
+        <section class="technical-section" id="check">
+          <p class="technical-number">08 / CHECK THE DESIGN</p>
+          <h2>Find connection and rule problems before a run.</h2>
+          <div class="technical-table-wrap"><table class="technical-table shortcut-table"><thead><tr><th scope="col">DESIGN MENU</th><th scope="col">KEY</th><th scope="col">CHECKS</th></tr></thead><tbody>
+            <tr><td>Check cellview</td><td><kbd>Ctrl+E</kbd></td><td>The open cell view only. A symbol view checks its pins against the cell's interface.</td></tr>
+            <tr><td>Check design</td><td><span class="shortcut-none">&mdash;</span></td><td>The whole design from the simulation root, plus every cell view in the project's own libraries that the walk does not reach.</td></tr>
+            <tr><td>Check and save&hellip;</td><td><kbd>Ctrl+Shift+E</kbd></td><td>Checks, then saves a validated revision.</td></tr>
+            <tr><td>Violations &rsaquo; Next violation</td><td><kbd>]</kbd> or <kbd>F8</kbd></td><td>Steps to the next finding; <strong>Previous violation</strong> is <kbd>[</kbd> or <kbd>Shift+F8</kbd>.</td></tr>
+          </tbody></table></div>
+          <p><strong>Violations &rsaquo; Clear check results</strong> clears the findings. <strong>Design rule setup&hellip;</strong> sets the severity each rule is reported at in this project. Findings also appear in <strong>View &rsaquo; Problems</strong>.</p>
+        </section>
+
+        <section class="technical-section" id="output">
+          <p class="technical-number">09 / PRINT AND EXPORT</p>
+          <h2>Get the drawing out.</h2>
+          <p><strong>File &rsaquo; Print&hellip;</strong> (<kbd>Ctrl+P</kbd>; <kbd>Ctrl+Alt+P</kbd> in the browser) prints the active view. <strong>File &rsaquo; Export &rsaquo; Image or PDF&hellip;</strong> (<kbd>Ctrl+Alt+Shift+E</kbd>) writes it as PDF, PDF/A, SVG, PNG or TIFF. <strong>Edit &rsaquo; Copy as image</strong> puts the selection, or the whole view, on the clipboard as a picture. To simulate the circuit, go on to <a href="simulation-setup.html">Simulation setup</a>.</p>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="page-frame footer__grid">
+      <div class="footer__identity"><a class="identity" href="../index.html"><img src="../assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a><p>Rust circuit simulator with desktop, CLI, Python, and WebAssembly interfaces.</p></div>
+      <div><h2>Technical</h2><a href="../reference.html">Generated reference</a><a href="../validation.html">Validation status</a><a href="../parity.html">Methodology</a><a href="../docs.html">Scope and builds</a></div>
+      <div><h2>Project</h2><a href="../changelog.html">Development record</a><a href="../download.html">Build from source</a><a href="../early-access.html">Early access</a><a href="../privacy.html">Privacy</a></div>
+      <div><h2>Contact</h2><a href="mailto:hello@rspice.app">General</a><a href="mailto:sales@rspice.app">Commercial</a><a href="https://github.com/JaimeHW/RSpice-Site/security" target="_blank" rel="noopener">Security</a></div>
+    </div>
+    <div class="page-frame footer__base"><span>&copy; <span data-year>2026</span> RSpice</span><span>SOURCE BUILD / HOSTED SERVICES NOT ACTIVE</span><span>IBM Plex under SIL OFL</span></div>
+  </footer>
+  <script src="../assets/field.js" defer></script>
+</body>
+</html>
