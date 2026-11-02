@@ -151,6 +151,14 @@ def table_records(table: dict[str, Any]) -> list[dict[str, str]]:
     return [dict(zip(table["headers"], row, strict=True)) for row in table["rows"]]
 
 
+def workspace_records(tables: list[dict[str, Any]]) -> list[dict[str, str]]:
+    """Join every Crate/Purpose table in README order; the source groups crates under subheadings."""
+    crate_tables = [table for table in tables if table["headers"] == ["Crate", "Purpose"]]
+    if not crate_tables:
+        raise ValueError("expected at least one Markdown table with Crate and Purpose columns")
+    return [record for table in crate_tables for record in table_records(table)]
+
+
 def workspace_metadata(cargo_toml: str) -> dict[str, str]:
     section_match = re.search(
         r"^\[workspace\.package\]\s*$([\s\S]*?)(?=^\[|\Z)",
@@ -335,7 +343,7 @@ def collect_catalog(
         "analyses": table_records(require_table(root_tables, "Analyses")),
         "devices": table_records(require_table(root_tables, "Devices")),
         "commands": table_records(require_table(root_tables, "Command line", ["Command", "Purpose"])),
-        "workspace": table_records(require_table(root_tables, None, ["Crate", "Purpose"])),
+        "workspace": workspace_records(root_tables),
         "cli_tables": [table for table in cli_tables if table["rows"]],
         "validation": {
             "ngspice_manifest": {

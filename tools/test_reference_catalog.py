@@ -19,6 +19,7 @@ from reference_catalog import (
     strip_markdown,
     validation_artifact_data,
     workspace_metadata,
+    workspace_records,
 )
 
 
@@ -72,7 +73,18 @@ class MarkdownTableTests(unittest.TestCase):
     def test_repository_table_identity_survives_heading_rename(self) -> None:
         for heading in ("Workspace", "Repository"):
             tables = parse_markdown_tables(f"## {heading}\n| Crate | Purpose |\n| --- | --- |\n| rspice-ui | IDE |\n")
-            self.assertEqual(require_table(tables, None, ["Crate", "Purpose"])["rows"], [["rspice-ui", "IDE"]])
+            self.assertEqual(workspace_records(tables), [{"Crate": "rspice-ui", "Purpose": "IDE"}])
+
+    def test_workspace_joins_crate_tables_grouped_under_subheadings(self) -> None:
+        tables = parse_markdown_tables(
+            "## Repository\n### Engine\n| Crate | Purpose |\n| --- | --- |\n| rspice-core | Engine |\n\n"
+            "### Frontends\n| Crate | Purpose |\n| --- | --- |\n| rspice-cli | CLI |\n| rspice-app | Desktop |\n\n"
+            "## Interfaces\n| Command | Purpose |\n| --- | --- |\n| rspice run | Execute |\n"
+        )
+        self.assertEqual([record["Crate"] for record in workspace_records(tables)],
+                         ["rspice-core", "rspice-cli", "rspice-app"])
+        with self.assertRaises(ValueError):
+            workspace_records(parse_markdown_tables("## Repository\nNo crate table.\n"))
 
     def test_reference_keeps_analysis_notes_visible_and_escaped(self) -> None:
         catalog = {"source": {"repository": "https://example.test", "revision": "a" * 40,
