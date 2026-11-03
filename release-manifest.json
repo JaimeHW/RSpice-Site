@@ -7,18 +7,18 @@
     },
     "rspice": {
       "repository": "JaimeHW/RSpice",
-      "sha": "3b2b71ba1969daf0ed892b3f15a2baa789c3ed28"
+      "sha": "0ff260da26a58f017fde271382c4318e22d556c9"
     }
   },
   "build": {
-    "built_utc": "2026-11-03T00:04:41Z",
+    "built_utc": "2026-11-03T03:33:16Z",
     "publisher": "local-static-branch",
     "rust": "rustc 1.94.0 (4a4ef493e 2026-03-02)"
   },
   "artifact": {
     "file_count": 87,
-    "byte_count": 61944994,
-    "tree_sha256": "eb98bbfd3025c9caf65cde98c0c3e8035c1b2cd3da9eb871cde3fe21c3812d18",
+    "byte_count": 61951885,
+    "tree_sha256": "ab8ee8f3e68c3a315c8abc9f1ef21ac244094fef97f5c29c9d70ec411de887a3",
     "files": [
       {
         "path": ".nojekyll",
@@ -152,13 +152,13 @@
       },
       {
         "path": "browser-qualification.json",
-        "size": 9717,
-        "sha256": "609f2a8c6bb8b46f3cca3b19df371c3c534be6a6f0ce294e35917ab6587380ac"
+        "size": 9708,
+        "sha256": "a2cff102feb815e015e083c7978f64582f4f8f9b51203c8755c01e292c22e524"
       },
       {
         "path": "build.json",
         "size": 956,
-        "sha256": "eec08a7a70d62a7a113e00c932b6621af08df351c67ec507da5cd4a9075a0fb1"
+        "sha256": "60f8071306b58344d5de852d71f63800abd1305b21304ec8554a3b19732d7a46"
       },
       {
         "path": "changelog.html",
@@ -236,94 +236,94 @@
         "sha256": "b5decd666c8b4f21c71c6619c2f44f02d3f19eb1445d4450346b14ded36e5d2c"
       },
       {
-        "path": "ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837/automation-worker.js",
+        "path": "ide/assets/190b58d8314bf764d5a396ad198b08335ad546f331e87735d6502289c9a13bec/automation-worker.js",
         "size": 25600,
         "sha256": "8b2adc1d209997d0a87cc735b396962382c8006bc81a8340d5daf72766d44250"
       },
       {
-        "path": "ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837/python/pyodide-314.0.2/LICENSE.cpython.txt",
+        "path": "ide/assets/190b58d8314bf764d5a396ad198b08335ad546f331e87735d6502289c9a13bec/python/pyodide-314.0.2/LICENSE.cpython.txt",
         "size": 13804,
         "sha256": "b0e25a78cffb43f4d92de8b61ccfa1f1f98ecbc22330b54b5251e7b6ba010231"
       },
       {
-        "path": "ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837/python/pyodide-314.0.2/LICENSE.pyodide.txt",
+        "path": "ide/assets/190b58d8314bf764d5a396ad198b08335ad546f331e87735d6502289c9a13bec/python/pyodide-314.0.2/LICENSE.pyodide.txt",
         "size": 16725,
         "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
       },
       {
-        "path": "ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837/python/pyodide-314.0.2/package.json",
+        "path": "ide/assets/190b58d8314bf764d5a396ad198b08335ad546f331e87735d6502289c9a13bec/python/pyodide-314.0.2/package.json",
         "size": 2999,
         "sha256": "3364fa3f11b85fa4dda78d984e6493ecb2affcec93a809c7bc678dd669e9734e"
       },
       {
-        "path": "ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837/python/pyodide-314.0.2/pyodide-lock.json",
+        "path": "ide/assets/190b58d8314bf764d5a396ad198b08335ad546f331e87735d6502289c9a13bec/python/pyodide-314.0.2/pyodide-lock.json",
         "size": 113804,
         "sha256": "c963d22858f6bcb8f41586a2142f03905ab370c88ea22a86a2736e95fac2a8f3"
       },
       {
-        "path": "ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837/python/pyodide-314.0.2/pyodide.asm.mjs",
+        "path": "ide/assets/190b58d8314bf764d5a396ad198b08335ad546f331e87735d6502289c9a13bec/python/pyodide-314.0.2/pyodide.asm.mjs",
         "size": 1250259,
         "sha256": "c7eccdfeb7a8419d61f910f0685b45cd5610b7ff5bbe844c3c1050ee6623b641"
       },
       {
-        "path": "ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837/python/pyodide-314.0.2/pyodide.asm.wasm",
+        "path": "ide/assets/190b58d8314bf764d5a396ad198b08335ad546f331e87735d6502289c9a13bec/python/pyodide-314.0.2/pyodide.asm.wasm",
         "size": 9609998,
         "sha256": "f7a8a169e513791e18fa0790fb69d6f2656b779e9012ba57e03e973f0df0b39f"
       },
       {
-        "path": "ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837/python/pyodide-314.0.2/pyodide.mjs",
+        "path": "ide/assets/190b58d8314bf764d5a396ad198b08335ad546f331e87735d6502289c9a13bec/python/pyodide-314.0.2/pyodide.mjs",
         "size": 17880,
         "sha256": "955d2088bbb7fc79a73c4802aca2370c1d95bfdfaffa4121e0faebda2b0ea3f9"
       },
       {
-        "path": "ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837/python/pyodide-314.0.2/python_stdlib.zip",
+        "path": "ide/assets/190b58d8314bf764d5a396ad198b08335ad546f331e87735d6502289c9a13bec/python/pyodide-314.0.2/python_stdlib.zip",
         "size": 2552456,
         "sha256": "101a9c94ca6304c1478c89b7b595136b9a51b4289bdc5b467d86db553efee9b3"
       },
       {
-        "path": "ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837/python/pyodide-314.0.2/rspice-runtime-manifest.json",
+        "path": "ide/assets/190b58d8314bf764d5a396ad198b08335ad546f331e87735d6502289c9a13bec/python/pyodide-314.0.2/rspice-runtime-manifest.json",
         "size": 2530,
         "sha256": "955d065eee77018655421975a508c3df6a452ee760656e5c56f7ada0bcfdd2d6"
       },
       {
-        "path": "ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837/python/rspice_browser_bootstrap.py",
+        "path": "ide/assets/190b58d8314bf764d5a396ad198b08335ad546f331e87735d6502289c9a13bec/python/rspice_browser_bootstrap.py",
         "size": 39702,
         "sha256": "6133114210f2620385ec3eb91c8e30876f7af8c5ddde1151a0aa6286d9aa4831"
       },
       {
-        "path": "ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837/rspice-ui-worker.js",
+        "path": "ide/assets/190b58d8314bf764d5a396ad198b08335ad546f331e87735d6502289c9a13bec/rspice-ui-worker.js",
         "size": 34350,
         "sha256": "4ecee61f394d59718a818c1debdf9796e83838e1c04134c370a9dc9aa4c91260"
       },
       {
-        "path": "ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837/rspice-ui-worker_bg.wasm.gz",
-        "size": 20057790,
-        "sha256": "309e3f0f63d6dd731c06bb8bea282a2bc352727c5152f2b2a00d30043c8b06fa"
+        "path": "ide/assets/190b58d8314bf764d5a396ad198b08335ad546f331e87735d6502289c9a13bec/rspice-ui-worker_bg.wasm.gz",
+        "size": 20060395,
+        "sha256": "501e046651ed7e36be2e53bd268d3850465ec6ade2b809b083cd14950636c429"
       },
       {
-        "path": "ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837/rspice-ui.js",
+        "path": "ide/assets/190b58d8314bf764d5a396ad198b08335ad546f331e87735d6502289c9a13bec/rspice-ui.js",
         "size": 144240,
-        "sha256": "40928d64e7be5b9e4dda220f77e811220808216773ffae7bd4aa49d5edc47e8f"
+        "sha256": "9f4be1f937d47dda902a53dcc1cc181fe1626f1e98a4eb4b8c5e6ab54df78051"
       },
       {
-        "path": "ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837/rspice-ui_bg.wasm.gz",
-        "size": 23496559,
-        "sha256": "9eb2a6c25c5b232f04dfb19648377ad68dbd784c1a19e2bbcfaf4a71ce458157"
+        "path": "ide/assets/190b58d8314bf764d5a396ad198b08335ad546f331e87735d6502289c9a13bec/rspice-ui_bg.wasm.gz",
+        "size": 23500854,
+        "sha256": "afca9288036323a4c79d4a2e3bad2c9d27e1700bfabf718b2b013e5b71ced0ec"
       },
       {
-        "path": "ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837/simulation-worker.js",
+        "path": "ide/assets/190b58d8314bf764d5a396ad198b08335ad546f331e87735d6502289c9a13bec/simulation-worker.js",
         "size": 23273,
         "sha256": "4ddcc4ccc132275c2b7fb0d27f5844de522aa83267b34bbc1ad3d7dc1e05b3ec"
       },
       {
-        "path": "ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837/wasm-loader.js",
+        "path": "ide/assets/190b58d8314bf764d5a396ad198b08335ad546f331e87735d6502289c9a13bec/wasm-loader.js",
         "size": 586,
         "sha256": "8ca27f6e94099eb0c4adf6eb7a10458f2f0ce3761bbe3ffd81c599d6b0c00b06"
       },
       {
         "path": "ide/index.html",
         "size": 16719,
-        "sha256": "2416537c4a325638bd98f957489a7116e75a4195229177a6ba61cf1315f14cb2"
+        "sha256": "673a3abb4cf4f753377eddfabbd5fab64fd2a456234bf671bb0ac84f5c2dab4d"
       },
       {
         "path": "index.html",
@@ -348,7 +348,7 @@
       {
         "path": "reference/catalog.json",
         "size": 43157,
-        "sha256": "14616c2d83a20290190b1f6eb7bd8356c6087f0dcea082bb5fa0a8327f678e4b"
+        "sha256": "8d0b0ba26750b66fa8ca06071b5e2efcfc100ad8ec940dbcf7390551a22ce5b6"
       },
       {
         "path": "reference/raw/ngspice-validation-manifest.tsv",
@@ -363,7 +363,7 @@
       {
         "path": "reference.html",
         "size": 90568,
-        "sha256": "3ecd74d0e58f6ec8ca768fd76da4b375c1bdea1dc0d72a8f386da39f6cc09d97"
+        "sha256": "58c3297f4c204666d98f7c6497ecd3543b5e96cc2d1f31e285e7ec52f57048d8"
       },
       {
         "path": "releases/latest.json",
@@ -383,7 +383,7 @@
       {
         "path": "validation.html",
         "size": 6535,
-        "sha256": "c40bca1f69d9c84f0b3a4b284fb35b58aa5e40ca0473cad09a338f3eaa36cde3"
+        "sha256": "3f80014b600a7cada92cceaea46687fafd120063e3983a79ebc7ca2a56f7c531"
       },
       {
         "path": "workbench/app.js",
