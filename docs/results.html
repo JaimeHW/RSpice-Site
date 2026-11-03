@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071015">
+  <meta name="color-scheme" content="dark">
+  <title>Results &mdash; RSpice</title>
+  <meta name="description" content="Read RSpice simulation results: the Results workspace, its views, result documents, cursors and measurements, comparisons, and importing and exporting datasets.">
+  <link rel="canonical" href="https://rspice.app/docs/results">
+  <link rel="icon" href="../assets/brand/rspice.ico" sizes="any">
+  <link rel="apple-touch-icon" href="../assets/brand/icon-256.png">
+  <link rel="stylesheet" href="../assets/field.css">
+  <link rel="stylesheet" href="../assets/technical.css">
+  <link rel="stylesheet" href="../assets/interior-refined.css">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Results &mdash; RSpice">
+  <meta property="og:description" content="Result views, documents, measurements, comparisons and dataset import and export in RSpice.">
+  <meta property="og:image" content="https://rspice.app/assets/og.png">
+</head>
+<body class="technical-page docs-page">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="topbar" data-topbar>
+    <div class="topbar__inner">
+      <a class="identity" href="../index.html" aria-label="RSpice home"><img src="../assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a>
+      <button class="nav-trigger" type="button" aria-controls="site-nav" aria-expanded="false" data-nav-trigger><span class="visually-hidden">Open navigation</span><span aria-hidden="true"></span><span aria-hidden="true"></span></button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary navigation" data-site-nav>
+        <a href="../index.html#engine">Engine</a><a href="../index.html#analyses">Analyses</a><a href="../index.html#truth">Status</a><a href="../reference.html">Reference</a><a href="../validation.html">Validation</a><a href="../docs.html" aria-current="page">Docs</a>
+      </nav>
+      <div class="topbar__actions"><a class="source-link" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a><a class="launch-link" href="../ide/">Open WASM lab <span class="launch-link__tag">experimental</span></a></div>
+    </div>
+  </header>
+
+  <main id="main">
+    <header class="technical-hero">
+      <div class="page-frame technical-hero__grid">
+        <div>
+          <p class="eyebrow"><a href="../docs.html">RSPICE / DOCS</a> / RESULTS</p>
+          <h1>Results.</h1>
+          <p class="technical-hero__lede">Every finished run is kept as a dataset. The Results workspace plots it, measures it, compares it with another, and exports it.</p>
+        </div>
+        <dl class="technical-hero__ledger" aria-label="Results at a glance">
+          <div><dt>WORKSPACE</dt><dd>Results, <kbd>Alt+4</kbd></dd></div>
+          <div><dt>BESIDE THE DESIGN</dt><dd>View &rsaquo; Split with results, <kbd>Ctrl+\</kbd></dd></div>
+          <div><dt>CURSORS</dt><dd>Link A/B cursors, <kbd>Shift+C</kbd></dd></div>
+          <div><dt>EXPORT</dt><dd>File &rsaquo; Export &rsaquo; Dataset&hellip;</dd></div>
+        </dl>
+      </div>
+    </header>
+
+    <div class="page-frame technical-layout">
+      <aside class="technical-index" aria-label="Results sections">
+        <p>ON THIS PAGE</p>
+        <a href="#workspace">The Results workspace</a><a href="#views">Views</a><a href="#documents">Result documents</a><a href="#measure">Cursors and measurements</a><a href="#compare">Compare and slice</a><a href="#exchange">Import and export</a>
+      </aside>
+
+      <article class="technical-document">
+        <section class="technical-section" id="workspace">
+          <p class="technical-number">01 / THE RESULTS WORKSPACE</p>
+          <h2>Runs, datasets and quantities.</h2>
+          <p>The Results workspace (<kbd>Alt+4</kbd>) lists the retained runs and each run's quantities in its data browser. <strong>Results &rsaquo; Results browser</strong> opens that browser and <strong>Results &rsaquo; Waveforms</strong> the waveform view. <strong>View &rsaquo; Split with results</strong> (<kbd>Ctrl+\</kbd>) shows results beside the design, so you can probe and read in one place.</p>
+          <p>From a dataset, the command palette's <strong>Open producing simulation plan</strong> goes back to the plan and analysis that produced it. <strong>Results &rsaquo; Clear result history</strong> clears the result history and the views built on it; it is unavailable while a run is executing.</p>
+        </section>
+
+        <section class="technical-section" id="views">
+          <p class="technical-number">02 / VIEWS</p>
+          <h2>Results &rsaquo; View as.</h2>
+          <p>The same dataset can be read several ways. <strong>View as</strong> opens a view of the active result:</p>
+          <div class="technical-table-wrap"><table class="technical-table"><thead><tr><th scope="col">FOR</th><th scope="col">VIEW AS</th></tr></thead><tbody>
+            <tr><td>Sweeps and time</td><td>DC sweep, Eye diagram, Event history</td></tr>
+            <tr><td>Frequency response</td><td>Bode, Nyquist, Polar response, Smith chart, Network matrix, Transfer function, Pole-zero</td></tr>
+            <tr><td>Spectra and RF</td><td>FFT, Harmonic balance tones, Phase noise</td></tr>
+            <tr><td>Contributions</td><td>Noise contribution, Sensitivity contribution</td></tr>
+            <tr><td>Statistics</td><td>Histogram, Correlation scatter, Box and violin</td></tr>
+            <tr><td>Verification</td><td>Safe operating area, Optimization, Specification results</td></tr>
+            <tr><td>Raw data</td><td>Sample table, Dataset manifest</td></tr>
+          </tbody></table></div>
+        </section>
+
+        <section class="technical-section" id="documents">
+          <p class="technical-number">03 / RESULT DOCUMENTS</p>
+          <h2>Quick views, and documents that keep their work.</h2>
+          <p>Opening a run shows it in a quick view: what you add there can be read but is not kept. <strong>Results &rsaquo; New result document&hellip;</strong> makes a project result document instead, which keeps its panes, measurements and comparisons with the project. <strong>Add pane&hellip;</strong> adds a plot pane to it, and <strong>Plot properties&hellip;</strong> edits the plot.</p>
+        </section>
+
+        <section class="technical-section" id="measure">
+          <p class="technical-number">04 / CURSORS AND MEASUREMENTS</p>
+          <h2>Read values off the data.</h2>
+          <ul class="technical-list">
+            <li><span><strong>Link A/B cursors</strong> (<kbd>Shift+C</kbd>) shares the A and B cursor positions across the panes; a result document keeps the link through a save. <strong>Simulate &rsaquo; Annotate transient voltages</strong> writes the voltages at cursor A onto the schematic.</span></li>
+            <li><span><strong>Add measurement&hellip;</strong> evaluates a scalar expression on the selected pane's analysis. In a result document the measurement is kept; in a quick view you can read it, but it is not kept.</span></li>
+            <li><span><strong>Calculator&hellip;</strong> opens the waveform calculator as a floating tool that stays open while you work in the plot.</span></li>
+            <li><span><strong>Expression diagnostics&hellip;</strong> lists every saved expression, across every analysis of the active dataset, with whether it evaluated, so a broken one shows up even on a sheet nobody has opened.</span></li>
+          </ul>
+        </section>
+
+        <section class="technical-section" id="compare">
+          <p class="technical-number">05 / COMPARE AND SLICE</p>
+          <h2>Against a baseline, across a family.</h2>
+          <p><strong>Compare datasets&hellip;</strong> compares the result you are looking at with a baseline dataset. In a result document the comparison is recorded with both datasets; in a quick view it is shown and not kept. <strong>Family slicing and pivot&hellip;</strong> slices, pivots, encodes and filters a sweep, corner or Monte Carlo family. For yield, corners and regression verdicts, see <a href="verification.html">Verification</a>.</p>
+        </section>
+
+        <section class="technical-section" id="exchange">
+          <p class="technical-number">06 / IMPORT AND EXPORT</p>
+          <h2>Datasets in and out.</h2>
+          <div class="technical-table-wrap"><table class="technical-table"><thead><tr><th scope="col">COMMAND</th><th scope="col">FORMATS</th></tr></thead><tbody>
+            <tr><td>File &rsaquo; Import &rsaquo; Result dataset&hellip;</td><td>RSpice result and dataset files (<code>.rspiceresult</code>, <code>.rspicedata</code>), CSV, TSV, Touchstone (<code>.s1p</code> to <code>.s4p</code>, <code>.snp</code>, <code>.ts</code>), HDF5, Arrow and Feather, Parquet, NumPy (<code>.npy</code>, <code>.npz</code>), MATLAB (<code>.mat</code>), SPICE raw, PSF ASCII, VCD and FST.</td></tr>
+            <tr><td>File &rsaquo; Export &rsaquo; Dataset&hellip;</td><td>RSpice result bundle, RSpice dataset bundle, CSV, TSV, Touchstone v2, HDF5, NumPy <code>.npy</code> and <code>.npz</code>, MATLAB v5 and VCD.</td></tr>
+            <tr><td>File &rsaquo; Export &rsaquo; Image or PDF&hellip;</td><td>PDF, PDF/A, SVG, PNG or TIFF of the active view (<kbd>Ctrl+Alt+Shift+E</kbd>).</td></tr>
+          </tbody></table></div>
+          <p>An imported dataset becomes a retained run marked as external data: it never claims to be an RSpice solve of the project. <strong>Results &rsaquo; Report editor&hellip;</strong> lays out report pages, with results inserted, for printing and export.</p>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="page-frame footer__grid">
+      <div class="footer__identity"><a class="identity" href="../index.html"><img src="../assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a><p>Rust circuit simulator with desktop, CLI, Python, and WebAssembly interfaces.</p></div>
+      <div><h2>Technical</h2><a href="../reference.html">Generated reference</a><a href="../validation.html">Validation status</a><a href="../parity.html">Methodology</a><a href="../docs.html">Scope and builds</a></div>
+      <div><h2>Project</h2><a href="../changelog.html">Development record</a><a href="../download.html">Build from source</a><a href="../early-access.html">Early access</a><a href="../privacy.html">Privacy</a></div>
+      <div><h2>Contact</h2><a href="mailto:hello@rspice.app">General</a><a href="mailto:sales@rspice.app">Commercial</a><a href="https://github.com/JaimeHW/RSpice-Site/security" target="_blank" rel="noopener">Security</a></div>
+    </div>
+    <div class="page-frame footer__base"><span>&copy; <span data-year>2026</span> RSpice</span><span>SOURCE BUILD / HOSTED SERVICES NOT ACTIVE</span><span>IBM Plex under SIL OFL</span></div>
+  </footer>
+  <script src="../assets/field.js" defer></script>
+</body>
+</html>

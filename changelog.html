@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#071015">
   <meta name="color-scheme" content="dark">
-  <title>Development record &mdash; RSpice</title>
-  <meta name="description" content="Current RSpice source status, active implementation areas, Workbench redesign status, and release requirements.">
+  <title>Changelog &mdash; RSpice</title>
+  <meta name="description" content="RSpice changes by version: the 0.1.0 development build's ten-menu bar, new and removed commands, changed keyboard shortcuts and notes for moving from an earlier build.">
   <link rel="canonical" href="https://rspice.app/changelog">
   <link rel="icon" href="assets/brand/rspice.ico" sizes="any">
   <link rel="apple-touch-icon" href="assets/brand/icon-256.png">
@@ -14,8 +14,8 @@
   <link rel="stylesheet" href="assets/technical.css">
   <link rel="stylesheet" href="assets/interior-refined.css">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Development record &mdash; RSpice">
-  <meta property="og:description" content="Current source status and active implementation areas for RSpice.">
+  <meta property="og:title" content="Changelog &mdash; RSpice">
+  <meta property="og:description" content="RSpice changes by version, starting with the 0.1.0 development build.">
   <meta property="og:image" content="https://rspice.app/assets/og.png">
 </head>
 <body class="technical-page">
@@ -36,57 +36,109 @@
     <header class="technical-hero">
       <div class="page-frame technical-hero__grid">
         <div>
-          <p class="eyebrow">RSPICE / DEVELOPMENT RECORD</p>
-          <h1>Current source status and active implementation areas.</h1>
-          <p class="technical-hero__lede">The workspace reports version 0.1.0 and does not publish signed installer releases. Repository commits and tags are the current change record.</p>
+          <p class="eyebrow">RSPICE / CHANGELOG</p>
+          <h1>Changelog.</h1>
+          <p class="technical-hero__lede">What changed for a user of RSpice, one entry per version. The repository's commits stay the complete record.</p>
         </div>
-        <dl class="technical-hero__ledger" aria-label="Development record status">
-          <div><dt>PUBLIC RELEASE</dt><dd>Not published</dd></div>
-          <div><dt>AUTHORITATIVE LOG</dt><dd>Repository commits and tags</dd></div>
-          <div><dt>WORKSPACE VERSION</dt><dd>0.1.0 source metadata</dd></div>
-          <div><dt>CONNECTED SERVICE</dt><dd>Planned / not operating</dd></div>
+        <dl class="technical-hero__ledger" aria-label="Changelog status">
+          <div><dt>LATEST ENTRY</dt><dd>0.1.0 / 2026-11-01</dd></div>
+          <div><dt>SIGNED INSTALLER</dt><dd>Not published</dd></div>
+          <div><dt>HOW TO GET IT</dt><dd>Build from source</dd></div>
+          <div><dt>COMPLETE RECORD</dt><dd>Repository commits</dd></div>
         </dl>
       </div>
     </header>
 
     <div class="page-frame technical-layout">
-      <aside class="technical-index" aria-label="Development record sections">
+      <aside class="technical-index" aria-label="Changelog sections">
         <p>ON THIS PAGE</p>
-        <a href="#record">Current source status</a><a href="#tracks">Implementation areas</a><a href="#ui">Workbench implementation</a><a href="#release">Release requirements</a><a href="#history">Commit history</a>
+        <a href="#v0.1.0">0.1.0</a><a href="#v0.1.0-menus">Ten menus</a><a href="#v0.1.0-new">New commands</a><a href="#v0.1.0-removed">Removed</a><a href="#v0.1.0-keys">Changed keys</a><a href="#v0.1.0-moving">Moving from an earlier build</a><a href="#tracks">Implementation areas</a><a href="#release">Release requirements</a><a href="#history">Commit history</a>
       </aside>
 
       <article class="technical-document">
-        <section class="technical-section" id="record">
-          <p class="technical-number">01 / CURRENT SOURCE STATUS</p>
-          <h2>Source metadata is 0.1.0; no signed installer release exists.</h2>
-          <p>Use the exact source commit, test output, target platform, model bundle, and documented limitations when comparing revisions.</p>
-          <div class="technical-callout"><strong>RECENT SOURCE FOCUS / 2026-07-10</strong><span>Recent commits concentrate on tiered generated Verilog-A kernels, sparse local-kernel size limits, and parallel Rust code generation. The linked commit history remains authoritative as work continues.</span></div>
+        <section class="technical-section" id="v0.1.0">
+          <p class="technical-number">0.1.0 / 2026-11-01</p>
+          <h2>0.1.0, the development build of 1 November 2026.</h2>
+          <p>0.1.0 is the version the RSpice source declares. There is no signed installer for it: <a href="download.html">build it from source</a>. This entry lists what a user of the desktop application sees changed between 20 October and 1 November 2026, on RSpice <code>main</code> up to commit <a href="https://github.com/JaimeHW/RSpice/commit/c72435a76cc052467c67148f11af52402106423d" target="_blank" rel="noopener"><code>c72435a76c</code></a>. Smaller fixes are in the <a href="https://github.com/JaimeHW/RSpice/commits/main" target="_blank" rel="noopener">commit history</a>.</p>
+
+          <h3 id="v0.1.0-menus">The menu bar has ten menus.</h3>
+          <p>File, Edit, View, Design, Simulate, Results, Verify, Tools, Window and Help. Each menu now holds one kind of work:</p>
+          <ul class="technical-list">
+            <li><span><strong>File</strong> makes, opens, closes, saves, imports, exports and prints. Open recent lists the recent files, newest first, and ends in All projects. Import and Export are submenus; Exit is on Windows and Linux only.</span></li>
+            <li><span><strong>Edit</strong> holds every edit to the selection, including Move, Stretch, Create array, Replace instance and Bulk edit, which were in Design. Undo and Redo name the step they take, such as &ldquo;Undo place resistor&rdquo;.</span></li>
+            <li><span><strong>View</strong> holds the zooms, a Grid submenu, Display options and the panels (Navigator, Inspector, Console, Split with results, Problems), which were in Window.</span></li>
+            <li><span><strong>Design</strong> moves through the hierarchy, then has Place, Arrange and Sheet submenus, design management, and the checks. With a symbol in front, Place lists the symbol's drawing tools.</span></li>
+            <li><span><strong>Simulate</strong> manages plans, sets them up through a Setup submenu of the nine setup pages, checks, runs and stops, then reads the operating point back onto the schematic.</span></li>
+            <li><span><strong>Results</strong> opens the Results browser and the viewers; View as offers only the viewers the selected result can be read in.</span></li>
+            <li><span><strong>Verify</strong> lists Monte Carlo yield, Process corners, Parameter tuning, Optimization, Safe operating area, Specification matrix and Regression.</span></li>
+            <li><span><strong>Tools</strong> replaces the Models and Automation menus: the Library manager, the model tools, PDK and model paths, the Netlist and script editor and Scripts.</span></li>
+            <li><span><strong>Window</strong> moves documents between windows, reaches all eight workspaces (<kbd>Alt+1</kbd> to <kbd>Alt+8</kbd>) and lays out panels.</span></li>
+            <li><span><strong>Help</strong> has RSpice Help, Keyboard shortcuts, Examples, Release notes, Report a problem, License and activation, and the notices.</span></li>
+          </ul>
+          <p>The command palette's tabs follow the ten menus, and each command in it names where the menu bar has it, such as &ldquo;Design &rsaquo; Place&rdquo;.</p>
+
+          <h3 id="v0.1.0-new">New commands.</h3>
+          <ul class="technical-list">
+            <li><span><strong>Edit &rsaquo; Select</strong> &rsaquo; Instances, Wires, Net labels, Pins, Text or Shapes replaces the selection with every object of that kind on the active schematic sheet. <strong>Edit &rsaquo; Deselect all</strong> clears it.</span></li>
+            <li><span><strong>Edit &rsaquo; Copy as image</strong> puts a picture of the selection, or of the whole view, on the clipboard: the export's drawing, not a screenshot.</span></li>
+            <li><span><strong>View &rsaquo; Zoom previous</strong> (<kbd>Shift+W</kbd>) steps a schematic or symbol canvas back through up to 16 earlier views.</span></li>
+            <li><span><strong>View &rsaquo; Grid</strong> &rsaquo; Dots, Lines or Off draws one grid style; <kbd>G</kbd> still steps through them.</span></li>
+            <li><span><strong>Design &rsaquo; Highlight net</strong> lights the net the selection is on, as clicking a wire does.</span></li>
+            <li><span><strong>Design &rsaquo; Create symbol from schematic</strong>, <strong>Variants</strong> and <strong>Annotate reference designators</strong> open those tasks directly.</span></li>
+            <li><span><strong>Simulate &rsaquo; Annotate DC operating point</strong> and <strong>Annotate transient voltages</strong> label the schematic's nets with the operating point, or with the transient's values at results cursor A.</span></li>
+            <li><span><strong>File &rsaquo; Print</strong> reaches system printers on macOS and Linux through CUPS. It was a Windows feature.</span></li>
+            <li><span><strong>Menu access keys</strong> on the Windows and Linux desktop: <kbd>Alt</kbd> and a menu's underlined letter opens it, a tap of <kbd>Alt</kbd> moves the focus to the menu bar, and a row's letter chooses it.</span></li>
+            <li><span><strong>The RSpice menu on macOS</strong> holds About RSpice, Settings (<kbd>&#x2318;,</kbd>) and Quit RSpice (<kbd>&#x2318;Q</kbd>); Window begins with Minimize and Zoom, and keys are written with the macOS symbols.</span></li>
+            <li><span><strong>Help &rsaquo; Examples</strong> opens one of six demonstration circuits, such as an RC low-pass filter or a CMOS inverter, as a new project.</span></li>
+            <li><span><strong>Help &rsaquo; Report a problem</strong> is the command once called System diagnostics and log locations.</span></li>
+          </ul>
+
+          <h3 id="v0.1.0-removed">Removed.</h3>
+          <ul class="technical-list">
+            <li><span><strong>The Specialist tool browser</strong> and the 34 preview workspaces it listed but could not open, and the <strong>PDK technology administrator</strong>, which only that browser reached. Tools &rsaquo; PDK and model paths stays.</span></li>
+            <li><span><strong>Source navigation and language tools</strong>, a nine-tab dialog. Rename symbol (<kbd>F2</kbd>), Go to definition and Find references (<kbd>F12</kbd> and <kbd>Shift+F12</kbd> on the desktop) and Format document act directly in the source editor.</span></li>
+            <li><span><strong>HSPICE and Xyce netlist export</strong>, which wrote the SPICE netlist under another extension. File &rsaquo; Export offers SPICE and Spectre netlists.</span></li>
+            <li><span><strong>Export schematic SVG</strong> (File &rsaquo; Export &rsaquo; Image or PDF writes SVG too) and <strong>Export publication snapshot</strong>.</span></li>
+            <li><span><strong>Reset active view.</strong> The zooms, Fit and each filter's own clear button restore what is shown.</span></li>
+            <li><span><strong>The Migration guide</strong> in the Help Center. Its notes are below.</span></li>
+            <li><span><strong>Recent projects</strong> (File &rsaquo; Open recent lists the projects) and <strong>Custom sheet sizes</strong> (Sheet defaults offers the size library).</span></li>
+          </ul>
+
+          <h3 id="v0.1.0-keys">Changed keyboard shortcuts.</h3>
+          <p>Every default key that changed. Where a browser keeps a key for itself, the key is the desktop's only. The <a href="docs/keyboard-shortcuts.html">keyboard shortcuts page</a> lists every key.</p>
+          <div class="technical-table-wrap"><table class="technical-table"><thead><tr><th scope="col">COMMAND</th><th scope="col">BEFORE</th><th scope="col">NOW</th></tr></thead><tbody>
+            <tr><td>File &rsaquo; New cell</td><td>No key</td><td><kbd>Ctrl+N</kbd> on the desktop; none in a browser, which opens a window on it.</td></tr>
+            <tr><td>File &rsaquo; Export &rsaquo; Image or PDF</td><td><kbd>Ctrl+Shift+P</kbd> on the desktop, <kbd>Ctrl+Alt+Shift+E</kbd> in a browser</td><td><kbd>Ctrl+Alt+Shift+E</kbd> everywhere.</td></tr>
+            <tr><td>View &rsaquo; Zoom 100%</td><td>No key</td><td><kbd>Ctrl+0</kbd> on the desktop; none in a browser, which zooms its page on it.</td></tr>
+            <tr><td>View &rsaquo; Zoom previous</td><td>New command</td><td><kbd>Shift+W</kbd> everywhere.</td></tr>
+            <tr><td>Design &rsaquo; Object table</td><td><kbd>Ctrl+Shift+T</kbd> everywhere</td><td><kbd>Ctrl+Shift+T</kbd> on the desktop; none in a browser, which reopens a tab on it.</td></tr>
+            <tr><td>Simulate &rsaquo; Check and netlist</td><td><kbd>Ctrl+E</kbd></td><td>No key. <kbd>Ctrl+E</kbd> is Design &rsaquo; Check cellview, in the Design workspace.</td></tr>
+          </tbody></table></div>
+          <p>Object table was called Engineering table view, Export image or PDF was Export active view, and Check and netlist was Preflight checks.</p>
+
+          <h3 id="v0.1.0-moving">Moving from an earlier build.</h3>
+          <ul class="technical-list">
+            <li><span><strong>Projects:</strong> a project saved by an earlier build is brought up to date when it opens; there is no separate migration step. Keep a copy of the project and of the model and source files it refers to before opening it in a newer build, and run Design &rsaquo; Check design and Simulate &rsaquo; Check and netlist before saving over it.</span></li>
+            <li><span><strong>Keyboard shortcut profiles</strong> keep loading. A key bound to a removed command is dropped without a warning, and a key bound to a few renamed commands, such as the old Run checks, reaches the command that replaced it.</span></li>
+            <li><span><strong>Netlist export:</strong> a saved HSPICE or Xyce export format reads back as SPICE.</span></li>
+            <li><span><strong>Sessions:</strong> a session left on a removed workspace opens on Design.</span></li>
+          </ul>
+          <div class="technical-callout"><strong>KNOWN LIMITS</strong><span>Result plots keep no Zoom previous history yet. In a browser, Copy as image needs a secure page. Annotate transient voltages draws nothing for a stepped transient. The printer driver properties button is Windows only.</span></div>
         </section>
 
         <section class="technical-section" id="tracks">
-          <p class="technical-number">02 / IMPLEMENTATION AREAS</p>
-          <h2>Current implementation areas.</h2>
+          <p class="technical-number">IMPLEMENTATION AREAS</p>
+          <h2>Where the source is being built out.</h2>
           <div class="technical-grid technical-grid--three">
             <article><span><span class="technical-pill">SOURCE PATH</span></span><h3>Core simulation</h3><p>Netlist elaboration, modified nodal analysis, device evaluation, sparse solvers, and analysis dispatch.</p></article>
-            <article><span><span class="technical-pill">SOURCE PATH</span></span><h3>Automation &amp; validation</h3><p>CLI commands, Python bindings, result conversion, golden comparison, machine-readable reports, and corpus harnesses.</p></article>
-            <article><span><span class="technical-pill technical-pill--warning">UNDER REVAMP</span></span><h3>Workbench GUI</h3><p>The current HTML mockup defines layouts for design, simulation, results, verification, models, and project management.</p></article>
+            <article><span><span class="technical-pill">SOURCE PATH</span></span><h3>Automation &amp; validation</h3><p>CLI commands, governed Python automation, result conversion, golden comparison, machine-readable reports, and corpus harnesses.</p></article>
+            <article><span><span class="technical-pill technical-pill--warning">UNDER REVAMP</span></span><h3>Workbench GUI</h3><p>The HTML mockup on the home page defines layouts for design, simulation, results, verification, models, and project management. The desktop application is a separate implementation.</p></article>
           </div>
-          <p>Compact-model generation, periodic/RF analyses, behavioral models, and host interfaces are versioned independently. See the source README for implementation-specific limitations.</p>
-        </section>
-
-        <section class="technical-section" id="ui">
-          <p class="technical-number">03 / WORKBENCH IMPLEMENTATION</p>
-          <h2>The Workbench mockup defines the current GUI layout.</h2>
-          <p>The home page renders the fixed 1440 × 900 Workbench HTML directly through an auto-fit frame. It does not embed the responsive-preview controls and does not use a screenshot.</p>
-          <div class="technical-grid">
-            <article><span>MOCKUP</span><h3>Defined layouts</h3><p>Hierarchy, schematic capture, checks, run configuration, property inspection, results, and desktop, tablet, or phone compositions.</p></article>
-            <article><span>IMPLEMENTATION</span><h3>Remaining qualification</h3><p>The native and browser hosts still require feature wiring, accessibility testing, performance measurements, persistence, and release packaging.</p></article>
-          </div>
-          <div class="technical-actions"><a class="button button--hot" href="index.html#product">Inspect Workbench concept</a><a class="button button--quiet" href="docs.html#interfaces">Read interface boundary</a></div>
+          <p>See the source README for implementation-specific limitations.</p>
         </section>
 
         <section class="technical-section" id="release">
-          <p class="technical-number">04 / RELEASE REQUIREMENTS</p>
+          <p class="technical-number">RELEASE REQUIREMENTS</p>
           <h2>Required contents of a public release.</h2>
           <ul class="technical-list">
             <li><span><strong>Pin a revision:</strong> identify the exact source commit, dependencies, toolchain, model bundle, and platform target.</span></li>
@@ -97,8 +149,8 @@
         </section>
 
         <section class="technical-section" id="history">
-          <p class="technical-number">05 / COMMIT HISTORY</p>
-          <h2>Repository commits and tags are the current change log.</h2>
+          <p class="technical-number">COMMIT HISTORY</p>
+          <h2>Repository commits are the complete change record.</h2>
           <p>Each commit identifies the changed files and parent revision. Pair it with CI output and the build environment when evaluating numerical or interface changes.</p>
           <div class="technical-actions"><a class="button button--hot" href="https://github.com/JaimeHW/RSpice/commits/main" target="_blank" rel="noopener">Open commit history <span aria-hidden="true">&nearr;</span></a><a class="button button--quiet" href="parity.html">Read validation approach</a></div>
         </section>

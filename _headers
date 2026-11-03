@@ -14,3 +14,6 @@
 
 /reference/*
   Cache-Control: public, max-age=300, must-revalidate
+
+/releases/*
+  Cache-Control: no-cache

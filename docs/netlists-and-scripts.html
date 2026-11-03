@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071015">
+  <meta name="color-scheme" content="dark">
+  <title>Netlists and scripts &mdash; RSpice</title>
+  <meta name="description" content="Work with SPICE decks in RSpice: open a deck as a project, edit and run owned source, export netlists, run Python automation workflows, and use the rspice command line.">
+  <link rel="canonical" href="https://rspice.app/docs/netlists-and-scripts">
+  <link rel="icon" href="../assets/brand/rspice.ico" sizes="any">
+  <link rel="apple-touch-icon" href="../assets/brand/icon-256.png">
+  <link rel="stylesheet" href="../assets/field.css">
+  <link rel="stylesheet" href="../assets/technical.css">
+  <link rel="stylesheet" href="../assets/interior-refined.css">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Netlists and scripts &mdash; RSpice">
+  <meta property="og:description" content="SPICE decks, generated and owned netlists, netlist export, Python workflows and the rspice command line.">
+  <meta property="og:image" content="https://rspice.app/assets/og.png">
+</head>
+<body class="technical-page docs-page">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="topbar" data-topbar>
+    <div class="topbar__inner">
+      <a class="identity" href="../index.html" aria-label="RSpice home"><img src="../assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a>
+      <button class="nav-trigger" type="button" aria-controls="site-nav" aria-expanded="false" data-nav-trigger><span class="visually-hidden">Open navigation</span><span aria-hidden="true"></span><span aria-hidden="true"></span></button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary navigation" data-site-nav>
+        <a href="../index.html#engine">Engine</a><a href="../index.html#analyses">Analyses</a><a href="../index.html#truth">Status</a><a href="../reference.html">Reference</a><a href="../validation.html">Validation</a><a href="../docs.html" aria-current="page">Docs</a>
+      </nav>
+      <div class="topbar__actions"><a class="source-link" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a><a class="launch-link" href="../ide/">Open WASM lab <span class="launch-link__tag">experimental</span></a></div>
+    </div>
+  </header>
+
+  <main id="main">
+    <header class="technical-hero">
+      <div class="page-frame technical-hero__grid">
+        <div>
+          <p class="eyebrow"><a href="../docs.html">RSPICE / DOCS</a> / NETLISTS AND SCRIPTS</p>
+          <h1>Netlists and scripts.</h1>
+          <p class="technical-hero__lede">Work from SPICE text instead of a schematic, keep an editable deck beside the generated one, export netlists, and automate runs with Python, in the application or from the command line.</p>
+        </div>
+        <dl class="technical-hero__ledger" aria-label="Netlists and scripts at a glance">
+          <div><dt>WORKSPACE</dt><dd>Netlist and script editor, <kbd>Alt+7</kbd></dd></div>
+          <div><dt>OPEN A DECK</dt><dd>File &rsaquo; Open netlist as project&hellip;</dd></div>
+          <div><dt>SCRIPTS</dt><dd>Tools &rsaquo; Scripts, <kbd>Ctrl+`</kbd></dd></div>
+          <div><dt>COMMAND LINE</dt><dd><code>rspice run</code></dd></div>
+        </dl>
+      </div>
+    </header>
+
+    <div class="page-frame technical-layout">
+      <aside class="technical-index" aria-label="Netlists and scripts sections">
+        <p>ON THIS PAGE</p>
+        <a href="#open">Open or import a deck</a><a href="#editor">The source editor</a><a href="#generated">Generated and owned source</a><a href="#run">Validate and run a deck</a><a href="#export">Export a netlist</a><a href="#scripts">Python workflows</a><a href="#cli">The command line</a>
+      </aside>
+
+      <article class="technical-document">
+        <section class="technical-section" id="open">
+          <p class="technical-number">01 / OPEN OR IMPORT A DECK</p>
+          <h2>A deck can be the whole project.</h2>
+          <ul class="technical-list">
+            <li><span><strong>File &rsaquo; Open netlist as project&hellip;</strong> (<kbd>Ctrl+Shift+L</kbd>; <kbd>Ctrl+Alt+Shift+L</kbd> in the browser), or <strong>Open SPICE deck&hellip;</strong> on the start screen, opens a deck as a netlist project. Such a project has no schematic: the Design workspace shows the deck and links to the editor. The project launcher also takes a dropped <code>.cir</code>, <code>.sp</code>, <code>.spice</code>, <code>.net</code> or <code>.ckt</code> file.</span></li>
+            <li><span><strong>File &rsaquo; Import &rsaquo; SPICE deck&hellip;</strong> brings a deck into the open project. Before the project changes, the import shows the file, the dialect it detected, the parser's result and every transformation it would make.</span></li>
+            <li><span>In a project with no deck yet, the Netlist and script editor offers <strong>New top deck&hellip;</strong> and <strong>Import deck&hellip;</strong>; no schematic is needed.</span></li>
+          </ul>
+        </section>
+
+        <section class="technical-section" id="editor">
+          <p class="technical-number">02 / THE SOURCE EDITOR</p>
+          <h2>Editing keys for SPICE text.</h2>
+          <div class="technical-table-wrap"><table class="technical-table shortcut-table"><thead><tr><th scope="col">COMMAND</th><th scope="col">KEY</th><th scope="col">COMMAND</th><th scope="col">KEY</th></tr></thead><tbody>
+            <tr><td>Find in source&hellip;</td><td><kbd>Ctrl+F</kbd></td><td>Go to line&hellip;</td><td><kbd>Ctrl+G</kbd></td></tr>
+            <tr><td>Toggle line comment</td><td><kbd>Ctrl+/</kbd></td><td>Duplicate line</td><td><kbd>Ctrl+D</kbd></td></tr>
+            <tr><td>Delete line</td><td><kbd>Ctrl+Shift+K</kbd></td><td>Rename symbol&hellip;</td><td><kbd>F2</kbd></td></tr>
+            <tr><td>Go to definition</td><td><kbd>F12</kbd> desktop</td><td>Find references</td><td><kbd>Shift+F12</kbd> desktop</td></tr>
+          </tbody></table></div>
+          <p><strong>Edit &rsaquo; Format document</strong> formats the deck, and <strong>View &rsaquo; Folding</strong> folds and unfolds it. Find and replace searches editable source and the generated references, but replaces only in project-owned source; Rename symbol renames a definition and every indexed reference to it across the project's editable netlists.</p>
+        </section>
+
+        <section class="technical-section" id="generated">
+          <p class="technical-number">03 / GENERATED AND OWNED SOURCE</p>
+          <h2>The schematic's netlist stays read-only.</h2>
+          <p>A schematic project's netlist is generated, read-only and mapped back to the schematic; <strong>Simulate &rsaquo; Open generated netlist</strong> (<kbd>Ctrl+L</kbd>; <kbd>Ctrl+Alt+L</kbd> in the browser) shows it. To change what runs, choose <strong>Create editable source from generated netlist&hellip;</strong> and an edit strategy. The editable copy records the revision it was based on and how it follows regeneration.</p>
+          <div class="technical-table-wrap"><table class="technical-table"><thead><tr><th scope="col">STRATEGY</th><th scope="col">WHAT YOU OWN</th></tr></thead><tbody>
+            <tr><td>Owned source</td><td>The complete deck, as an independently editable source revision.</td></tr>
+            <tr><td>Parameter and option override</td><td>Only <code>.param</code>, <code>.option</code> and <code>.temp</code> cards; a run composes them with the frozen generated deck.</td></tr>
+            <tr><td>Include-order override</td><td>Include and library ordering, keeping the generated circuit and analyses.</td></tr>
+            <tr><td>Analysis-only deck</td><td>Analysis, measurement, save and probe cards, keeping the generated circuit.</td></tr>
+          </tbody></table></div>
+          <p>Each included file is marked by who owns it: project-owned and editable, or a read-only external reference, vendor source, technology package or standard library. <strong>Copy to project</strong> makes an include project-owned, so edits apply when the deck runs and are saved with the project.</p>
+        </section>
+
+        <section class="technical-section" id="run">
+          <p class="technical-number">04 / VALIDATE AND RUN A DECK</p>
+          <h2>Run from the editor.</h2>
+          <p><strong>Validate source</strong> checks the deck with all of its includes; an include cannot be validated or run on its own, only through its root deck. <strong>Run deck</strong> runs it and <strong>Stop</strong> ends the run. The run strip then shows whether the deck in the editor is byte for byte the one the run executed, and offers <strong>Open in Results</strong> and <strong>Compare</strong>, which compares the run's deck with the working revision.</p>
+        </section>
+
+        <section class="technical-section" id="export">
+          <p class="technical-number">05 / EXPORT A NETLIST</p>
+          <h2>File &rsaquo; Export.</h2>
+          <p><strong>SPICE netlist&hellip;</strong> and <strong>Spectre netlist&hellip;</strong> export the current generated revision, either as a deck or as a bundle with its dependencies and a checksum manifest. Exporting does not change the project's source.</p>
+        </section>
+
+        <section class="technical-section" id="scripts">
+          <p class="technical-number">06 / PYTHON WORKFLOWS</p>
+          <h2>Tools &rsaquo; Scripts.</h2>
+          <p><strong>Tools &rsaquo; Scripts</strong> (<kbd>Ctrl+`</kbd>) opens the Automation and CI console in the Netlist and script editor. An automation workspace is a set of files: a Python entry point, a YAML run plan, a read-only environment lock, and a TOML manifest of the capabilities the workflow is granted.</p>
+          <ul class="technical-list">
+            <li><span>The console's toolbar has <strong>Validate</strong>, which checks the workflow with the managed Python runtime, <strong>Dry run</strong>, and <strong>Run workflow</strong> and <strong>Stop workflow</strong>.</span></li>
+            <li><span>The inspector lists the permissions the manifest grants: project files, the artifact directory, network access, process spawning and secret logging.</span></li>
+            <li><span>Scripts can be debugged: <kbd>F9</kbd> toggles a breakpoint on the active line, and the debugger starts, pauses and continues.</span></li>
+          </ul>
+          <div class="technical-callout"><strong>RUNTIME</strong><span>Python runs and debugging use only the Python runtime RSpice manages. RSpice never falls back to a system interpreter or invents run or debug results.</span></div>
+        </section>
+
+        <section class="technical-section" id="cli">
+          <p class="technical-number">07 / THE COMMAND LINE</p>
+          <h2><code>rspice</code> for batch runs and CI.</h2>
+          <p>The command line runs the same engine as the application, and its exit status is the verification contract: <code>0</code> is success, <code>3</code> is a missed <code>.MEAS</code> goal or a golden mismatch, and other codes name invalid input, unsupported decks and engine failures. Build it as described on the <a href="../docs.html#build">docs index</a>.</p>
+          <figure class="technical-code"><figcaption><span>shell / rspice</span><span>examples</span></figcaption><pre><code># Run a deck and print its measurements
+rspice run rc_lowpass.sp --meas
+
+# Write results as HDF5 instead
+rspice run rc_lowpass.sp -o rc.h5 --format hdf5
+
+# Quiet batch run with a JUnit report and a time budget
+rspice run circuit.sp -q --report-format junit --report-file results.xml --timeout 600
+
+# Compare against a golden file
+rspice compare results.csv golden.csv --abstol 1e-9 --reltol 1e-6</code></pre></figure>
+          <p><code>rspice check</code> validates syntax and connectivity, <code>rspice info</code> prints what a deck contains, <code>rspice convert</code> converts between raw, ASCII raw, CSV, TSV, JSON, HDF5 and VCD, and <code>rspice study</code> plans and runs a versioned study. <code>--spice-dialect</code> chooses <code>ngspice</code>, <code>xyce</code> or <code>best</code> semantics. The full manual is <code>crates/rspice-cli/README.md</code> in the source repository.</p>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="page-frame footer__grid">
+      <div class="footer__identity"><a class="identity" href="../index.html"><img src="../assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a><p>Rust circuit simulator with desktop, CLI, Python, and WebAssembly interfaces.</p></div>
+      <div><h2>Technical</h2><a href="../reference.html">Generated reference</a><a href="../validation.html">Validation status</a><a href="../parity.html">Methodology</a><a href="../docs.html">Scope and builds</a></div>
+      <div><h2>Project</h2><a href="../changelog.html">Development record</a><a href="../download.html">Build from source</a><a href="../early-access.html">Early access</a><a href="../privacy.html">Privacy</a></div>
+      <div><h2>Contact</h2><a href="mailto:hello@rspice.app">General</a><a href="mailto:sales@rspice.app">Commercial</a><a href="https://github.com/JaimeHW/RSpice-Site/security" target="_blank" rel="noopener">Security</a></div>
+    </div>
+    <div class="page-frame footer__base"><span>&copy; <span data-year>2026</span> RSpice</span><span>SOURCE BUILD / HOSTED SERVICES NOT ACTIVE</span><span>IBM Plex under SIL OFL</span></div>
+  </footer>
+  <script src="../assets/field.js" defer></script>
+</body>
+</html>

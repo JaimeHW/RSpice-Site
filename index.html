@@ -93,7 +93,7 @@
         <dl class="hero-dossier" aria-label="Generated source inventory">
           <div><dt>SOURCE REVISION</dt><dd><a href="reference.html"><span data-catalog-field="source.short_revision">c216a0922ae3</span></a></dd></div>
           <div><dt>WORKSPACE</dt><dd>v<span data-catalog-field="source.version">0.1.0</span> / Rust <span data-catalog-field="source.rust_version">1.94</span></dd></div>
-          <div><dt>NIGHTLY GATE</dt><dd><span data-catalog-field="validation.nightly.configured_total">113</span> ngspice decks configured</dd></div>
+          <div><dt>NGSPICE MANIFEST</dt><dd><span data-catalog-field="validation.ngspice_manifest.entries">49</span> classified entries</dd></div>
           <div><dt>RETAINED CORPUS</dt><dd><span data-catalog-field="validation.xyce_manifest.entries">2123</span> Xyce contracts</dd></div>
           <div><dt>HOSTED STATE</dt><dd>Identity / sync / compute not active</dd></div>
         </dl>
@@ -147,8 +147,7 @@
             <div class="host-matrix__head" role="row"><span role="columnheader">HOST</span><span role="columnheader">EXECUTION</span><span role="columnheader">PRIMARY USE</span><span role="columnheader">STATE</span></div>
             <article role="row"><strong role="cell">Desktop</strong><span role="cell">Native / egui / wgpu</span><p role="cell">Schematic capture, local projects, analysis configuration, and waveform inspection.</p><em role="cell">SOURCE BUILD</em></article>
             <article role="row"><strong role="cell">CLI</strong><span role="cell">Native / batch</span><p role="cell">Deck execution, reports, conversion, comparison, time budgets, and CI gating.</p><em role="cell">SOURCE BUILD</em></article>
-            <article role="row"><strong role="cell">Python</strong><span role="cell">PyO3 / NumPy</span><p role="cell">Programmatic DC, transient, and AC results inside numerical workflows.</p><em role="cell">SOURCE BUILD</em></article>
-            <article role="row"><strong role="cell">Browser</strong><span role="cell">WASM / single thread</span><p role="cell">Netlist summaries plus selected DC, AC, and transient result snapshots.</p><em role="cell">EXPERIMENTAL</em></article>
+            <article role="row"><strong role="cell">Browser</strong><span role="cell">WASM / WebGPU</span><p role="cell">The desktop workbench compiled to WebAssembly, with simulations in a module worker.</p><em role="cell">EXPERIMENTAL</em></article>
             <article role="row"><strong role="cell">Hosted runner</strong><span role="cell">Managed service</span><p role="cell">Planned queued sweeps, retained artifacts, organization policy, and result links.</p><em role="cell">NOT ACTIVE</em></article>
           </div>
         </div>
@@ -236,7 +235,7 @@
             <article><span>03 / SOURCES &amp; MIXED SIGNAL</span><h3>Sources, controlled elements, and bridges</h3><p>Independent and controlled sources provide time-domain stimulus, behavioral expressions, switching, and analog/digital conversion.</p><ul><li>PULSE, SIN, EXP, PWL, SFFM, AM, TRNOISE, and PWL file sources</li><li>E/F/G/H controlled and B behavioral sources; controlled switches</li><li>XSPICE-style analog/digital elements, tri-state drivers, and A/D–D/A bridges</li></ul></article>
             <article><span>04 / DECK &amp; MODEL PIPELINE</span><h3>Netlist elaboration and Verilog-A</h3><p>The parser resolves parameters, includes, libraries, and subcircuits before matrix assembly; Verilog-A uses interpreted, JIT, and generated-Rust paths.</p><ul><li><code>.SUBCKT</code>, <code>.PARAM</code>, expressions, <code>.INCLUDE</code>, and <code>.LIB</code></li><li><code>.OPTIONS</code>, <code>.TEMP</code>, engineering suffixes, and flattened elaboration</li><li>Verilog-A parser, semantic IR, bytecode VM, native JIT, and generated-Rust backends</li></ul></article>
             <article><span>05 / AUTOMATION &amp; VALIDATION</span><h3>CLI reports and regression tests</h3><p>CLI exit codes and report formats allow measurement failures, timeouts, invalid results, and golden-reference mismatches to stop CI jobs.</p><ul><li><code>run</code>, <code>info</code>, <code>check</code>, <code>compare</code>, <code>convert</code>, and <code>compile-va</code></li><li>Typed exit codes, timeouts, JUnit, TAP, JSON summaries, and measurement files</li><li>ngspice and Xyce corpus harnesses with explicit oracles and failure tracking</li></ul></article>
-            <article><span>06 / INTERFACES &amp; DATA</span><h3>Desktop, Python, WASM, and formats</h3><p>The egui application, CLI, Python bindings, and WebAssembly bindings use the same core, with target-specific analysis exposure.</p><ul><li>egui/wgpu desktop Workbench, CLI, Python/NumPy, and WebAssembly bindings</li><li>SPICE RAW, ASCII RAW, CSV, TSV, JSON, HDF5, and Touchstone output</li><li>Native desktop is the primary target; browser support is experimental and mobile UI remains a design target</li></ul></article>
+            <article><span>06 / INTERFACES &amp; DATA</span><h3>Desktop, CLI, browser, and formats</h3><p>The egui application, its WebAssembly browser build, and the CLI run the same core.</p><ul><li>egui/wgpu desktop Workbench, CLI, and WebAssembly browser build</li><li>SPICE RAW, ASCII RAW, CSV, TSV, JSON, HDF5, and Touchstone output</li><li>Native desktop is the primary target; browser support is experimental and mobile UI remains a design target</li></ul></article>
           </div>
           <a class="capability-ledger__link" href="docs.html">Read the revision-specific technical scope and limitations <span aria-hidden="true">↗</span></a>
         </div>
@@ -298,7 +297,7 @@
               <article><div><code>03</code><h3>Jobs, targets, and diagnostics</h3><span class="surface-state surface-state--mixed">ENGINE + DESIGN</span></div><p>Local runs and planned remote jobs expose queued, running, completed, cancelled, timed-out, failed, and verification-blocked states with retained diagnostics.</p><ul><li>Per-task run-set progress</li><li>Stop at safe solver boundaries</li><li>Residual and convergence history</li><li>Input and build fingerprint</li></ul></article>
               <article><div><code>04</code><h3>Datasets and visualizations</h3><span class="surface-state surface-state--mixed">SOURCE + DESIGN</span></div><p>Waveforms, spectra, measurements, tables, overlays, and exported datasets remain scoped to an immutable result manifest so a viewer cannot silently combine incompatible runs.</p><ul><li>Time, frequency, XY, eye, and statistical views</li><li>A/B cursors and derived expressions</li><li>Dataset comparison and export</li><li>Result provenance in the inspector</li></ul></article>
               <article><div><code>05</code><h3>Verification and sign-off evidence</h3><span class="surface-state surface-state--design">GUI REDESIGN</span></div><p>Specification matrices, corner coverage, regression comparisons, model qualification, reliability checks, review comments, and approvals are represented as evidence attached to a run.</p><ul><li>Requirements-to-measurement mapping</li><li>Pass, fail, not evaluated, and blocked</li><li>Golden reference differences</li><li>Report and audit export</li></ul></article>
-              <article><div><code>06</code><h3>Automation and reproducibility</h3><span class="surface-state surface-state--source">SOURCE BUILD</span></div><p>CLI, Python, reports, deterministic seeds, checkpoints, output conversion, and explicit exit codes let the same engineering checks operate outside the graphical client.</p><ul><li>JUnit, TAP, JSON, and measurement files</li><li>Golden compare and reviewed bless flow</li><li>Python/NumPy result access</li><li>Shell completions and configuration files</li></ul></article>
+              <article><div><code>06</code><h3>Automation and reproducibility</h3><span class="surface-state surface-state--source">SOURCE BUILD</span></div><p>CLI, Python, reports, deterministic seeds, checkpoints, output conversion, and explicit exit codes let the same engineering checks operate outside the graphical client.</p><ul><li>JUnit, TAP, JSON, and measurement files</li><li>Golden compare and reviewed bless flow</li><li>Governed Python automation</li><li>Shell completions and configuration files</li></ul></article>
             </div>
           </div>
         </div>
@@ -350,8 +349,8 @@ EXIT   0</span></code></pre>
           <article><span>RESULT FORMATS</span><h3>RAW / ASCII / CSV / TSV / JSON / HDF5</h3><p>Multi-analysis decks receive tagged outputs. Table-shaped TF, pole-zero, and sensitivity results use compatible formats rather than being forced into an unsuitable HDF5 section.</p></article>
           <article><span>RF DATA</span><h3>Complex tables / Touchstone</h3><p>Two-port extraction writes S11, S21, S12, and S22 across the deck’s AC sweep, with <code>.s2p</code> output when Touchstone is selected.</p></article>
           <article><span>REPORTS</span><h3>JUnit / TAP / JSON summary</h3><p>Tool version, per-run status, measurements, written files, and the overall verdict can be consumed without parsing terminal prose.</p></article>
-          <article><span>PYTHON</span><h3>PyO3 / NumPy arrays</h3><p>DC, transient, and AC result data can be returned directly to Python for numerical analysis, regression work, and custom plotting.</p></article>
-          <article><span>WEBASSEMBLY</span><h3>JSON-serializable snapshots</h3><p>The experimental single-threaded browser binding exposes netlist summaries and selected DC, AC, and transient execution without a hosted upload.</p></article>
+          <article><span>PYTHON</span><h3>Governed automation</h3><p>Python automation runs in a verified, managed runtime in its own worker, under a governed automation protocol.</p></article>
+          <article><span>WEBASSEMBLY</span><h3>One engine in the browser</h3><p>The experimental browser build runs the same core as the desktop and CLI, in a module worker off the UI thread, without a hosted upload.</p></article>
           <article><span>REPRODUCIBILITY</span><h3>Seeds / fingerprints / checkpoints</h3><p>Monte Carlo defaults to a deterministic seed; transient resume requires a byte-identical deck fingerprint; outputs retain run configuration and model identity.</p></article>
         </div>
       </div>
@@ -362,14 +361,13 @@ EXIT   0</span></code></pre>
         <header class="section-title section-title--split dossier-heading">
           <div>
             <p class="eyebrow">08 / VALIDATION EVIDENCE</p>
-            <h2 id="evidence-title">Configured gates, retained corpora, and raw files stay separate from pass claims.</h2>
+            <h2 id="evidence-title">Retained corpora and raw files stay separate from pass claims.</h2>
           </div>
-          <p>The public validation page is regenerated from the exact RSpice source commit. A CI conclusion is shown only when the downloaded artifact names that same commit; otherwise the site reports configuration and inventories without inventing a pass percentage.</p>
+          <p>The public validation page is regenerated from the exact RSpice source commit. A CI conclusion is shown only when the downloaded artifact names that same commit; otherwise the site reports source-controlled inventories without inventing a pass percentage.</p>
         </header>
 
         <div class="evidence-ledger">
           <article><span>SOURCE</span><strong data-catalog-field="source.short_revision">c216a0922ae3</strong><p>Commit used for the generated reference and validation inventory.</p></article>
-          <article><span>NIGHTLY RATCHET</span><strong><span data-catalog-field="validation.nightly.configured_total">113</span> decks</strong><p>Configured aggregate; no more than <span data-catalog-field="validation.nightly.max_failing">2</span> failing decks.</p></article>
           <article><span>NGSPICE MANIFEST</span><strong><span data-catalog-field="validation.ngspice_manifest.entries">49</span> entries</strong><p>Numeric, smoke, locked-grid, measure, scripted, and expected-unsolvable modes.</p></article>
           <article><span>XYCE MANIFEST</span><strong><span data-catalog-field="validation.xyce_manifest.entries">2123</span> contracts</strong><p>Retained deck and wrapper requirements, not a claim of successful execution.</p></article>
         </div>
@@ -379,7 +377,6 @@ EXIT   0</span></code></pre>
           <article><span>02</span><h3>Oracle replay</h3><p>Retained inputs and outputs for history-coupled devices and numerical state transitions.</p></article>
           <article><span>03</span><h3>ngspice corpus</h3><p>Deck-by-deck execution with probe-aware floors, relative tolerance, watchdogs, and explicit aggregate output.</p></article>
           <article><span>04</span><h3>Xyce contracts</h3><p>Runtime decks plus retained wrapper requirements that remain visible until the harness implements them.</p></article>
-          <article><span>05</span><h3>Benchmark context</h3><p>Source-controlled host, executable paths, repeats, deck names, medians, and raw scoreboard JSON.</p></article>
         </div>
         <div class="evidence-actions"><a class="button button--hot" href="validation.html">Open revision-pinned validation</a><a class="button button--quiet" href="reference/catalog.json">Inspect catalog JSON</a><a class="button button--quiet" href="parity.html">Read comparison methodology</a></div>
       </div>
@@ -400,11 +397,11 @@ EXIT   0</span></code></pre>
           <div class="truth__instrument-head"><span>AVAILABILITY MATRIX</span><span>CURRENT PUBLIC STATUS</span><span>CHECK THE SOURCE REVISION</span></div>
         <div class="truth-table" role="table" aria-label="RSpice product status">
           <div class="truth-table__head" role="row"><span role="columnheader">STATUS</span><span role="columnheader">COMPONENT</span><span role="columnheader">CURRENT SCOPE</span><span role="columnheader">DETAIL</span></div>
-          <article role="row"><span class="truth-pill truth-pill--ready" role="cell">SOURCE BUILD</span><h3 role="cell">Native engine &amp; tools</h3><p role="cell">The Rust engine, CLI, Python bindings, validation harnesses, and desktop egui application are present in the public source tree.</p><a role="cell" href="download.html">Build from source <span aria-hidden="true">↗</span></a></article>
+          <article role="row"><span class="truth-pill truth-pill--ready" role="cell">SOURCE BUILD</span><h3 role="cell">Native engine &amp; tools</h3><p role="cell">The Rust engine, CLI, validation harnesses, and desktop egui application are present in the public source tree.</p><a role="cell" href="download.html">Build from source <span aria-hidden="true">↗</span></a></article>
           <article role="row"><span class="truth-pill truth-pill--ready" role="cell">SOURCE BUILD</span><h3 role="cell">Verilog-A toolchain</h3><p role="cell">Parser, semantic IR, bytecode VM, x64-first JIT, standalone compilation, and generated-Rust built-in paths are present behind their applicable features.</p><a role="cell" href="reference.html">Inspect compiler surface <span aria-hidden="true">&nearr;</span></a></article>
-          <article role="row"><span class="truth-pill truth-pill--test" role="cell">EXPERIMENTAL</span><h3 role="cell">WebAssembly &amp; browser IDE</h3><p role="cell">The WASM interface exposes netlist summaries plus DC, AC, and transient runs; WebGPU and single-thread limits apply.</p><a role="cell" href="ide/">Open WASM lab <span aria-hidden="true">↗</span></a></article>
+          <article role="row"><span class="truth-pill truth-pill--test" role="cell">EXPERIMENTAL</span><h3 role="cell">WebAssembly &amp; browser IDE</h3><p role="cell">The desktop application compiled to WebAssembly. It needs a WebGPU-capable browser; phones and tablets are not a qualified target.</p><a role="cell" href="ide/">Open WASM lab <span aria-hidden="true">↗</span></a></article>
           <article role="row"><span class="truth-pill truth-pill--concept" role="cell">MOCKUP</span><h3 role="cell">New Workbench UI</h3><p role="cell">The embedded desktop, tablet, and phone layouts are HTML design mockups, not the current egui application.</p><a role="cell" href="#product">Inspect mockup <span aria-hidden="true">↗</span></a></article>
-          <article role="row"><span class="truth-pill truth-pill--test" role="cell">GENERATED</span><h3 role="cell">Reference &amp; validation status</h3><p role="cell">The catalog, gate configuration, manifest counts, benchmark context, and raw files are generated from the source commit named on each page.</p><a role="cell" href="validation.html">Open generated status <span aria-hidden="true">&nearr;</span></a></article>
+          <article role="row"><span class="truth-pill truth-pill--test" role="cell">GENERATED</span><h3 role="cell">Reference &amp; validation status</h3><p role="cell">The catalog, manifest counts, and raw files are generated from the source commit named on each page.</p><a role="cell" href="validation.html">Open generated status <span aria-hidden="true">&nearr;</span></a></article>
           <article role="row"><span class="truth-pill truth-pill--future" role="cell">ROADMAP</span><h3 role="cell">Accounts, sync, cloud &amp; sharing</h3><p role="cell">Live collaboration, cloud saves, managed simulation, and published circuit URLs are planned services; they are not live.</p><a role="cell" href="#roadmap">View hosted plan <span aria-hidden="true">↗</span></a></article>
         </div>
         </div>

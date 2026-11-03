@@ -5,10 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RSpice — IDE (browser)</title>
 <meta name="description" content="Run the browser-based RSpice IDE with the WebAssembly engine, schematic editor, and waveform workspace.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='25' fill='%23F2B824'/%3E%3Cg transform='translate(14.4 14.4) scale(0.7)'%3E%3Cg fill='none' stroke='%2317181A' stroke-width='10.5'%3E%3Cpath d='M 8 32 H 29'/%3E%3Cpath d='M 8 64 H 29'/%3E%3Cpath d='M 70 48 H 88'/%3E%3C/g%3E%3Cg fill='%2317181A'%3E%3Ccircle cx='8' cy='32' r='8'/%3E%3Ccircle cx='8' cy='64' r='8'/%3E%3Ccircle cx='88' cy='48' r='8'/%3E%3C/g%3E%3Cpath d='M 25 20 L 25 76 L 71 48 Z' fill='%2317181A' stroke='%2317181A' stroke-width='10.5' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='25' fill='%23F2B824'/%3E%3Cg transform='translate(2.88 2.88) scale(0.94)'%3E%3Cg fill='%23868E94'%3E%3Crect x='13' y='28' width='17' height='8' rx='1.5'/%3E%3Crect x='66' y='28' width='17' height='8' rx='1.5'/%3E%3Crect x='13' y='44' width='17' height='8' rx='1.5'/%3E%3Crect x='66' y='44' width='17' height='8' rx='1.5'/%3E%3Crect x='13' y='60' width='17' height='8' rx='1.5'/%3E%3Crect x='66' y='60' width='17' height='8' rx='1.5'/%3E%3C/g%3E%3Cpath fill='%2317181A' fill-rule='evenodd' d='M 28 24 A 4 4 0 0 1 32 20 H 42 A 6 6 0 0 0 54 20 H 64 A 4 4 0 0 1 68 24 V 72 A 4 4 0 0 1 64 76 H 32 A 4 4 0 0 1 28 72 Z'/%3E%3Ccircle cx='35' cy='29' r='3.2' fill='%23E6E9EB'/%3E%3C/g%3E%3C/svg%3E">
 <style>
   html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
   body { background: #11171B; }
+  .rspice-sr-only {
+    position: fixed; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap;
+    border: 0;
+  }
+  .rspice-sr-only:focus {
+    width: auto; height: auto; margin: 0; clip: auto; overflow: visible;
+    top: 8px; left: 8px; z-index: 40; padding: 9px 12px;
+    background: #171D21; color: #F4F6F7; border: 1px solid #F2B824;
+    border-radius: 4px; outline: 3px solid #F2B824; outline-offset: 2px;
+    font: 600 14px/1.2 "Segoe UI", system-ui, sans-serif;
+  }
   #rspice_spoken_feedback {
     position: fixed; top: 8px; left: 8px; z-index: 30;
     transform: translateY(calc(-100% - 16px));
@@ -37,7 +49,7 @@
     display: flex; align-items: center; justify-content: center;
     animation: pulse 1.6s ease-in-out infinite;
   }
-  #rspice_loading .tile svg { width: 70%; height: 70%; }
+  #rspice_loading .tile svg { width: 100%; height: 100%; }
   #rspice_loading p { margin: 0; font-size: 14px; letter-spacing: 0.04em; }
   #rspice_loading .err { color: #E06C5A; max-width: 48ch; text-align: center; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
@@ -48,15 +60,28 @@
 </style>
 </head>
 <body>
+<a class="rspice-sr-only" href="#rspice_canvas">Skip to RSpice workspace</a>
 <button id="rspice_spoken_feedback" type="button" aria-pressed="false">Enable spoken interaction feedback</button>
+<p id="rspice_canvas_instructions" class="rspice-sr-only">
+  RSpice is a keyboard-operable engineering application. Use Tab to move through controls,
+  Shift plus F10 for the focused schematic context menu, Escape to cancel the active tool,
+  and the command palette to find any command by name.
+</p>
+<div id="rspice_semantic_context" class="rspice-sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 <div id="rspice_loading" role="status" aria-live="polite" aria-atomic="true">
   <div class="tile" aria-hidden="true">
     <svg viewBox="0 0 96 96">
-      <g fill="#17181A" stroke="#17181A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M 31 20 L 31 76 L 77 48 Z"></path>
-        <path d="M 9 34 H 30" fill="none"></path>
-        <path d="M 9 62 H 30" fill="none"></path>
-        <path d="M 77 48 H 87" fill="none"></path>
+      <g transform="translate(2.88 2.88) scale(0.94)">
+      <g fill="#868E94">
+        <rect x="13" y="28" width="17" height="8" rx="1.5"></rect>
+        <rect x="66" y="28" width="17" height="8" rx="1.5"></rect>
+        <rect x="13" y="44" width="17" height="8" rx="1.5"></rect>
+        <rect x="66" y="44" width="17" height="8" rx="1.5"></rect>
+        <rect x="13" y="60" width="17" height="8" rx="1.5"></rect>
+        <rect x="66" y="60" width="17" height="8" rx="1.5"></rect>
+      </g>
+      <path fill="#17181A" fill-rule="evenodd" d="M 28 24 A 4 4 0 0 1 32 20 H 42 A 6 6 0 0 0 54 20 H 64 A 4 4 0 0 1 68 24 V 72 A 4 4 0 0 1 64 76 H 32 A 4 4 0 0 1 28 72 Z"></path>
+      <circle cx="35" cy="29" r="3.2" fill="#E6E9EB"></circle>
       </g>
     </svg>
   </div>
@@ -64,6 +89,9 @@
 </div>
 <canvas
   id="rspice_canvas"
+  role="application"
+  tabindex="0"
+  aria-describedby="rspice_canvas_instructions rspice_semantic_context"
   aria-label="RSpice application canvas. Use the preceding control to enable spoken interaction feedback."
 >RSpice requires a browser with canvas and WebGPU support.</canvas>
 <script>
@@ -86,9 +114,11 @@
   // attribute so changing the setting never reloads or discards work.
   (() => {
     const attribute = "data-rspice-spoken-feedback";
+    const contextMenuAttribute = "data-rspice-context-menu-request";
     const storageKey = "rspice.web.spoken-feedback";
     const root = document.documentElement;
     const button = document.getElementById("rspice_spoken_feedback");
+    const canvas = document.getElementById("rspice_canvas");
 
     function enabledFromAttribute() {
       return root.getAttribute(attribute) === "true";
@@ -127,39 +157,47 @@
       // consume the updated attribute without a destructive page reload.
       window.dispatchEvent(new Event("resize"));
     });
+
+    // Chromium reserves Shift+F10 for its native context-menu gesture before
+    // every WebAssembly keyboard backend reports a usable F10 key. Publish a
+    // one-shot request while leaving the event available to eframe; Rust
+    // consumes the attribute only when the schematic canvas owns focus and
+    // resolves the selected object through the same keyboard target path as
+    // native builds.
+    canvas.addEventListener("keydown", (event) => {
+      if (event.shiftKey && (event.key === "F10" || event.code === "F10")) {
+        root.setAttribute(contextMenuAttribute, "true");
+        event.preventDefault();
+      }
+    });
   })();
 </script>
 <script type="module">
   // Release assembly replaces this token with a content-addressed directory
   // containing the worker, wasm-bindgen module, and Wasm binary. Development
   // serving keeps the source-tree layout and uses one fresh page identity.
-  const RELEASE_ASSET_ROOT = "./assets/1c5a9929c5180aed7b7a8b7ff564c41400b26e67bd4b3d1a31e0bc929c907d05";
+  const RELEASE_ASSET_ROOT = "/ide/assets/e3abc387f99a4251761e33a15931f0449f26119eedfec40c69934a9459e26837";
   const IS_RELEASE = !RELEASE_ASSET_ROOT.startsWith("__RSPICE_");
   const DEVELOPMENT_ASSET_VERSION = `dev-${Date.now()}`;
 
   function executableAsset(name) {
     const path = IS_RELEASE
       ? `${RELEASE_ASSET_ROOT}/${name}`
-      : name === "simulation-worker.js"
-        ? "./simulation-worker.js"
+      : name === "simulation-worker.js" || name === "automation-worker.js" || name === "wasm-loader.js"
+        ? `./${name}`
         : `./pkg/${name}`;
-    const url = new URL(path, import.meta.url);
+    // The OIDC callback may load this same entrypoint at a nested route. All
+    // release and development assets are origin-rooted so that callback paths
+    // cannot redirect executable fetches into a nonexistent route-relative
+    // directory. Browser deployments are intentionally origin-scoped.
+    const url = new URL(path, `${location.origin}/`);
     if (!IS_RELEASE) {
       url.searchParams.set("v", DEVELOPMENT_ASSET_VERSION);
     }
     return url;
   }
 
-  async function loadCompressedWasm() {
-    const response = await fetch(executableAsset("rspice-ui_bg.wasm.gz"));
-    if (!response.ok || !response.body) {
-      throw new Error(`Failed to fetch compressed RSpice module (${response.status}).`);
-    }
-    const stream = response.body.pipeThrough(new DecompressionStream("gzip"));
-    return new Response(stream).arrayBuffer();
-  }
-
-  function showStartupError(message) {
+  function showStartupError(message, hint = "A WebGPU-capable browser (current Chrome/Edge) is required.") {
     const el = document.getElementById("rspice_loading");
     if (!el) {
       return;
@@ -169,7 +207,7 @@
     el.replaceChildren();
     for (const text of [
       message,
-      "A WebGPU-capable browser (current Chrome/Edge) is required.",
+      hint,
     ]) {
       const paragraph = document.createElement("p");
       paragraph.className = "err";
@@ -183,16 +221,22 @@
   }
 
   function recordWorkerStartupError(message) {
+    window.__RSPICE_SIM_WORKER_READY = false;
     window.__RSPICE_SIM_WORKER_ERROR = message;
+    window.__RSPICE_WASM_JIT_CAPABILITY = null;
+    document.documentElement.removeAttribute("data-rspice-wasm-jit-solver-result");
+    document.documentElement.setAttribute("data-rspice-wasm-jit-status", "error");
   }
 
   function reportSimulationWorkerStartupError(error) {
     const message = `RSpice simulation worker failed: ${errorMessage(error)}`;
     recordWorkerStartupError(message);
-    showStartupError(message);
+    showStartupError(message, "Retry engine startup from the application status bar. Reload the application if its files could not be loaded.");
   }
 
   function installSimulationWorker() {
+    window.__RSPICE_SIM_WORKER_READY = false;
+    window.__RSPICE_SIM_WORKER_ERROR = null;
     try {
       const workerUrl = executableAsset("simulation-worker.js");
       // Retain the exact page-bound URL even after an abort/error terminates
@@ -203,17 +247,49 @@
         { type: "module" },
       );
       worker.addEventListener("error", (event) => {
+        if (window.__RSPICE_SIM_WORKER !== worker) return;
         reportSimulationWorkerStartupError(
           event.message || "Browser simulation worker failed to load.",
         );
       });
       worker.addEventListener("messageerror", () => {
+        if (window.__RSPICE_SIM_WORKER !== worker) return;
         reportSimulationWorkerStartupError(
           "Browser simulation worker returned an unreadable startup message.",
         );
       });
       worker.addEventListener("message", (event) => {
+        if (window.__RSPICE_SIM_WORKER !== worker) return;
         const message = event.data || {};
+        if (message.type === "ready") {
+          window.__RSPICE_SIM_WORKER_READY = true;
+          window.__RSPICE_SIM_WORKER_ERROR = null;
+          window.__RSPICE_WASM_JIT_CAPABILITY = message.wasmJit || {
+            available: false,
+            reason: "Simulation worker omitted its WASM JIT capability report.",
+          };
+          const capability = window.__RSPICE_WASM_JIT_CAPABILITY;
+          document.documentElement.setAttribute(
+            "data-rspice-wasm-jit-status",
+            capability.available ? "qualified" : "rejected",
+          );
+          if (Number.isFinite(capability.solverResult)) {
+            document.documentElement.setAttribute(
+              "data-rspice-wasm-jit-solver-result",
+              String(capability.solverResult),
+            );
+          }
+          if (window.__RSPICE_WASM_JIT_CAPABILITY.available) {
+            console.info(
+              `RSpice WASM JIT architecture qualified ${JSON.stringify(window.__RSPICE_WASM_JIT_CAPABILITY)}`,
+            );
+          } else {
+            console.warn(
+              "RSpice WASM JIT architecture unavailable",
+              window.__RSPICE_WASM_JIT_CAPABILITY.reason,
+            );
+          }
+        }
         if (message.type === "error" && (!message.id || message.id === 0)) {
           reportSimulationWorkerStartupError(
             message.error || message.message || "Browser simulation worker failed to initialize.",
@@ -224,17 +300,53 @@
     } catch (error) {
       const message = `Failed to start the RSpice simulation worker: ${errorMessage(error)}`;
       recordWorkerStartupError(message);
-      showStartupError(message);
+      showStartupError(message, "Retry engine startup from the application status bar. Reload the application if its files could not be loaded.");
       console.error(error);
     }
   }
 
+  // The Python runtime starts on demand; its URL stays bound to this page's assets.
+  window.__RSPICE_AUTOMATION_WORKER_URL = executableAsset("automation-worker.js").href;
   installSimulationWorker();
 
-  import(executableAsset("rspice-ui.js").href)
-    .then(async ({ default: init }) =>
-      init({ module_or_path: await loadCompressedWasm() }),
-    )
+  // Give the canvas its real backing store before eframe's first paint.
+  //
+  // A canvas whose width/height attributes were never set keeps the 300x150
+  // default while its CSS box is already full size. eframe normally corrects
+  // that from its ResizeObserver, but in a tab that is not being composited the
+  // observer cannot take the runner lock during startup ("failed to lock
+  // runner"), so the first paint reaches egui-wgpu against a surface that was
+  // never allocated and panics: "Tried to update a texture that has not been
+  // allocated yet". The instance is dead after that — it keeps its last frame
+  // and silently drops every click and keystroke, so it reads as a frozen app
+  // rather than a crash. Loading RSpice into a background tab is ordinary
+  // (middle click, a restored session), so this must not depend on the tab
+  // being visible.
+  //
+  // This runs after the dynamic import resolves, which is what makes it
+  // correct: at parse time the element has no laid-out size yet, and the usual
+  // retry — requestAnimationFrame — never fires in a tab that is not
+  // compositing. eframe still owns every resize after this one.
+  function sizeCanvasForFirstPaint() {
+    const canvas = document.getElementById("rspice_canvas");
+    if (!canvas || canvas.clientWidth <= 0 || canvas.clientHeight <= 0) {
+      return;
+    }
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = Math.round(canvas.clientWidth * ratio);
+    canvas.height = Math.round(canvas.clientHeight * ratio);
+  }
+
+  const wasmModule = executableAsset(IS_RELEASE ? "rspice-ui_bg.wasm.gz" : "rspice-ui_bg.wasm");
+  Promise.all([
+    import(executableAsset("rspice-ui.js").href),
+    import(executableAsset("wasm-loader.js").href),
+  ])
+    .then(async ([{ default: init }, { loadWasm }]) => {
+      const module_or_path = await loadWasm(wasmModule);
+      sizeCanvasForFirstPaint();
+      return init({ module_or_path });
+    })
     .catch((e) => {
       showStartupError(`Failed to load the RSpice module: ${errorMessage(e)}`);
       console.error(e);

@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071015">
+  <meta name="color-scheme" content="dark">
+  <title>Simulation setup &mdash; RSpice</title>
+  <meta name="description" content="Set up an RSpice simulation: the simulation plan, the analyses the application offers, the setup pages, the stimulus library, and checking and running a plan.">
+  <link rel="canonical" href="https://rspice.app/docs/simulation-setup">
+  <link rel="icon" href="../assets/brand/rspice.ico" sizes="any">
+  <link rel="apple-touch-icon" href="../assets/brand/icon-256.png">
+  <link rel="stylesheet" href="../assets/field.css">
+  <link rel="stylesheet" href="../assets/technical.css">
+  <link rel="stylesheet" href="../assets/interior-refined.css">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Simulation setup &mdash; RSpice">
+  <meta property="og:description" content="Simulation plans, the analysis catalogue, setup pages, stimulus definitions, and checking and running a plan in RSpice.">
+  <meta property="og:image" content="https://rspice.app/assets/og.png">
+</head>
+<body class="technical-page docs-page">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="topbar" data-topbar>
+    <div class="topbar__inner">
+      <a class="identity" href="../index.html" aria-label="RSpice home"><img src="../assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a>
+      <button class="nav-trigger" type="button" aria-controls="site-nav" aria-expanded="false" data-nav-trigger><span class="visually-hidden">Open navigation</span><span aria-hidden="true"></span><span aria-hidden="true"></span></button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary navigation" data-site-nav>
+        <a href="../index.html#engine">Engine</a><a href="../index.html#analyses">Analyses</a><a href="../index.html#truth">Status</a><a href="../reference.html">Reference</a><a href="../validation.html">Validation</a><a href="../docs.html" aria-current="page">Docs</a>
+      </nav>
+      <div class="topbar__actions"><a class="source-link" href="https://github.com/JaimeHW/RSpice" target="_blank" rel="noopener">Source <span aria-hidden="true">&nearr;</span></a><a class="launch-link" href="../ide/">Open WASM lab <span class="launch-link__tag">experimental</span></a></div>
+    </div>
+  </header>
+
+  <main id="main">
+    <header class="technical-hero">
+      <div class="page-frame technical-hero__grid">
+        <div>
+          <p class="eyebrow"><a href="../docs.html">RSPICE / DOCS</a> / SIMULATION SETUP</p>
+          <h1>Simulation setup.</h1>
+          <p class="technical-hero__lede">Tell RSpice what to compute: the analyses in the simulation plan, the sources that drive the circuit, the outputs to keep, the sweeps to run, and the solver options. Then check the plan and run it.</p>
+        </div>
+        <dl class="technical-hero__ledger" aria-label="Simulation setup at a glance">
+          <div><dt>WORKSPACE</dt><dd>Simulate, <kbd>Alt+3</kbd></dd></div>
+          <div><dt>ADD</dt><dd>Simulate &rsaquo; Add analysis&hellip;</dd></div>
+          <div><dt>RUN</dt><dd><kbd>F5</kbd>; <kbd>Ctrl+Enter</kbd> in the browser</dd></div>
+          <div><dt>STOP</dt><dd><kbd>Shift+F5</kbd>; <kbd>Ctrl+Shift+Enter</kbd> in the browser</dd></div>
+        </dl>
+      </div>
+    </header>
+
+    <div class="page-frame technical-layout">
+      <aside class="technical-index" aria-label="Simulation setup sections">
+        <p>ON THIS PAGE</p>
+        <a href="#plan">The simulation plan</a><a href="#analyses">Analyses</a><a href="#setup">Setup pages</a><a href="#stimulus">Stimulus library</a><a href="#run">Check and run</a><a href="#annotate">Probes and annotation</a>
+      </aside>
+
+      <article class="technical-document">
+        <section class="technical-section" id="plan">
+          <p class="technical-number">01 / THE SIMULATION PLAN</p>
+          <h2>A plan is the ordered list of what to compute.</h2>
+          <p>Each project has an active simulation plan: its analyses in order, with the variables, outputs, specifications, run set, model choices, solver options and save policy that go with them. The Simulate workspace (<kbd>Alt+3</kbd>) edits the active plan, one setup page at a time.</p>
+          <p><strong>Simulate &rsaquo; Manage simulation plans&hellip;</strong> keeps several plans in one project: create, activate, rename, clone, compare, archive and restore them, export one as a package or import one, and queue a campaign over several. Archiving a plan never changes the results already recorded against it.</p>
+        </section>
+
+        <section class="technical-section" id="analyses">
+          <p class="technical-number">02 / ANALYSES</p>
+          <h2>The analyses the application offers.</h2>
+          <p><strong>Simulate &rsaquo; Add analysis&hellip;</strong> opens the <strong>Add analysis or workflow</strong> catalogue. It lists every analysis below, grouped as here and searchable by name or code, and each row says how it stands against the current plan, for example that an instance is already in it. Choosing a row adds an instance to the plan; a plan can hold more than one instance of a kind.</p>
+          <div class="technical-table-wrap"><table class="technical-table"><thead><tr><th scope="col">ANALYSIS</th><th scope="col">CODE</th><th scope="col">WHAT IT COMPUTES</th></tr></thead>
+            <tbody><tr><th scope="rowgroup" colspan="3">CORE ANALYSES</th></tr>
+            <tr><td>Operating point</td><td><code>OP</code></td><td>The DC bias solution and each device's operating point.</td></tr>
+            <tr><td>Transient</td><td><code>TRAN</code></td><td>The time-domain response, with adaptive timestep, an output start time and initial-condition control.</td></tr>
+            <tr><td>AC response</td><td><code>AC</code></td><td>The small-signal frequency response over a swept band.</td></tr>
+            <tr><td>AC frequency table</td><td><code>ACTAB</code></td><td>The same response at exactly the frequencies a table lists.</td></tr>
+            <tr><td>DC sweep</td><td><code>DC</code></td><td>One bias source swept, or two nested.</td></tr>
+            <tr><td>Noise</td><td><code>NOISE</code></td><td>Input- and output-referred noise, integrated over a band, with the contributors ranked.</td></tr></tbody>
+            <tbody><tr><th scope="rowgroup" colspan="3">TRANSFER &amp; LINEARIZATION</th></tr>
+            <tr><td>Pole-zero</td><td><code>PZ</code></td><td>Poles and zeros of the linearized circuit.</td></tr>
+            <tr><td>Sensitivity</td><td><code>SENS</code></td><td>Derivatives of one output with respect to device, model and design parameters, at the operating point or across an AC sweep.</td></tr>
+            <tr><td>Loop stability</td><td><code>STB</code></td><td>Loop gain, gain margin and phase margin.</td></tr>
+            <tr><td>Transfer function</td><td><code>XF</code></td><td>DC transfer gain with input and output resistance.</td></tr></tbody>
+            <tbody><tr><th scope="rowgroup" colspan="3">RF &amp; PERIODIC SOLVERS</th></tr>
+            <tr><td>Periodic steady state</td><td><code>PSS</code></td><td>A periodic operating point by shooting Newton, driven or autonomous.</td></tr>
+            <tr><td>Quasi-periodic steady state <span class="technical-pill technical-pill--future">PREVIEW</span></td><td><code>QPSS</code></td><td>A steady state on several incommensurate tones.</td></tr>
+            <tr><td>Harmonic balance</td><td><code>HB</code></td><td>A single- or multi-tone nonlinear solution in the frequency domain.</td></tr>
+            <tr><td>S-parameters</td><td><code>SP</code></td><td>Multiport network response at a reference impedance, with Touchstone export.</td></tr>
+            <tr><td>Large-signal S-parameters <span class="technical-pill technical-pill--future">PREVIEW</span></td><td><code>HBSP</code></td><td>Small-signal network response around a harmonic-balance solution.</td></tr>
+            <tr><td>Harmonic-balance noise <span class="technical-pill technical-pill--future">PREVIEW</span></td><td><code>HBNOISE</code></td><td>Noise around a harmonic-balance solution, with folding and contributors.</td></tr>
+            <tr><td>Envelope <span class="technical-pill technical-pill--future">PREVIEW</span></td><td><code>ENV</code></td><td>The slow modulation envelope over a periodic carrier.</td></tr></tbody>
+            <tbody><tr><th scope="rowgroup" colspan="3">PERIODIC SMALL-SIGNAL</th></tr>
+            <tr><td>Periodic AC</td><td><code>PAC</code></td><td>Frequency-translated small-signal response around a periodic solution.</td></tr>
+            <tr><td>Periodic noise</td><td><code>PNOISE</code></td><td>Cyclostationary noise and noise folding around a periodic operating point.</td></tr>
+            <tr><td>Periodic transfer</td><td><code>PXF</code></td><td>Frequency-conversion paths and sideband transfer around a PSS.</td></tr>
+            <tr><td>Periodic stability</td><td><code>PSTB</code></td><td>Floquet and sideband stability around a periodic solution.</td></tr>
+            <tr><td>Periodic S-parameters <span class="technical-pill technical-pill--future">PREVIEW</span></td><td><code>PSP</code></td><td>Frequency-translated multiport response around a periodic steady state.</td></tr></tbody>
+            <tbody><tr><th scope="rowgroup" colspan="3">QUASI-PERIODIC SMALL-SIGNAL</th></tr>
+            <tr><td>Quasi-periodic AC <span class="technical-pill technical-pill--future">PREVIEW</span></td><td><code>QPAC</code></td><td>The small-signal conversion matrix around a QPSS solution.</td></tr>
+            <tr><td>Quasi-periodic noise <span class="technical-pill technical-pill--future">PREVIEW</span></td><td><code>QPNOISE</code></td><td>Noise folding and correlation across the tones of a QPSS solution.</td></tr>
+            <tr><td>Quasi-periodic transfer <span class="technical-pill technical-pill--future">PREVIEW</span></td><td><code>QPXF</code></td><td>Translated transfer paths between input and output mixing products.</td></tr></tbody>
+            <tbody><tr><th scope="rowgroup" colspan="3">TIME-DOMAIN STOCHASTIC</th></tr>
+            <tr><td>Transient noise <span class="technical-pill technical-pill--future">PREVIEW</span></td><td><code>TNOISE</code></td><td>Device noise simulated in the time domain, reproducibly.</td></tr></tbody>
+            <tbody><tr><th scope="rowgroup" colspan="3">SWEEPS &amp; VARIATION</th></tr>
+            <tr><td>Monte Carlo</td><td><code>MC</code></td><td>Sampled parameter variation about the nominal design, under one distribution, spread and seed.</td></tr>
+            <tr><td>Temperature sweep</td><td><code>TEMP</code></td><td>A range or list of temperatures over a chosen base analysis.</td></tr>
+            <tr><td>Process corners</td><td><code>CORNER</code></td><td>Model sections crossed with supply and temperature.</td></tr>
+            <tr><td>DC mismatch contribution <span class="technical-pill technical-pill--future">PREVIEW</span></td><td><code>DCMATCH</code></td><td>Local mismatch variance, its contributors and sigma estimates around an operating point.</td></tr></tbody>
+            <tbody><tr><th scope="rowgroup" colspan="3">MEASUREMENTS</th></tr>
+            <tr><td>Fourier measurements</td><td><code>FOUR</code></td><td>Fundamental and harmonic magnitudes, with total harmonic distortion, from a transient.</td></tr>
+            <tr><td>FFT spectrum</td><td><code>FFT</code></td><td>The windowed spectrum of one transient output, computed inside that transient and recorded with the run.</td></tr>
+            <tr><td>Distortion compatibility</td><td><code>DISTO</code></td><td>Second- and third-order Volterra distortion from <code>DISTOF1</code> and <code>DISTOF2</code> source excitations.</td></tr></tbody>
+            <tbody><tr><th scope="rowgroup" colspan="3">VERIFICATION CHECKS</th></tr>
+            <tr><td>Safe operating area</td><td><code>SOA</code></td><td>Terminal-voltage limit checks on MOS, JFET, MESFET and BJT devices; the results open in <a href="verification.html#soa">Verify</a>.</td></tr></tbody>
+            <tbody><tr><th scope="rowgroup" colspan="3">OPTIMIZATION WORKFLOW</th></tr>
+            <tr><td>Optimization</td><td><code>OPT</code></td><td>Bounded variables driven against one objective, with a choice of algorithm and a stated convergence rule.</td></tr></tbody>
+          </table></div>
+          <p>Some analyses build on another's solution: AC and the AC frequency table, noise, pole-zero, sensitivity, loop stability, transfer function, PSS, QPSS, harmonic balance, S-parameters and DC mismatch on an operating point; the periodic small-signal analyses on a PSS; large-signal S-parameters and harmonic-balance noise on harmonic balance; the quasi-periodic small-signal analyses on a QPSS; Fourier, FFT and transient noise on a transient; distortion on an AC response.</p>
+          <div class="technical-callout"><strong>PREVIEW</strong><span>The catalogue marks the analyses tagged above as a preview engine, non-sign-off. They produce real results and are never hidden, but those results are stamped so they cannot be carried into a sign-off package as production results.</span></div>
+        </section>
+
+        <section class="technical-section" id="setup">
+          <p class="technical-number">03 / SETUP PAGES</p>
+          <h2>One page per concern of the plan.</h2>
+          <p><strong>Simulate &rsaquo; Setup</strong> opens each page of the Simulate workspace.</p>
+          <div class="technical-table-wrap"><table class="technical-table"><thead><tr><th scope="col">PAGE</th><th scope="col">WHAT IT HOLDS</th></tr></thead><tbody>
+            <tr><td>Analyses</td><td>The plan's analyses, in order.</td></tr>
+            <tr><td>Excitations</td><td>Every source and RF port that drives the circuit, across the whole hierarchy, and which analyses read each. Sources are edited on the schematic; a row takes you to its instance.</td></tr>
+            <tr><td>Design variables</td><td>The typed parameters the plan resolves.</td></tr>
+            <tr><td>Outputs &amp; expressions</td><td>The expressions a run saves, each with whether it resolves against the design, so a name the design lacks is caught before a run.</td></tr>
+            <tr><td>Requirements &amp; specifications</td><td>The limits results are judged against, and any limit whose measurement no analysis produces.</td></tr>
+            <tr><td>PVT, sweeps &amp; variation</td><td>The run space: process, voltage and temperature axes, sweeps and variation, and the number of runs they multiply out to.</td></tr>
+            <tr><td>Models &amp; sections</td><td>The loaded model libraries, the corner section a run will use from each, and whether each source is pinned well enough to reproduce.</td></tr>
+            <tr><td>Simulator options</td><td>Convergence tolerances, how the solve recovers when it does not converge, iteration limits, timestep control, matrix factoring and model temperature, written into the deck's <code>.OPTIONS</code>.</td></tr>
+            <tr><td>Save, streaming &amp; retention policy</td><td>What a run keeps, how results arrive while it runs, and what that costs.</td></tr>
+          </tbody></table></div>
+          <p><strong>Setup &rsaquo; Configuration sets&hellip;</strong> opens the project's configuration page, the hierarchy editor that decides which view each instance netlists with.</p>
+        </section>
+
+        <section class="technical-section" id="stimulus">
+          <p class="technical-number">04 / STIMULUS LIBRARY</p>
+          <h2>Reusable source definitions.</h2>
+          <p>The Stimulus library workspace (<kbd>Alt+8</kbd>, or <strong>Simulate &rsaquo; Setup &rsaquo; Stimulus library</strong>) holds the project's stimulus definitions: a waveform written once and used by many sources. A definition is written there or saved from a placed source's properties. The library plots the waveform with the engine's own evaluator and shows the SPICE card it produces, and it can place a source that carries the definition's saved revision. When placed sources use an older revision of a definition, the library says how many.</p>
+        </section>
+
+        <section class="technical-section" id="run">
+          <p class="technical-number">05 / CHECK AND RUN</p>
+          <h2>Nothing runs that would be refused.</h2>
+          <ul class="technical-list">
+            <li><span><strong>Simulate &rsaquo; Check and netlist</strong> runs the checks a run would, then has the engine build every deck the run would dispatch, without solving. What it finds is listed in <strong>View &rsaquo; Problems</strong>.</span></li>
+            <li><span><strong>Simulate &rsaquo; Run</strong> (<kbd>F5</kbd>; <kbd>Ctrl+Enter</kbd> in the browser) runs the plan. It is checked first: an analysis that cannot run on this circuit is refused before any solving, naming the analysis, the instance and the reason. <strong>Stop</strong> (<kbd>Shift+F5</kbd>; <kbd>Ctrl+Shift+Enter</kbd> in the browser) ends the run.</span></li>
+            <li><span><strong>Open generated netlist</strong> (<kbd>Ctrl+L</kbd>; <kbd>Ctrl+Alt+L</kbd> in the browser) shows the SPICE deck the design produces, read-only and mapped back to the schematic, in the Netlist and script editor.</span></li>
+            <li><span><strong>Run history&hellip;</strong> lists the running and retained runs with their manifests.</span></li>
+          </ul>
+          <p>A finished run's data opens in the <a href="results.html">Results</a> workspace. When a run is refused, <a href="troubleshooting.html#refused">Troubleshooting</a> explains where to look.</p>
+        </section>
+
+        <section class="technical-section" id="annotate">
+          <p class="technical-number">06 / PROBES AND ANNOTATION</p>
+          <h2>Mark signals on the schematic, and read values back onto it.</h2>
+          <ul class="technical-list">
+            <li><span><strong>Simulate &rsaquo; Probe</strong> (<kbd>P</kbd>) places a voltage or current probe flag on the schematic; the flag records the output it measures.</span></li>
+            <li><span><strong>Annotate DC operating point</strong> shows or hides the DC operating point on the schematic, and <strong>Operating-point table</strong> lists it.</span></li>
+            <li><span><strong>Annotate transient voltages</strong> shows or hides the transient's node voltages at results cursor A on the schematic.</span></li>
+          </ul>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="page-frame footer__grid">
+      <div class="footer__identity"><a class="identity" href="../index.html"><img src="../assets/brand/logo.svg" width="31" height="31" alt=""><span>RSpice</span></a><p>Rust circuit simulator with desktop, CLI, Python, and WebAssembly interfaces.</p></div>
+      <div><h2>Technical</h2><a href="../reference.html">Generated reference</a><a href="../validation.html">Validation status</a><a href="../parity.html">Methodology</a><a href="../docs.html">Scope and builds</a></div>
+      <div><h2>Project</h2><a href="../changelog.html">Development record</a><a href="../download.html">Build from source</a><a href="../early-access.html">Early access</a><a href="../privacy.html">Privacy</a></div>
+      <div><h2>Contact</h2><a href="mailto:hello@rspice.app">General</a><a href="mailto:sales@rspice.app">Commercial</a><a href="https://github.com/JaimeHW/RSpice-Site/security" target="_blank" rel="noopener">Security</a></div>
+    </div>
+    <div class="page-frame footer__base"><span>&copy; <span data-year>2026</span> RSpice</span><span>SOURCE BUILD / HOSTED SERVICES NOT ACTIVE</span><span>IBM Plex under SIL OFL</span></div>
+  </footer>
+  <script src="../assets/field.js" defer></script>
+</body>
+</html>

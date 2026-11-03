@@ -61,7 +61,7 @@
           <h2>Source is the current native distribution.</h2>
           <p>The public repository contains the engine, interfaces, models, and tests. A checkout identifies its exact implementation revision; signed packages and supported-platform matrices are not yet published.</p>
           <div class="technical-grid technical-grid--three">
-            <article><span><span class="technical-pill">AVAILABLE</span></span><h3>Rust source</h3><p>The public repository provides the engine, CLI, UI, Python bindings, WASM bindings, and test material.</p></article>
+            <article><span><span class="technical-pill">AVAILABLE</span></span><h3>Rust source</h3><p>The public repository provides the engine, CLI, desktop and browser application, and test material.</p></article>
             <article><span><span class="technical-pill technical-pill--warning">EXPERIMENTAL</span></span><h3>Web lab</h3><p>The browser route is a constrained, client-side evaluation target rather than a hosted compute service.</p></article>
             <article><span><span class="technical-pill technical-pill--future">NOT AVAILABLE</span></span><h3>Commercial delivery</h3><p>There are no signed installers, entitlements, billing accounts, hosted projects, or published support terms.</p></article>
           </div>
@@ -76,16 +76,16 @@ cd RSpice
 cargo build --release -p rspice-cli
 target/release/rspice run example.sp</code></pre></figure>
           <figure class="technical-code"><figcaption><span>shell / desktop UI</span><span>native graphical path</span></figcaption><pre><code>cd RSpice
-cargo run --release -p rspice-ui</code></pre></figure>
+cargo run --release -p rspice-app</code></pre></figure>
           <div class="technical-callout"><strong>DEVELOPMENT BUILD</strong><span>No released installer, platform support window, or commercial qualification accompanies the current source build. Validate the revision and model path against your own reference cases.</span></div>
         </section>
 
         <section class="technical-section" id="browser">
           <p class="technical-number">03 / BROWSER PREVIEW</p>
-          <h2>Browser path: summaries, DC, AC, and transient.</h2>
-          <p>The experimental lab runs the WebAssembly binding in the browser. It does not create accounts, synchronize projects, allocate managed runners, or expose every native analysis.</p>
+          <h2>Browser path: an experimental IDE.</h2>
+          <p>The experimental lab runs the desktop application compiled to WebAssembly, and needs a WebGPU-capable browser. It does not create accounts, synchronize projects, allocate managed runners, or expose every native analysis.</p>
           <ul class="technical-list">
-            <li><span><strong>Available:</strong> netlist summaries and client-side DC operating-point, AC, and transient result snapshots.</span></li>
+            <li><span><strong>Available:</strong> the desktop workbench, sharing its workbench state and command registry, running client-side.</span></li>
             <li><span><strong>Not available:</strong> parallel campaigns, managed storage, hosted runners, collaboration, or full parity with the native interfaces.</span></li>
             <li><span><strong>Data path:</strong> the current lab has no account or project-sync service.</span></li>
           </ul>

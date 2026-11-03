@@ -251,6 +251,15 @@
   line-height: 1;
 }
 
+.technical-list--steps { counter-reset: step; }
+.technical-list--steps li { counter-increment: step; }
+.technical-list--steps li::before {
+  content: counter(step, decimal-leading-zero);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  line-height: 1.9;
+}
+
 .technical-table-wrap {
   margin-top: 24px;
   overflow-x: auto;
@@ -286,6 +295,23 @@
 
 .technical-table tbody tr:last-child td { border-bottom: 0; }
 .technical-table td:first-child { color: var(--text); font-family: var(--mono); font-size: 12px; }
+
+.technical-document kbd {
+  display: inline-block;
+  padding: 0 6px;
+  border: 1px solid var(--line-soft);
+  background: rgba(216, 222, 226, 0.06);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.shortcut-table td:not(:first-child) { white-space: nowrap; }
+.shortcut-note,
+.shortcut-none { color: var(--dim); }
+.shortcut-note { font-family: var(--sans); font-size: 12px; }
 
 .technical-pill {
   display: inline-flex;
