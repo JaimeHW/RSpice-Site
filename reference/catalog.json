@@ -1185,10 +1185,10 @@
   "schema_version": 1,
   "source": {
     "repository": "https://github.com/JaimeHW/RSpice",
-    "revision": "d4294bdee99c8242519d7be287766097e4298b8e",
-    "revision_date": "2026-11-06T09:55:56-06:00",
+    "revision": "8a2f25f3f738ada0f0de50effa8f266ac2259216",
+    "revision_date": "2026-11-06T16:27:27-06:00",
     "rust_version": "1.94",
-    "short_revision": "d4294bdee99c",
+    "short_revision": "8a2f25f3f738",
     "version": "0.1.0"
   },
   "validation": {
@@ -1211,10 +1211,10 @@
       "source_revision": null
     },
     "ngspice_manifest": {
-      "entries": 49,
+      "entries": 50,
       "modes": {
         "locked_grid": 2,
-        "measures": 3,
+        "measures": 4,
         "reference_unsolvable": 1,
         "scripted_control": 23,
         "smoke": 20
