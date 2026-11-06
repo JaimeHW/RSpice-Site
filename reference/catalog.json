@@ -1185,10 +1185,10 @@
   "schema_version": 1,
   "source": {
     "repository": "https://github.com/JaimeHW/RSpice",
-    "revision": "0ff260da26a58f017fde271382c4318e22d556c9",
-    "revision_date": "2026-11-02T21:01:22-06:00",
+    "revision": "d4294bdee99c8242519d7be287766097e4298b8e",
+    "revision_date": "2026-11-06T09:55:56-06:00",
     "rust_version": "1.94",
-    "short_revision": "0ff260da26a5",
+    "short_revision": "d4294bdee99c",
     "version": "0.1.0"
   },
   "validation": {
